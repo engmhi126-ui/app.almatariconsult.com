@@ -3,88 +3,195 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>المطري كونسلت</title>
+  <title>المطري كونسلت | طلب زيارة</title>
   <style>
-    body{
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
       font-family: Tahoma, Arial, sans-serif;
-      background:#f5f7fb;
-      margin:0;
-      padding:0;
-      direction:rtl;
+      background: #f4f7fb;
+      color: #1f2937;
+      direction: rtl;
     }
-    .box{
-      max-width:500px;
-      margin:40px auto;
-      background:#fff;
-      padding:20px;
-      border-radius:12px;
-      box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+    .wrap {
+      max-width: 760px;
+      margin: 30px auto;
+      padding: 16px;
     }
-    h1{
-      text-align:center;
-      color:#1f3c88;
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px;
     }
-    label{
-      display:block;
-      margin-top:12px;
-      margin-bottom:6px;
-      font-weight:bold;
+
+    h1 {
+      text-align: center;
+      color: #0f2f57;
     }
-    input, textarea, button{
-      width:100%;
-      padding:12px;
-      border:1px solid #ccc;
-      border-radius:8px;
-      font-size:16px;
-      box-sizing:border-box;
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
-    textarea{
-      min-height:100px;
-      resize:vertical;
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
     }
-    button{
-      margin-top:18px;
-      background:#1f3c88;
-      color:#fff;
-      border:none;
-      cursor:pointer;
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-family: inherit;
     }
-    button:hover{
-      opacity:.9;
+
+    textarea {
+      min-height: 100px;
+    }
+
+    button {
+      background: #0f2f57;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .success {
+      display: block;
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .error {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    @media(max-width:640px){
+      .grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="box">
+
+<div class="wrap">
+  <div class="card">
     <h1>طلب زيارة إشراف</h1>
 
-    <label>الاسم</label>
-    <input type="text" id="name" />
+    <form id="form">
 
-    <label>رقم الجوال</label>
-    <input type="text" id="phone" />
+      <div class="grid">
+        <div>
+          <label>الاسم</label>
+          <input id="name" />
+        </div>
 
-    <label>المدينة</label>
-    <input type="text" id="city" />
+        <div>
+          <label>الجوال</label>
+          <input id="phone" />
+        </div>
 
-    <label>وصف الطلب</label>
-    <textarea id="description"></textarea>
+        <div>
+          <label>المدينة</label>
+          <input id="city" />
+        </div>
 
-    <button onclick="sendRequest()">إرسال الطلب</button>
+        <div>
+          <label>الحي</label>
+          <input id="district" />
+        </div>
+
+        <div>
+          <label>نوع العقار</label>
+          <select id="propertyType">
+            <option>فيلا</option>
+            <option>عمارة</option>
+            <option>محلات</option>
+          </select>
+        </div>
+
+        <div>
+          <label>نوع الزيارة</label>
+          <select id="visitType">
+            <option>قواعد</option>
+            <option>أعمدة</option>
+            <option>سقف</option>
+          </select>
+        </div>
+      </div>
+
+      <label>الوصف</label>
+      <textarea id="description"></textarea>
+
+      <button type="submit">إرسال الطلب</button>
+
+    </form>
+
+    <div id="msg" class="message"></div>
+
   </div>
+</div>
 
-  <script>
-    async function sendRequest() {
-      const data = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        city: document.getElementById('city').value,
-        description: document.getElementById('description').value
-      };
+<script>
 
-      alert("تم التقاط البيانات مبدئيًا");
-      console.log(data);
-    }
-  </script>
+const WEBHOOK = "https://n8n.srv1243842.hstgr.cloud/webhook/0e757524-0f31-4d37-99b0-89b515c9ce97";
+
+function el(id){ return document.getElementById(id); }
+
+function show(type,text){
+  const m = el("msg");
+  m.className = "message " + type;
+  m.innerText = text;
+}
+
+document.getElementById("form").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const data = {
+    name: el("name").value,
+    phone: el("phone").value,
+    city: el("city").value,
+    district: el("district").value,
+    propertyType: el("propertyType").value,
+    visitType: el("visitType").value,
+    description: el("description").value
+  };
+
+  try {
+    const res = await fetch(WEBHOOK,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(data)
+    });
+
+    show("success","تم إرسال الطلب بنجاح ✅");
+
+    document.getElementById("form").reset();
+
+  } catch(err){
+    show("error","حدث خطأ ❌ حاول مرة أخرى");
+  }
+
+});
+
+</script>
+
 </body>
 </html>
