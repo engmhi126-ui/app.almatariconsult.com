@@ -1,197 +1,926 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>المطري كونسلت | طلب زيارة</title>
-  <style>
-    * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050D18">
+<title>المطري كونسلت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    body {
-      margin: 0;
-      font-family: Tahoma, Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1f2937;
-      direction: rtl;
-    }
+<script>
+const CONFIG = {
+  SUPABASE_URL: 'https://xvqxhraqwuorhrncnurj.supabase.co',
+  SUPABASE_ANON_KEY: 'ضع_مفتاح_supabase_anon_هنا',
+  N8N_WEBHOOK_URL: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-request',
+  N8N_GET_REQUESTS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-my-requests',
+  N8N_REPORT_STATUS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-report-status'
+};
+</script>
 
-    .wrap {
-      max-width: 760px;
-      margin: 30px auto;
-      padding: 16px;
-    }
+<style>
+:root {
+  --bg:#050D18;
+  --bg2:#080F1C;
+  --surface:#0C1929;
+  --surface2:#0F2035;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --gold:#D4A843;
+  --gold2:#F0C060;
+  --gold-dim:rgba(212,168,67,0.15);
+  --blue:#2E7FE8;
+  --blue-dim:rgba(46,127,232,0.12);
+  --green:#34C97A;
+  --green-dim:rgba(52,201,122,0.12);
+  --red:#E85454;
+  --red-dim:rgba(232,84,84,0.12);
+  --text:#EEF2F8;
+  --text2:#8BA5C4;
+  --text3:#4A6A8A;
+  --radius:16px;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
 
-    .card {
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      padding: 24px;
-    }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body {
+  background:var(--bg);
+  font-family:'Cairo', -apple-system, sans-serif;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+input, textarea, select, button { font-family:inherit; }
+input:focus, textarea:focus, select:focus { outline:none; }
+img { max-width:100%; }
 
-    h1 {
-      text-align: center;
-      color: #0f2f57;
-    }
+#app {
+  display:flex; flex-direction:column;
+  height:100%; height:100dvh;
+  max-width:430px; margin:0 auto;
+  position:relative; overflow:hidden;
+  background:var(--bg);
+}
+#app::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(46,127,232,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46,127,232,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+#header {
+  background:rgba(8,15,28,0.95);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 16px;
+  height:58px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative; z-index:50;
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-mark {
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:900; color:#fff;
+  box-shadow:0 2px 12px rgba(212,168,67,.35), inset 0 1px 0 rgba(255,255,255,.2);
+}
+.logo-text .name { font-size:14px; font-weight:800; color:var(--text); line-height:1.2; }
+.logo-text .tag { font-size:10px; color:var(--gold); font-weight:600; }
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+.header-right { display:flex; align-items:center; gap:8px; }
+#user-pill {
+  display:none; align-items:center; gap:6px;
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:20px; padding:5px 12px;
+  font-size:12px; color:var(--blue); font-weight:600;
+}
+#logout-btn {
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--text3); font-size:14px; cursor:pointer;
+  padding:6px 10px; border-radius:8px; display:none;
+}
 
-    input, select, textarea, button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-family: inherit;
-    }
+#pages { flex:1; overflow:hidden; position:relative; z-index:1; }
+.page {
+  position:absolute; inset:0;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:20px 16px 100px;
+  opacity:0; pointer-events:none;
+  transform:translateY(12px);
+  transition:opacity .22s ease, transform .22s ease;
+}
+.page.active { opacity:1; pointer-events:all; transform:translateY(0); }
 
-    textarea {
-      min-height: 100px;
-    }
+#bottom-nav {
+  flex-shrink:0;
+  background:rgba(8,15,28,0.97);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  position:relative; z-index:50;
+  min-height:64px;
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:4px; cursor:pointer; border:none; background:none;
+  color:var(--text3); font-size:10px; font-weight:700;
+  transition:all .2s; padding:8px 4px;
+}
+.nav-item .nav-icon { font-size:22px; line-height:1; }
+.nav-item.active { color:var(--gold); }
 
-    button {
-      background: #0f2f57;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+.page-tag {
+  font-size:10px; color:var(--gold); font-weight:700;
+  letter-spacing:2.5px; margin-bottom:6px; text-align:center;
+}
+.page-title { font-size:24px; font-weight:900; text-align:center; }
+.page-sub { font-size:13px; color:var(--text2); text-align:center; margin-top:6px; line-height:1.6; }
+.page-head { margin-bottom:24px; }
 
-    .message {
-      display: none;
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-    }
+.card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px; margin-bottom:12px;
+}
+.field { margin-bottom:14px; }
+.label {
+  display:block; font-size:12px; font-weight:700;
+  color:var(--text2); margin-bottom:7px;
+}
+.req { color:var(--red); }
+input[type=text], input[type=tel], input[type=date], textarea, select {
+  width:100%;
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:13px 14px;
+  color:var(--text); font-size:15px; font-weight:600;
+  appearance:none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color:var(--blue) !important;
+  box-shadow:0 0 0 3px rgba(46,127,232,0.12);
+}
+textarea { resize:none; line-height:1.7; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
 
-    .success {
-      display: block;
-      background: #ecfdf5;
-      color: #065f46;
-    }
+.btn {
+  width:100%; padding:14px 20px; border-radius:13px;
+  font-size:15px; font-weight:800; cursor:pointer;
+  border:none; transition:all .18s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-gold {
+  background:linear-gradient(135deg, var(--gold), #9A6B12);
+  color:#fff;
+  box-shadow:0 4px 20px rgba(212,168,67,.3), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.btn-outline {
+  background:transparent;
+  color:var(--text2);
+  border:1.5px solid var(--border2);
+}
+.btn-green {
+  background:linear-gradient(135deg, #22B868, #148049);
+  color:#fff;
+}
+.btn:disabled { opacity:.45; cursor:not-allowed; }
 
-    .error {
-      display: block;
-      background: #fef2f2;
-      color: #991b1b;
-    }
+.upload-zone {
+  border:2px dashed var(--border2); border-radius:var(--radius);
+  padding:24px 16px; text-align:center;
+  background:var(--surface); cursor:pointer; margin-bottom:16px;
+}
+.upload-icon { font-size:32px; margin-bottom:8px; }
+.upload-label { font-size:13px; color:var(--text2); font-weight:600; }
+.upload-hint { font-size:11px; color:var(--text3); margin-top:4px; }
+#client-photo-input { display:none; }
+.photo-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px; }
+.photo-thumb {
+  aspect-ratio:1; border-radius:10px; overflow:hidden;
+  position:relative; background:var(--surface2);
+  border:1px solid var(--border);
+}
+.photo-thumb img { width:100%; height:100%; object-fit:cover; }
+.photo-thumb .del {
+  position:absolute; top:4px; left:4px;
+  background:rgba(0,0,0,.75); border:none; border-radius:50%;
+  width:24px; height:24px; color:#fff; font-size:11px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
 
-    @media(max-width:640px){
-      .grid { grid-template-columns:1fr; }
-    }
-  </style>
+.visit-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius); padding:16px; margin-bottom:10px;
+}
+.vc-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.vc-num { font-size:12px; font-weight:800; color:var(--gold); font-family:monospace; }
+.vc-client { font-size:15px; font-weight:700; margin-bottom:4px; }
+.vc-meta { font-size:12px; color:var(--text2); }
+
+.status-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 12px; border-radius:20px;
+  font-size:10px; font-weight:800;
+}
+.sp-new_request, .sp-new { background:rgba(46,127,232,.12); color:#7ABCFF; border:1px solid rgba(46,127,232,.25); }
+.sp-accepted { background:rgba(52,201,122,.12); color:#70EEA0; border:1px solid rgba(52,201,122,.25); }
+.sp-scheduled { background:rgba(46,127,232,.12); color:#90CAF9; border:1px solid rgba(46,127,232,.25); }
+.sp-analyzing { background:rgba(100,180,255,.1); color:#90D4FF; border:1px solid rgba(100,180,255,.2); }
+.sp-under_review, .sp-pending_review { background:rgba(180,120,255,.12); color:#C899FF; border:1px solid rgba(180,120,255,.25); }
+.sp-approved, .sp-sent, .sp-completed { background:rgba(52,201,122,.18); color:#50FF90; border:1px solid rgba(52,201,122,.35); }
+.sp-cancelled { background:rgba(232,84,84,.1); color:#FF8A8A; border:1px solid rgba(232,84,84,.2); }
+
+#loading {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(5,13,24,.9); backdrop-filter:blur(12px);
+  display:none; align-items:center; justify-content:center;
+  flex-direction:column; gap:16px;
+}
+#loading.show { display:flex; }
+.spinner {
+  width:44px; height:44px; border-radius:50%;
+  border:3px solid var(--surface2); border-top-color:var(--gold);
+  animation:spin .75s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { font-size:14px; color:var(--text2); font-weight:600; }
+
+#toast {
+  position:fixed; bottom:88px; left:50%; transform:translateX(-50%) translateY(16px);
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:12px; padding:11px 20px;
+  font-size:13px; font-weight:700; color:var(--text);
+  z-index:300; opacity:0; transition:all .28s;
+  white-space:nowrap; pointer-events:none;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.error { background:rgba(60,15,15,.95); border-color:rgba(232,84,84,.4); color:#FF9999; }
+#toast.success { background:rgba(10,30,20,.95); border-color:rgba(52,201,122,.4); color:#90EEC0; }
+
+#login-overlay {
+  position:fixed; inset:0; z-index:100;
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+}
+.login-box { width:100%; max-width:360px; }
+.login-logo { text-align:center; margin-bottom:36px; }
+.login-mark {
+  width:76px; height:76px; border-radius:22px;
+  background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
+  display:flex; align-items:center; justify-content:center;
+  font-size:34px; font-weight:900; color:#fff;
+  margin:0 auto 16px;
+}
+.login-title { font-size:24px; font-weight:900; margin-bottom:5px; }
+.login-sub { font-size:13px; color:var(--text2); font-weight:600; }
+.divider { height:1px; background:var(--border); margin:24px 0; }
+
+.role-btn {
+  width:100%; padding:16px 20px; border-radius:14px;
+  font-size:15px; font-weight:800; cursor:pointer;
+  border:1.5px solid var(--border); background:var(--surface);
+  color:var(--text); text-align:center;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:10px;
+}
+.role-icon { font-size:28px; }
+.role-info { text-align:right; }
+.role-title { font-size:15px; font-weight:800; }
+.role-sub { font-size:11px; color:var(--text2); margin-top:2px; font-weight:600; }
+
+.empty-state { text-align:center; padding:50px 20px; }
+.empty-icon { font-size:52px; margin-bottom:14px; opacity:.6; }
+.empty-title { font-size:17px; font-weight:800; margin-bottom:6px; color:var(--text2); }
+.empty-sub { font-size:13px; color:var(--text3); line-height:1.7; }
+
+@media (max-width:640px) {
+  .grid2 { grid-template-columns:1fr; }
+}
+</style>
 </head>
 <body>
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">جارٍ المعالجة...</div>
+</div>
 
-<div class="wrap">
-  <div class="card">
-    <h1>طلب زيارة إشراف</h1>
+<div id="toast"></div>
 
-    <form id="form">
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-mark">م</div>
+      <div class="login-title">المطري كونسلت</div>
+      <div class="login-sub">المستشار مؤتمن</div>
+    </div>
 
-      <div class="grid">
-        <div>
-          <label>الاسم</label>
-          <input id="name" />
+    <div id="login-role-select">
+      <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px;font-weight:600;letter-spacing:1px">اختر طريقة الدخول</div>
+      <button class="role-btn" onclick="showLoginForm()">
+        <span class="role-icon">🏠</span>
+        <div class="role-info">
+          <div class="role-title">صاحب عقار</div>
+          <div class="role-sub">طلب فحص هندسي جديد أو متابعة طلبك</div>
         </div>
+      </button>
+      <div class="divider"></div>
+      <div style="text-align:center;font-size:12px;color:var(--text3)">
+        للاستفسار: واتساب
+        <span style="color:var(--gold);font-weight:800">0538986031</span>
+      </div>
+    </div>
 
-        <div>
-          <label>الجوال</label>
-          <input id="phone" />
-        </div>
+    <div id="login-form-wrap" style="display:none">
+      <div style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center">🏠 دخول صاحب العقار</div>
 
-        <div>
-          <label>المدينة</label>
-          <input id="city" />
+      <div id="client-step-phone">
+        <div class="field">
+          <label class="label">رقم جوالك <span class="req">*</span></label>
+          <input type="tel" id="login-phone" placeholder="05XXXXXXXX" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
         </div>
-
-        <div>
-          <label>الحي</label>
-          <input id="district" />
-        </div>
-
-        <div>
-          <label>نوع العقار</label>
-          <select id="propertyType">
-            <option>فيلا</option>
-            <option>عمارة</option>
-            <option>محلات</option>
-          </select>
-        </div>
-
-        <div>
-          <label>نوع الزيارة</label>
-          <select id="visitType">
-            <option>قواعد</option>
-            <option>أعمدة</option>
-            <option>سقف</option>
-          </select>
-        </div>
+        <button class="btn btn-gold" onclick="checkClientPhone()">التالي ←</button>
+        <button class="btn btn-outline" onclick="backToRoles()" style="margin-top:8px">← رجوع</button>
       </div>
 
-      <label>الوصف</label>
-      <textarea id="description"></textarea>
+      <div id="client-step-existing" style="display:none">
+        <div style="text-align:center;padding:16px 0 20px">
+          <div style="font-size:40px;margin-bottom:10px">👋</div>
+          <div style="font-size:18px;font-weight:800;margin-bottom:4px">أهلاً بعودتك!</div>
+          <div style="font-size:13px;color:var(--text2)" id="existing-client-name">جارٍ التحميل...</div>
+        </div>
+        <button class="btn btn-gold" onclick="loginExistingClient()">دخول لحسابي ←</button>
+        <button class="btn btn-outline" onclick="resetClientStep()" style="margin-top:8px">← تغيير الرقم</button>
+      </div>
 
-      <button type="submit">إرسال الطلب</button>
-
-    </form>
-
-    <div id="msg" class="message"></div>
-
+      <div id="client-step-new" style="display:none">
+        <div style="background:var(--blue-dim);border:1px solid rgba(46,127,232,.3);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center">
+          <div style="font-size:13px;color:var(--text2)">رقم جديد — أكمل بياناتك لإنشاء حساب</div>
+        </div>
+        <div class="field">
+          <label class="label">اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="login-name-new" placeholder="محمد أحمد">
+        </div>
+        <div class="field">
+          <label class="label">المدينة</label>
+          <select id="login-city-new">
+            <option value="جازان">جازان</option>
+            <option value="أبو عريش">أبو عريش</option>
+            <option value="صبيا">صبيا</option>
+            <option value="العارضة">العارضة</option>
+            <option value="صامطة">صامطة</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" onclick="registerNewClient()">إنشاء حساب ←</button>
+        <button class="btn btn-outline" onclick="resetClientStep()" style="margin-top:8px">← رجوع</button>
+      </div>
+    </div>
   </div>
 </div>
 
+<div id="app">
+  <div id="header">
+    <div class="logo">
+      <div class="logo-mark">م</div>
+      <div class="logo-text">
+        <div class="name">المطري كونسلت</div>
+        <div class="tag">المستشار مؤتمن</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="user-pill"><span id="user-name-display"></span></div>
+      <button id="logout-btn" onclick="logout()">⏻</button>
+    </div>
+  </div>
+
+  <div id="pages">
+    <div class="page active" id="page-home">
+      <div class="page-head">
+        <div class="page-tag">نظام الفحص الهندسي</div>
+        <div class="page-title">طلب فحص العقار</div>
+        <div class="page-sub">أرسل طلبك ويتواصل معك المكتب</div>
+      </div>
+
+      <div id="client-form-wrap">
+        <div class="field">
+          <label class="label">اسمك الكامل <span class="req">*</span></label>
+          <input type="text" id="cf-name" placeholder="محمد العنزي">
+        </div>
+        <div class="field">
+          <label class="label">رقم الجوال <span class="req">*</span></label>
+          <input type="tel" id="cf-phone" placeholder="05XXXXXXXX" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+        <div class="grid2">
+          <div>
+            <label class="label">المدينة <span class="req">*</span></label>
+            <select id="cf-city">
+              <option value="">— اختر المدينة —</option>
+              <option>جازان</option>
+              <option>أبو عريش</option>
+              <option>صبيا</option>
+              <option>العارضة</option>
+              <option>صامطة</option>
+              <option>بيش</option>
+              <option>فيفا</option>
+              <option>الدرب</option>
+              <option>أحد المسارحة</option>
+              <option>الريث</option>
+              <option>أخرى</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">نوع العقار <span class="req">*</span></label>
+            <select id="cf-type">
+              <option value="فيلا">فيلا</option>
+              <option value="شقة">شقة</option>
+              <option value="تجاري">تجاري</option>
+              <option value="أرض">أرض</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">الحي <span class="req">*</span></label>
+          <input type="text" id="cf-district" placeholder="اسم الحي...">
+        </div>
+        <div class="grid2">
+          <div>
+            <label class="label">نوع الزيارة <span class="req">*</span></label>
+            <select id="cf-visit-type">
+              <option value="general_inspection">معاينة عامة</option>
+              <option value="foundations">قواعد</option>
+              <option value="columns">أعمدة</option>
+              <option value="roof">سقف</option>
+              <option value="finishing">تشطيبات</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">التاريخ المناسب <span class="req">*</span></label>
+            <input type="date" id="cf-date">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">الفترة المناسبة <span class="req">*</span></label>
+          <select id="cf-time">
+            <option value="">— اختر الفترة —</option>
+            <option value="08:00 ص - 12:00 م">صباحاً (8-12)</option>
+            <option value="04:00 م - 09:00 م">مساءً (4-9)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">وصف المشكلة أو الهدف <span class="req">*</span></label>
+          <textarea id="cf-desc" rows="4" placeholder="صف المشكلة أو هدف الفحص..."></textarea>
+        </div>
+
+        <div class="field">
+          <label class="label">صور المشكلة (اختياري)</label>
+          <div class="upload-zone" onclick="document.getElementById('client-photo-input').click()">
+            <div class="upload-icon">📎</div>
+            <div class="upload-label">اضغط لإضافة صور</div>
+            <div class="upload-hint">حتى 5 صور</div>
+          </div>
+          <input type="file" id="client-photo-input" accept="image/*" multiple onchange="handleClientPhotos(event)">
+          <div class="photo-grid" id="client-photos-grid"></div>
+        </div>
+
+        <button class="btn btn-gold" onclick="submitClientRequest()">إرسال الطلب ✉️</button>
+      </div>
+
+      <div id="client-success" style="display:none">
+        <div style="text-align:center;padding:24px 0">
+          <div style="font-size:64px;margin-bottom:12px">✅</div>
+          <div style="font-size:22px;font-weight:900;margin-bottom:6px">تم إرسال طلبك!</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:20px">
+            رقم طلبك: <strong style="color:var(--gold)" id="success-visit-num">MC-2026-XXXX</strong><br>
+            سيتواصل معك المكتب قريباً
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-gold" onclick="goToMyRequests()">📋 عرض طلباتي</button>
+            <button class="btn btn-outline" onclick="resetClientForm()">+ إرسال طلب جديد</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-my-requests">
+      <div class="page-head">
+        <div class="page-tag">طلباتي</div>
+        <div class="page-title">طلباتي السابقة</div>
+        <div class="page-sub">جميع طلبات الفحص الخاصة بك</div>
+      </div>
+      <div id="my-requests-list"></div>
+    </div>
+  </div>
+
+  <nav id="bottom-nav">
+    <button class="nav-item active" onclick="navTo('home',this)" id="nav-home">
+      <span class="nav-icon">🏠</span>
+      <span>طلب فحص</span>
+    </button>
+    <button class="nav-item" onclick="navTo('my-requests',this)" id="nav-my-requests">
+      <span class="nav-icon">📋</span>
+      <span>طلباتي</span>
+    </button>
+  </nav>
+</div>
+
 <script>
+const STATE = {
+  user: null,
+  clientPhotos: [],
+  pendingVisit: null
+};
 
-const WEBHOOK = "https://n8n.srv1243842.hstgr.cloud/webhook/0e757524-0f31-4d37-99b0-89b515c9ce97";
-
-function el(id){ return document.getElementById(id); }
-
-function show(type,text){
-  const m = el("msg");
-  m.className = "message " + type;
-  m.innerText = text;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  setTimeout(() => el.className = '', 2800);
 }
 
-document.getElementById("form").addEventListener("submit", async (e)=>{
-  e.preventDefault();
+function showLoading(txt='جارٍ المعالجة...') {
+  document.getElementById('loading-text').textContent = txt;
+  document.getElementById('loading').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loading').classList.remove('show');
+}
 
-  const data = {
-    name: el("name").value,
-    phone: el("phone").value,
-    city: el("city").value,
-    district: el("district").value,
-    propertyType: el("propertyType").value,
-    visitType: el("visitType").value,
-    description: el("description").value
+function navTo(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (page === 'my-requests') loadMyRequests();
+}
+
+function statusLabel(s) {
+  const m = {
+    new_request:'طلب جديد',
+    new:'طلب جديد',
+    accepted:'تم القبول',
+    scheduled:'مجدول',
+    analyzing:'جارٍ التحليل',
+    under_review:'قيد المراجعة',
+    pending_review:'قيد المراجعة',
+    approved:'التقرير جاهز',
+    sent:'تم الإرسال',
+    completed:'مكتمل',
+    cancelled:'ملغي'
   };
+  return m[s] || s;
+}
 
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' });
+}
+
+async function supaFetch(path, opts = {}) {
+  const url = CONFIG.SUPABASE_URL + '/rest/v1/' + path;
+  const res = await fetch(url, {
+    ...opts,
+    headers: {
+      'apikey': CONFIG.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+const dbGet = (table, query='') => supaFetch(table + '?' + query);
+const dbInsert = (table, body) => supaFetch(table, { method:'POST', body: JSON.stringify(body) });
+
+function showLoginForm() {
+  document.getElementById('login-role-select').style.display = 'none';
+  document.getElementById('login-form-wrap').style.display = 'block';
+  resetClientStep();
+}
+function backToRoles() {
+  document.getElementById('login-role-select').style.display = 'block';
+  document.getElementById('login-form-wrap').style.display = 'none';
+}
+function resetClientStep() {
+  document.getElementById('client-step-phone').style.display = 'block';
+  document.getElementById('client-step-existing').style.display = 'none';
+  document.getElementById('client-step-new').style.display = 'none';
+}
+
+let foundClient = null;
+
+async function checkClientPhone() {
+  const phone = document.getElementById('login-phone').value.trim();
+  if (!phone || phone.length < 9) {
+    toast('أدخل رقم الجوال بشكل صحيح', 'error');
+    return;
+  }
+  const cleanPhone = phone.replace(/^(\+966|966)/, '0');
+  showLoading('جارٍ البحث...');
   try {
-    const res = await fetch(WEBHOOK,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(data)
-    });
+    const existing = await dbGet('clients', `phone_hash=eq.${cleanPhone}&limit=1`);
+    hideLoading();
+    document.getElementById('client-step-phone').style.display = 'none';
+    if (existing && existing.length > 0) {
+      foundClient = existing[0];
+      document.getElementById('existing-client-name').textContent = (foundClient.name || 'عزيزي العميل') + ' — ' + cleanPhone;
+      document.getElementById('client-step-existing').style.display = 'block';
+    } else {
+      foundClient = null;
+      document.getElementById('client-step-new').style.display = 'block';
+    }
+  } catch (e) {
+    hideLoading();
+    toast('خطأ في البحث', 'error');
+  }
+}
 
-    show("success","تم إرسال الطلب بنجاح ✅");
+function loginExistingClient() {
+  if (!foundClient) return;
+  const phone = document.getElementById('login-phone').value.trim().replace(/^(\+966|966)/, '0');
+  STATE.user = {
+    id: foundClient.id,
+    name: foundClient.name || 'عزيزي العميل',
+    phone,
+    role: 'client'
+  };
+  onLoginSuccess();
+}
 
-    document.getElementById("form").reset();
+async function registerNewClient() {
+  const name = document.getElementById('login-name-new').value.trim();
+  const city = document.getElementById('login-city-new').value;
+  const phone = document.getElementById('login-phone').value.trim().replace(/^(\+966|966)/, '0');
 
-  } catch(err){
-    show("error","حدث خطأ ❌ حاول مرة أخرى");
+  if (!name) {
+    toast('أدخل اسمك الكامل', 'error');
+    return;
   }
 
-});
+  showLoading('جارٍ إنشاء حسابك...');
+  try {
+    const rec = await dbInsert('clients', {
+      name,
+      phone_hash: phone,
+      phone_last4: phone.slice(-4),
+      city
+    });
+    const clientId = Array.isArray(rec) ? rec[0]?.id : rec?.id;
+    hideLoading();
+    STATE.user = { id: clientId, name, phone, role:'client' };
+    onLoginSuccess();
+  } catch (e) {
+    hideLoading();
+    toast('خطأ في إنشاء الحساب', 'error');
+  }
+}
 
+function onLoginSuccess() {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('user-pill').style.display = 'flex';
+  document.getElementById('logout-btn').style.display = 'block';
+  document.getElementById('user-name-display').textContent = STATE.user.name;
+
+  document.getElementById('cf-name').value = STATE.user.name || '';
+  document.getElementById('cf-phone').value = STATE.user.phone || '';
+  toast('أهلًا ' + STATE.user.name + ' 👋', 'success');
+}
+
+function logout() {
+  STATE.user = null;
+  STATE.clientPhotos = [];
+  STATE.pendingVisit = null;
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('user-pill').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('login-role-select').style.display = 'block';
+  document.getElementById('login-form-wrap').style.display = 'none';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-home').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-home').classList.add('active');
+  toast('تم تسجيل الخروج', 'success');
+}
+
+function handleClientPhotos(e) {
+  const files = Array.from(e.target.files).slice(0, 5);
+  const grid = document.getElementById('client-photos-grid');
+  grid.innerHTML = '';
+  STATE.clientPhotos = files;
+  files.forEach((f, i) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const div = document.createElement('div');
+      div.className = 'photo-thumb';
+      div.innerHTML = `<img src="${ev.target.result}"><button class="del" onclick="removeClientPhoto(${i})">✕</button>`;
+      grid.appendChild(div);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function removeClientPhoto(i) {
+  STATE.clientPhotos.splice(i, 1);
+  document.getElementById('client-photo-input').value = '';
+  const grid = document.getElementById('client-photos-grid');
+  grid.innerHTML = '';
+  STATE.clientPhotos.forEach((f, idx) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const div = document.createElement('div');
+      div.className = 'photo-thumb';
+      div.innerHTML = `<img src="${ev.target.result}"><button class="del" onclick="removeClientPhoto(${idx})">✕</button>`;
+      grid.appendChild(div);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+async function submitClientRequest() {
+  const name = document.getElementById('cf-name').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  const city = document.getElementById('cf-city').value;
+  const district = document.getElementById('cf-district').value.trim();
+  const date = document.getElementById('cf-date').value;
+  const time = document.getElementById('cf-time').value;
+  const desc = document.getElementById('cf-desc').value.trim();
+  const propType = document.getElementById('cf-type').value;
+  const visitType = document.getElementById('cf-visit-type').value;
+
+  if (!STATE.user?.id) { toast('سجل الدخول أولًا', 'error'); return; }
+  if (!name) { toast('الاسم مطلوب', 'error'); return; }
+  if (!phone || phone.length < 9) { toast('رقم الجوال غير صالح', 'error'); return; }
+  if (!city) { toast('اختر المدينة', 'error'); return; }
+  if (!district) { toast('اسم الحي مطلوب', 'error'); return; }
+  if (!date) { toast('اختر التاريخ المناسب', 'error'); return; }
+  if (!time) { toast('اختر الفترة المناسبة', 'error'); return; }
+  if (!desc) { toast('وصف المشكلة مطلوب', 'error'); return; }
+
+  showLoading('جارٍ إرسال طلبك...');
+
+  try {
+    const response = await fetch(CONFIG.N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        client_id: STATE.user.id,
+        name,
+        phone,
+        city,
+        district,
+        property_type: propType,
+        visit_type: visitType,
+        description: desc,
+        preferred_date: date,
+        preferred_time: time
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || 'تعذر إرسال الطلب');
+    }
+
+    hideLoading();
+
+    document.getElementById('client-form-wrap').style.display = 'none';
+    document.getElementById('success-visit-num').textContent = result.visit_number || 'MC-NEW';
+    document.getElementById('client-success').style.display = 'block';
+
+    STATE.pendingVisit = {
+      visit_number: result.visit_number || 'MC-NEW',
+      property_type: propType,
+      city,
+      district,
+      preferred_date: date,
+      preferred_time: time,
+      status: 'new_request',
+      created_at: new Date().toISOString()
+    };
+
+    toast('تم إرسال طلبك بنجاح ✅', 'success');
+  } catch (e) {
+    hideLoading();
+    toast(e.message || 'حدث خطأ في الإرسال', 'error');
+  }
+}
+
+function goToMyRequests() {
+  navTo('my-requests', document.getElementById('nav-my-requests'));
+}
+
+function resetClientForm() {
+  ['cf-name','cf-phone','cf-district','cf-desc','cf-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('cf-city').value = '';
+  document.getElementById('cf-type').value = 'فيلا';
+  document.getElementById('cf-visit-type').value = 'general_inspection';
+  document.getElementById('cf-time').value = '';
+  document.getElementById('client-photo-input').value = '';
+  document.getElementById('client-photos-grid').innerHTML = '';
+  STATE.clientPhotos = [];
+  document.getElementById('client-success').style.display = 'none';
+  document.getElementById('client-form-wrap').style.display = 'block';
+
+  if (STATE.user) {
+    document.getElementById('cf-name').value = STATE.user.name || '';
+    document.getElementById('cf-phone').value = STATE.user.phone || '';
+  }
+}
+
+async function loadMyRequests() {
+  const el = document.getElementById('my-requests-list');
+  el.innerHTML = '<div class="empty-state"><div class="empty-title">جارٍ التحميل...</div></div>';
+
+  if (!STATE.user?.phone) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">يرجى تسجيل الدخول</div></div>';
+    return;
+  }
+
+  try {
+    const url = CONFIG.N8N_GET_REQUESTS_WEBHOOK + '?phone=' + encodeURIComponent(STATE.user.phone);
+    const res = await fetch(url);
+    const data = await res.json().catch(() => ({}));
+
+    let requests = data.requests || [];
+    if (STATE.pendingVisit) {
+      const found = requests.find(r => r.visit_number === STATE.pendingVisit.visit_number);
+      if (!found) requests = [STATE.pendingVisit, ...requests];
+    }
+
+    if (!requests.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <div class="empty-title">لا توجد طلبات بعد</div>
+          <div class="empty-sub">اضغط "طلب فحص" لإرسال طلبك الأول</div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = requests.map(v => `
+      <div class="visit-card">
+        <div class="vc-top">
+          <div class="vc-num">${v.visit_number || '—'}</div>
+          <span class="status-pill sp-${v.status || 'new_request'}">${statusLabel(v.status || 'new_request')}</span>
+        </div>
+        <div class="vc-client">🏠 ${(v.property_type || '—')} — ${(v.city || '—')}</div>
+        <div class="vc-meta">📍 ${(v.district || '—')}</div>
+        <div class="vc-meta">📅 ${(v.preferred_date || '—')} | ⏰ ${(v.preferred_time || '—')}</div>
+        <div class="vc-meta" style="margin-top:4px">${formatDate(v.created_at)}</div>
+        ${['approved','sent','completed'].includes(v.status) ? `
+          <button class="btn btn-green" style="margin-top:10px" onclick="checkReportStatus('${v.visit_number}')">📄 متابعة التقرير</button>
+        ` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">خطأ في تحميل الطلبات</div></div>';
+  }
+}
+
+async function checkReportStatus(visitNumber) {
+  showLoading('جارٍ جلب حالة التقرير...');
+  try {
+    const url = CONFIG.N8N_REPORT_STATUS_WEBHOOK + '?visit_number=' + encodeURIComponent(visitNumber);
+    const res = await fetch(url);
+    const data = await res.json().catch(() => ({}));
+    hideLoading();
+
+    if (data.report_url) {
+      window.open(data.report_url, '_blank');
+      return;
+    }
+
+    toast(data.message || 'التقرير قيد الإعداد', 'success');
+  } catch (e) {
+    hideLoading();
+    toast('تعذر جلب حالة التقرير', 'error');
+  }
+}
+
+(function initDateMin(){
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const el = document.getElementById('cf-date');
+  if (el) el.min = tomorrow.toISOString().split('T')[0];
+})();
 </script>
-
 </body>
 </html>
