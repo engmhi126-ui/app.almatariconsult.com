@@ -486,9 +486,9 @@ async function saveImgRecords(visitId,urls,engId){
 }
 
 window.previewReport = () => {
-  const s=getS();
   const visitId=$('r-id').value;
   if(!visitId) return alert('يجب فتح الطلب أولاً من صفحة الفحص.');
+  const s=getS();
   const finalAI={
     summary:$('ai-edit-summary').value.trim()||aiData?.summary||null,
     severity:$('ai-edit-severity').value||aiData?.severity||null,
@@ -497,14 +497,14 @@ window.previewReport = () => {
     client_message:$('ai-edit-client-msg').value.trim()||aiData?.client_message||null
   };
   const previewData={
-    visit_number:$('r-id').value,
+    visit_number:visitId,
     client_name:$('i-client').textContent,
     client_phone:$('i-phone').textContent,
     city:$('i-city').textContent,
     district:$('i-dist').textContent,
     property_type:$('i-prop').textContent,
-    preferred_time:'',
     preferred_date:new Date().toISOString().split('T')[0],
+    preferred_time:'',
     engineer_name:s?.name||s?.engineer_name||'—',
     contractor_name:$('r-cname').value.trim()||null,
     contractor_phone:$('r-cphone').value.trim()||null,
@@ -516,8 +516,9 @@ window.previewReport = () => {
     ai_recommendations:finalAI.recommendations,
     ai_client_message:finalAI.client_message
   };
-  sessionStorage.setItem('report_preview', JSON.stringify(previewData));
-  const url=`https://engmhi126-ui.github.io/app.almatariconsult.com/report-view.html?mode=preview`;
+  // Encode data in URL
+  const encoded=btoa(encodeURIComponent(JSON.stringify(previewData)));
+  const url=`https://engmhi126-ui.github.io/app.almatariconsult.com/report-view.html?data=${encoded}`;
   window.open(url,'_blank');
 };
 
