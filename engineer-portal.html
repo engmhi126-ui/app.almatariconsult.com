@@ -48,7 +48,7 @@
     .field{margin-bottom:14px}.label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:7px}.req{color:var(--red)}
     input[type=text],input[type=tel],input[type=password],input[type=date],textarea,select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--text);font-size:15px;font-weight:600;appearance:none;}
     input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(46,127,232,.12);}
-    textarea{line-height:1.7;min-height:100px}
+    textarea{line-height:1.7;min-height:90px}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
     .btn{width:100%;padding:14px 20px;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;}
     .btn-gold{background:linear-gradient(135deg,var(--gold),#9A6B12);color:#fff;box-shadow:0 4px 20px rgba(212,168,67,.3)}
@@ -57,6 +57,7 @@
     .btn-blue{background:linear-gradient(135deg,#2E7FE8,#1E60B7);color:#fff}
     .btn-purple{background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff}
     .btn-orange{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff}
+    .btn-sm{padding:8px 14px;font-size:13px;border-radius:9px;width:auto}
     .btn:disabled{opacity:.45;cursor:not-allowed}
     .msg{display:none;margin-bottom:14px;padding:12px 13px;border-radius:12px;font-size:13px;line-height:1.7;font-weight:700}
     .msg.show{display:block}.msg.success{background:rgba(45,190,115,.12);border:1px solid rgba(45,190,115,.30);color:#81e7af}
@@ -89,14 +90,31 @@
     .irm{position:absolute;top:4px;left:4px;background:rgba(228,90,90,.9);border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;cursor:pointer;}
     .lb{background:rgba(46,127,232,.08);border:1px solid rgba(46,127,232,.2);border-radius:12px;padding:12px;margin-top:12px}
     .lt{font-size:12px;color:#9dc7ff;font-weight:700;line-height:1.8}
-    .aib{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(46,127,232,.08));border:1px solid rgba(124,58,237,.25);border-radius:14px;padding:14px;margin-top:12px;}
-    .aih{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-    .aibg{background:linear-gradient(135deg,#7C3AED,#2E7FE8);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px}
-    .ait{font-size:14px;font-weight:900;color:#c4b5fd}
-    .air{margin-bottom:8px}.air .k{font-size:11px;color:var(--text3);font-weight:700;margin-bottom:3px}
-    .air .v{font-size:13px;color:var(--text);font-weight:600;line-height:1.7}
-    .sl{color:#86efac}.sm{color:#fcd34d}.sh{color:#fca5a5}
-    .al{padding-right:16px}.al li{font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.7}
+
+    /* AI Results Table */
+    .ai-table-wrap{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(46,127,232,.08));border:1px solid rgba(124,58,237,.25);border-radius:14px;padding:14px;margin-top:12px;}
+    .ai-table-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+    .ai-badge{background:linear-gradient(135deg,#7C3AED,#2E7FE8);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px}
+    .ai-ttl{font-size:14px;font-weight:900;color:#c4b5fd}
+    .ai-field{margin-bottom:12px}
+    .ai-field .k{font-size:11px;color:#c4b5fd;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .ai-field textarea,.ai-field input,.ai-field select{background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);color:var(--text);font-size:13px;padding:10px 12px;border-radius:10px;min-height:auto}
+    .ai-field textarea{min-height:80px}
+    .ai-field textarea:focus,.ai-field input:focus,.ai-field select:focus{border-color:#7C3AED!important;box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+    .sev-badge{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .sev-opt{padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;border:2px solid transparent;cursor:pointer;transition:all .15s}
+    .sev-opt.low{background:rgba(134,239,172,.1);color:#86efac;border-color:rgba(134,239,172,.3)}
+    .sev-opt.medium{background:rgba(252,211,77,.1);color:#fcd34d;border-color:rgba(252,211,77,.3)}
+    .sev-opt.high{background:rgba(252,165,165,.1);color:#fca5a5;border-color:rgba(252,165,165,.3)}
+    .sev-opt.selected.low{background:rgba(134,239,172,.25);border-color:#86efac}
+    .sev-opt.selected.medium{background:rgba(252,211,77,.25);border-color:#fcd34d}
+    .sev-opt.selected.high{background:rgba(252,165,165,.25);border-color:#fca5a5}
+    .list-editor{display:flex;flex-direction:column;gap:6px}
+    .list-row{display:flex;gap:6px;align-items:center}
+    .list-row input{flex:1;min-height:auto;padding:8px 12px;font-size:13px}
+    .list-row .del-btn{background:rgba(228,90,90,.2);border:1px solid rgba(228,90,90,.3);color:#fca5a5;border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;flex-shrink:0}
+    .add-item-btn{background:rgba(124,58,237,.15);border:1px dashed rgba(124,58,237,.4);color:#c4b5fd;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;width:100%;margin-top:4px}
+
     .sp::after{content:'...';animation:spanim 1.2s steps(4,end) infinite}
     @keyframes spanim{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
     @media(max-width:360px){.g2,.vg,.va,.igrid{grid-template-columns:1fr}}
@@ -112,6 +130,8 @@
     <div class="header-right"><div id="eng-pill"></div><button id="logout-btn">خروج</button></div>
   </header>
   <main id="pages">
+
+    <!-- دخول -->
     <section id="pg-auth" class="page active">
       <div class="page-head"><div class="page-tag">ENGINEER PORTAL</div><div class="page-title">دخول المهندس</div><div class="page-sub">سجل الدخول للوصول إلى الطلبات وإعداد التقارير.</div></div>
       <div id="auth-msg" class="msg"></div>
@@ -123,6 +143,8 @@
         </form>
       </div>
     </section>
+
+    <!-- الطلبات -->
     <section id="pg-visits" class="page">
       <div class="page-head"><div class="page-tag">VISITS</div><div class="page-title">الطلبات</div><div class="page-sub">اقبل الطلب ثم انتقل للفحص وإعداد التقرير.</div></div>
       <div class="g2"><div class="ms"><div class="n" id="s-all">0</div><div class="t">إجمالي</div></div><div class="ms"><div class="n" id="s-new">0</div><div class="t">جديدة</div></div></div>
@@ -130,10 +152,13 @@
       <div id="visits-msg" class="msg"></div>
       <div id="visits-list"></div>
     </section>
+
+    <!-- الفحص -->
     <section id="pg-inspect" class="page">
-      <div class="page-head"><div class="page-tag">INSPECTION</div><div class="page-title">فحص الموقع</div><div class="page-sub">ارفع الصور وحدد الموقع ثم شغّل التحليل الذكي.</div></div>
+      <div class="page-head"><div class="page-tag">INSPECTION</div><div class="page-title">فحص الموقع</div><div class="page-sub">ارفع الصور وحدد الموقع ثم حلّل بالذكاء الاصطناعي وعدّل النتائج.</div></div>
       <div class="sbar"><div class="sd done"></div><div class="sd act"></div><div class="sd"></div></div>
       <div id="inspect-msg" class="msg"></div>
+
       <div class="card">
         <div class="stitle">بيانات الطلب</div>
         <div class="vg">
@@ -146,33 +171,75 @@
           <div class="vi" style="grid-column:1/-1"><div class="k">الوصف</div><div class="v" id="i-desc">—</div></div>
         </div>
       </div>
+
       <div class="card">
         <div class="stitle">📸 صور الموقع <span class="req">*</span></div>
-        <div class="uz"><input type="file" id="img-input" accept="image/*" multiple/><div style="font-size:32px;margin-bottom:8px">📷</div><div style="font-size:13px;color:var(--text2);font-weight:700">اضغط لرفع صور الموقع</div><div style="font-size:11px;color:var(--text3);margin-top:4px">حتى 5 صور</div></div>
+        <div class="uz"><input type="file" id="img-input" accept="image/*" multiple/>
+          <div style="font-size:32px;margin-bottom:8px">📷</div>
+          <div style="font-size:13px;color:var(--text2);font-weight:700">اضغط لرفع صور الموقع</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">حتى 5 صور • JPG, PNG, HEIC</div>
+        </div>
         <div id="imgs-preview" class="igrid"></div>
         <div id="imgs-msg" class="hint" style="display:none"></div>
       </div>
+
       <div class="card">
         <div class="stitle">📍 موقع البناء <span class="req">*</span></div>
         <button id="loc-btn" class="btn btn-blue">📍 تحديد موقعي الحالي</button>
         <div id="loc-box" class="lb" style="display:none"><div class="lt" id="loc-txt"></div></div>
         <input type="hidden" id="loc-lat"/><input type="hidden" id="loc-lng"/><input type="hidden" id="loc-url"/>
       </div>
+
       <div class="card">
         <div class="stitle">🤖 تحليل الذكاء الاصطناعي</div>
         <button id="analyze-btn" class="btn btn-purple" disabled>🤖 تحليل الصور بـ Claude AI</button>
-        <div id="ai-loading" style="display:none;text-align:center;padding:16px;color:#c4b5fd;font-weight:700" class="sp">جاري التحليل</div>
-        <div id="ai-result" class="aib" style="display:none">
-          <div class="aih"><span class="aibg">Claude AI</span><span class="ait">نتائج التحليل</span></div>
-          <div class="air"><div class="k">الملخص</div><div class="v" id="ai-sum"></div></div>
-          <div class="air"><div class="k">درجة الخطورة</div><div class="v" id="ai-sev"></div></div>
-          <div class="air"><div class="k">العيوب</div><div class="v" id="ai-def"></div></div>
-          <div class="air"><div class="k">التوصيات</div><div class="v" id="ai-rec"></div></div>
-          <div class="air"><div class="k">رسالة للعميل</div><div class="v" id="ai-cli"></div></div>
+        <div id="ai-loading" style="display:none;text-align:center;padding:20px;color:#c4b5fd;font-weight:700;font-size:14px" class="sp">جاري التحليل</div>
+
+        <!-- جدول نتائج AI قابل للتعديل -->
+        <div id="ai-table" class="ai-table-wrap" style="display:none">
+          <div class="ai-table-hdr">
+            <span class="ai-badge">Claude AI</span>
+            <span class="ai-ttl">نتائج التحليل — قابلة للتعديل</span>
+          </div>
+
+          <div class="ai-field">
+            <div class="k">📋 الملخص الهندسي</div>
+            <textarea id="ai-edit-summary" placeholder="ملخص حالة الموقع..."></textarea>
+          </div>
+
+          <div class="ai-field">
+            <div class="k">⚠️ درجة الخطورة</div>
+            <div class="sev-badge">
+              <button type="button" class="sev-opt low" onclick="setSev('low')">منخفض 🟢</button>
+              <button type="button" class="sev-opt medium" onclick="setSev('medium')">متوسط 🟡</button>
+              <button type="button" class="sev-opt high" onclick="setSev('high')">مرتفع 🔴</button>
+            </div>
+            <input type="hidden" id="ai-edit-severity" value="medium"/>
+          </div>
+
+          <div class="ai-field">
+            <div class="k">🔴 العيوب المرصودة <button type="button" class="btn-sm btn-outline" style="font-size:11px;padding:4px 10px;width:auto;border-radius:6px" onclick="addDefect()">+ إضافة</button></div>
+            <div class="list-editor" id="defects-list"></div>
+          </div>
+
+          <div class="ai-field">
+            <div class="k">✅ التوصيات <button type="button" class="btn-sm btn-outline" style="font-size:11px;padding:4px 10px;width:auto;border-radius:6px" onclick="addRec()">+ إضافة</button></div>
+            <div class="list-editor" id="recs-list"></div>
+          </div>
+
+          <div class="ai-field">
+            <div class="k">💬 رسالة للعميل</div>
+            <textarea id="ai-edit-client-msg" placeholder="رسالة احترافية للعميل..."></textarea>
+          </div>
         </div>
       </div>
-      <div class="card"><button id="goto-report-btn" class="btn btn-orange" disabled>التالي: إعداد التقرير ←</button></div>
+
+      <div class="card" id="next-card" style="display:none">
+        <button id="goto-report-btn" class="btn btn-orange">التالي: إعداد التقرير ←</button>
+      </div>
     </section>
+
+    <!-- التقرير -->
     <section id="pg-report" class="page">
       <div class="page-head"><div class="page-tag">REPORT</div><div class="page-title">إعداد التقرير</div><div class="page-sub">راجع التقرير وأضف بيانات المقاول ثم اعتمده وأرسله للعميل.</div></div>
       <div class="sbar"><div class="sd done"></div><div class="sd done"></div><div class="sd act"></div></div>
@@ -180,14 +247,17 @@
       <form id="report-form">
         <input id="r-id" type="hidden"/>
         <div class="card">
-          <div class="stitle">📝 ملاحظات التقرير</div>
+          <div class="stitle">📝 التقرير</div>
           <div class="field"><label class="label">حالة التقرير <span class="req">*</span></label>
-            <select id="r-status" required><option value="">اختر الحالة</option><option value="review">يحتاج مراجعة</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option></select></div>
+            <select id="r-status" required><option value="">اختر</option><option value="review">يحتاج مراجعة</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option></select></div>
           <div class="field"><label class="label">حالة الزيارة <span class="req">*</span></label>
-            <select id="r-vstatus" required><option value="">اختر الحالة</option><option value="in_progress">قيد المعالجة</option><option value="completed">منجز</option><option value="cancelled">ملغي</option></select></div>
-          <div class="field"><label class="label">نص التقرير <span class="req">*</span></label><textarea id="r-text" placeholder="الملاحظات الفنية، العيوب، البنود، التوصيات..." required></textarea></div>
-          <div class="field"><label class="label">رابط PDF</label><input id="r-pdf" type="text" placeholder="ضع رابط التقرير عند توفره"/></div>
-          <div class="field"><label class="label">ملاحظات للإدارة</label><textarea id="r-admin" placeholder="ملاحظات داخلية" style="min-height:70px"></textarea></div>
+            <select id="r-vstatus" required><option value="">اختر</option><option value="in_progress">قيد المعالجة</option><option value="completed">منجز</option><option value="cancelled">ملغي</option></select></div>
+          <div class="field"><label class="label">نص التقرير <span class="req">*</span></label>
+            <textarea id="r-text" placeholder="الملاحظات الفنية، العيوب، البنود، التوصيات..." required></textarea></div>
+          <div class="field"><label class="label">رابط PDF</label>
+            <input id="r-pdf" type="text" placeholder="ضع رابط التقرير عند توفره"/></div>
+          <div class="field"><label class="label">ملاحظات للإدارة</label>
+            <textarea id="r-admin" placeholder="ملاحظات داخلية" style="min-height:70px"></textarea></div>
         </div>
         <div class="card">
           <div class="stitle">👷 بيانات المقاول</div>
@@ -197,6 +267,7 @@
         <div class="card"><button id="submit-btn" class="btn btn-green" type="submit">✅ اعتماد التقرير وإرساله للعميل</button></div>
       </form>
     </section>
+
   </main>
   <nav id="bottom-nav">
     <button class="nav-item active" data-pg="pg-visits"><span class="nav-icon">📋</span><span>الطلبات</span></button>
@@ -204,10 +275,12 @@
     <button class="nav-item" data-pg="pg-report"><span class="nav-icon">📝</span><span>التقرير</span></button>
   </nav>
 </div>
+
 <script>
 const $=id=>document.getElementById(id);
-const KEY='alm_eng_v4';
-let imgs=[],aiData=null,locData=null,curVisit=null;
+const KEY='alm_eng_v5';
+let imgs=[],aiData=null,locData=null,selectedSev='medium';
+
 const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 function M(el,t,txt){if(!el)return;el.className='msg show '+t;el.textContent=txt}
 function Mc(el){if(!el)return;el.className='msg';el.textContent=''}
@@ -234,6 +307,46 @@ function statusBadge(s){
   const m={pending:{c:'bp',t:'جديد'},accepted:{c:'ba',t:'مقبول'},in_progress:{c:'ba',t:'قيد المعالجة'},review:{c:'br',t:'مراجعة'},completed:{c:'bd',t:'مكتمل'},cancelled:{c:'bp',t:'ملغي'}};
   return m[s]||{c:'bp',t:s||'—'};
 }
+
+// ---- Severity selector ----
+window.setSev = val => {
+  selectedSev = val;
+  $('ai-edit-severity').value = val;
+  document.querySelectorAll('.sev-opt').forEach(b => {
+    b.classList.toggle('selected', b.classList.contains(val));
+  });
+};
+
+// ---- Defects list ----
+window.addDefect = (text='') => {
+  const list = $('defects-list');
+  const div = document.createElement('div');
+  div.className = 'list-row';
+  div.innerHTML = `<input type="text" value="${esc(text)}" placeholder="أدخل عيباً مرصوداً..."/><button type="button" class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+};
+window.addRec = (text='') => {
+  const list = $('recs-list');
+  const div = document.createElement('div');
+  div.className = 'list-row';
+  div.innerHTML = `<input type="text" value="${esc(text)}" placeholder="أدخل توصية..."/><button type="button" class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+};
+
+function getDefects(){ return Array.from($('defects-list').querySelectorAll('input')).map(i=>i.value.trim()).filter(Boolean) }
+function getRecs(){ return Array.from($('recs-list').querySelectorAll('input')).map(i=>i.value.trim()).filter(Boolean) }
+
+function fillAITable(p){
+  $('ai-edit-summary').value = p.summary||'';
+  setSev(p.severity||'medium');
+  $('defects-list').innerHTML='';(p.defects||[]).forEach(d=>addDefect(d));
+  $('recs-list').innerHTML='';(p.recommendations||[]).forEach(r=>addRec(r));
+  $('ai-edit-client-msg').value = p.client_message||'';
+  $('ai-table').style.display='block';
+  $('next-card').style.display='block';
+}
+
+// ---- Images ----
 $('img-input').addEventListener('change',e=>{
   Array.from(e.target.files).slice(0,5-imgs.length).forEach(f=>{
     const r=new FileReader();r.onload=ev=>{imgs.push({file:f,url:ev.target.result});renderImgs()};r.readAsDataURL(f);
@@ -245,44 +358,87 @@ function renderImgs(){
   const m=$('imgs-msg');
   if(imgs.length){m.style.display='block';m.textContent=`✅ ${imgs.length} صورة جاهزة`}else{m.style.display='none'}
 }
-window.delImg=i=>{imgs.splice(i,1);aiData=null;$('ai-result').style.display='none';renderImgs()};
+window.delImg=i=>{imgs.splice(i,1);renderImgs()};
+
+// ---- Location ----
 $('loc-btn').addEventListener('click',()=>{
   const b=$('loc-btn');load(b,true,'📍 تحديد موقعي الحالي','⏳ جاري التحديد...');
+  if(!navigator.geolocation){load(b,false,'📍 تحديد موقعي الحالي','');M($('inspect-msg'),'error','المتصفح لا يدعم GPS.');return}
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);
     locData={lat,lng};$('loc-lat').value=lat;$('loc-lng').value=lng;
     const url=`https://maps.google.com/?q=${lat},${lng}`;$('loc-url').value=url;
     $('loc-txt').innerHTML=`خط العرض: <strong>${lat}</strong> | خط الطول: <strong>${lng}</strong><br><a href="${url}" target="_blank" style="color:#60a5fa;font-size:11px">📌 عرض على خرائط Google</a>`;
     $('loc-box').style.display='block';b.textContent='✅ تم تحديد الموقع';b.style.background='linear-gradient(135deg,#22B868,#148049)';b.disabled=false;
-  },()=>{load(b,false,'📍 تحديد موقعي الحالي','');M($('inspect-msg'),'error','تعذر تحديد الموقع.')},
+  },()=>{load(b,false,'📍 تحديد موقعي الحالي','');M($('inspect-msg'),'error','تعذر تحديد الموقع. تأكد من الإذن.')},
   {enableHighAccuracy:true,timeout:15000,maximumAge:0});
 });
+
+// ---- Claude AI ----
 $('analyze-btn').addEventListener('click',async()=>{
   if(!imgs.length)return M($('inspect-msg'),'error','يرجى رفع صورة أولاً.');
-  load($('analyze-btn'),true,'🤖 تحليل الصور بـ Claude AI','⏳ جاري التحليل...');
-  $('ai-loading').style.display='block';$('ai-result').style.display='none';Mc($('inspect-msg'));
+  load($('analyze-btn'),true,'🤖 جاري التحليل...','🤖 جاري التحليل...');
+  $('ai-loading').style.display='block';
+  $('ai-table').style.display='none';
+  $('next-card').style.display='none';
+  Mc($('inspect-msg'));
+
   try{
     const content=[];
-    imgs.slice(0,4).forEach(im=>{content.push({type:'image',source:{type:'base64',media_type:im.file.type||'image/jpeg',data:im.url.split(',')[1]}});});
-    content.push({type:'text',text:`أنت مهندس استشاري خبير. حلّل صور موقع البناء.\n\nمعلومات:\n- نوع العقار: ${$('i-prop').textContent}\n- الحي: ${$('i-dist').textContent}\n- الإحداثيات: ${locData?locData.lat+','+locData.lng:'غير محدد'}\n\nأجب بـ JSON فقط:\n{"summary":"...","severity":"low/medium/high","defects":["..."],"recommendations":["..."],"client_message":"..."}`});
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':CONFIG.CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1500,messages:[{role:'user',content}]})});
-    const data=await res.json();if(!res.ok)throw new Error(data.error?.message||'خطأ Claude');
+    imgs.slice(0,4).forEach(im=>{
+      content.push({type:'image',source:{type:'base64',media_type:im.file.type||'image/jpeg',data:im.url.split(',')[1]}});
+    });
+    content.push({type:'text',text:`أنت مهندس استشاري خبير في الإشراف الهندسي. حلّل صور موقع البناء المرفقة.\n\nمعلومات:\n- نوع العقار: ${$('i-prop').textContent}\n- الحي: ${$('i-dist').textContent}\n- الموقع: ${locData?locData.lat+','+locData.lng:'غير محدد'}\n\nأجب بـ JSON فقط بدون أي نص إضافي:\n{"summary":"ملخص هندسي شامل","severity":"low أو medium أو high","defects":["عيب 1","عيب 2"],"recommendations":["توصية 1","توصية 2"],"client_message":"رسالة احترافية للعميل"}`});
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':CONFIG.CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1500,messages:[{role:'user',content}]})
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error?.message||'خطأ في Claude API');
+
     const raw=data.content?.[0]?.text||'{}';
-    let p;try{p=JSON.parse(raw.replace(/```json|```/g,'').trim())}catch{p={summary:raw,severity:'medium',defects:[],recommendations:[],client_message:raw}}
+    let p;
+    try{p=JSON.parse(raw.replace(/```json|```/g,'').trim())}
+    catch{p={summary:raw,severity:'medium',defects:[],recommendations:[],client_message:''}}
+
     aiData=p;
-    if(p.summary&&!$('r-text').value){let t=`الملخص: ${p.summary}\n\n`;if(p.defects?.length)t+=`العيوب:\n${p.defects.map(d=>`• ${d}`).join('\n')}\n\n`;if(p.recommendations?.length)t+=`التوصيات:\n${p.recommendations.map(r=>`• ${r}`).join('\n')}`;$('r-text').value=t;}
-    const sc={low:'sl',medium:'sm',high:'sh'};const st={low:'منخفض 🟢',medium:'متوسط 🟡',high:'مرتفع 🔴'};
-    $('ai-sum').textContent=p.summary||'—';
-    $('ai-sev').innerHTML=`<span class="${sc[p.severity]||'sm'}">${st[p.severity]||p.severity}</span>`;
-    $('ai-def').innerHTML=p.defects?.length?`<ul class="al">${p.defects.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:'لا توجد عيوب';
-    $('ai-rec').innerHTML=p.recommendations?.length?`<ul class="al">${p.recommendations.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:'—';
-    $('ai-cli').textContent=p.client_message||'—';
-    $('ai-result').style.display='block';$('goto-report-btn').disabled=false;
-    M($('inspect-msg'),'success','✅ تم التحليل! انتقل لإعداد التقرير.');
-  }catch(e){M($('inspect-msg'),'error','فشل التحليل: '+(e.message||'خطأ'))}
-  finally{load($('analyze-btn'),false,'🤖 تحليل الصور بـ Claude AI','');$('ai-loading').style.display='none'}
+
+    // Fill report text automatically
+    let rt=`الملخص: ${p.summary||''}\n\n`;
+    if(p.defects?.length)rt+=`العيوب المرصودة:\n${p.defects.map(d=>`• ${d}`).join('\n')}\n\n`;
+    if(p.recommendations?.length)rt+=`التوصيات:\n${p.recommendations.map(r=>`• ${r}`).join('\n')}`;
+    if(!$('r-text').value)$('r-text').value=rt;
+
+    fillAITable(p);
+    M($('inspect-msg'),'success','✅ اكتمل التحليل! راجع النتائج وعدّلها حسب رأيك ثم انتقل للتقرير.');
+  }catch(e){
+    M($('inspect-msg'),'error','فشل التحليل: '+(e.message||'خطأ غير معروف'));
+  }finally{
+    load($('analyze-btn'),false,'🤖 تحليل الصور بـ Claude AI','');
+    $('ai-loading').style.display='none';
+  }
 });
-$('goto-report-btn').addEventListener('click',()=>setPage('pg-report'));
+
+$('goto-report-btn').addEventListener('click',()=>{
+  // Update aiData from edited table
+  aiData={
+    summary:$('ai-edit-summary').value.trim(),
+    severity:$('ai-edit-severity').value,
+    defects:getDefects(),
+    recommendations:getRecs(),
+    client_message:$('ai-edit-client-msg').value.trim()
+  };
+  // Update report text
+  let rt=`الملخص: ${aiData.summary}\n\n`;
+  if(aiData.defects.length)rt+=`العيوب المرصودة:\n${aiData.defects.map(d=>`• ${d}`).join('\n')}\n\n`;
+  if(aiData.recommendations.length)rt+=`التوصيات:\n${aiData.recommendations.map(r=>`• ${r}`).join('\n')}`;
+  $('r-text').value=rt;
+  setPage('pg-report');
+});
+
+// ---- Upload Images ----
 async function uploadImgs(visitId){
   const urls=[];
   for(let i=0;i<imgs.length;i++){
@@ -294,6 +450,8 @@ async function uploadImgs(visitId){
 async function saveImgRecords(visitId,urls,engId){
   for(const url of urls)await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/visit_images`,{method:'POST',headers:{apikey:CONFIG.SUPABASE_KEY,Authorization:`Bearer ${CONFIG.SUPABASE_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({visit_id:visitId,image_url:url,uploaded_by:engId})});
 }
+
+// ---- Submit Report ----
 $('report-form').addEventListener('submit',async e=>{
   e.preventDefault();Mc($('report-msg'));
   const s=getS();if(!s)return M($('report-msg'),'error','يجب تسجيل الدخول.');
@@ -303,33 +461,62 @@ $('report-form').addEventListener('submit',async e=>{
   if(!$('r-status').value)return M($('report-msg'),'error','اختر حالة التقرير.');
   if(!$('r-vstatus').value)return M($('report-msg'),'error','اختر حالة الزيارة.');
   if(!$('r-text').value.trim())return M($('report-msg'),'error','اكتب ملاحظات التقرير.');
+
+  // Capture final AI data from edited table
+  const finalAI={
+    summary:$('ai-edit-summary').value.trim()||aiData?.summary||null,
+    severity:$('ai-edit-severity').value||aiData?.severity||null,
+    defects:getDefects().length?getDefects():(aiData?.defects||[]),
+    recommendations:getRecs().length?getRecs():(aiData?.recommendations||[]),
+    client_message:$('ai-edit-client-msg').value.trim()||aiData?.client_message||null
+  };
+
   const btn=$('submit-btn');load(btn,true,'✅ اعتماد التقرير وإرساله للعميل','⏳ جاري الرفع...');
   try{
     M($('report-msg'),'info','⏳ جاري رفع الصور...');
-    const urls=await uploadImgs($('r-id').value);await saveImgRecords($('r-id').value,urls,s.id);
+    const urls=await uploadImgs($('r-id').value);
+    await saveImgRecords($('r-id').value,urls,s.id);
+
     M($('report-msg'),'info','⏳ جاري حفظ التقرير...');
     const r=await api(CONFIG.N8N_REPORT,{
-      visit_id:$('r-id').value,report_status:$('r-status').value,visit_status:$('r-vstatus').value,
-      report_text:$('r-text').value.trim(),report_file_url:$('r-pdf').value.trim()||null,
-      admin_notes:$('r-admin').value.trim()||null,contractor_name:$('r-cname').value.trim()||null,
-      contractor_phone:$('r-cphone').value.trim()||null,engineer_id:s.id||null,
-      engineer_name:s.name||s.engineer_name||'',engineer_phone:s.phone||'',
-      location_lat:$('loc-lat').value,location_lng:$('loc-lng').value,location_url:$('loc-url').value,
-      image_urls:urls,ai_summary:aiData?.summary||null,ai_severity:aiData?.severity||null,
-      ai_defects:aiData?.defects||[],ai_recommendations:aiData?.recommendations||[],ai_client_message:aiData?.client_message||null
+      visit_id:$('r-id').value,
+      report_status:$('r-status').value,
+      visit_status:$('r-vstatus').value,
+      report_text:$('r-text').value.trim(),
+      report_file_url:$('r-pdf').value.trim()||null,
+      admin_notes:$('r-admin').value.trim()||null,
+      contractor_name:$('r-cname').value.trim()||null,
+      contractor_phone:$('r-cphone').value.trim()||null,
+      engineer_id:s.id||null,
+      engineer_name:s.name||s.engineer_name||'',
+      engineer_phone:s.phone||'',
+      location_lat:$('loc-lat').value,
+      location_lng:$('loc-lng').value,
+      location_url:$('loc-url').value,
+      image_urls:urls,
+      ai_summary:finalAI.summary,
+      ai_severity:finalAI.severity,
+      ai_defects:finalAI.defects,
+      ai_recommendations:finalAI.recommendations,
+      ai_client_message:finalAI.client_message
     });
+
     if(r.success!==false){
-      M($('report-msg'),'success',`✅ تم اعتماد التقرير وإرساله للعميل.`);
-      imgs=[];aiData=null;locData=null;$('imgs-preview').innerHTML='';$('ai-result').style.display='none';
+      M($('report-msg'),'success',`✅ تم اعتماد التقرير وإرساله للعميل. رُفعت ${urls.length} صورة.`);
+      imgs=[];aiData=null;locData=null;
+      $('imgs-preview').innerHTML='';$('ai-table').style.display='none';$('next-card').style.display='none';
       $('loc-box').style.display='none';$('loc-lat').value='';$('loc-lng').value='';
-      $('analyze-btn').disabled=true;$('goto-report-btn').disabled=true;$('report-form').reset();
+      $('analyze-btn').disabled=true;$('report-form').reset();
       loadVisits();setTimeout(()=>setPage('pg-visits'),1500);
     }else M($('report-msg'),'error',r.message||'تعذر حفظ التقرير.');
   }catch(e){M($('report-msg'),'error',e.message||'فشل الاتصال.')}
   finally{load(btn,false,'✅ اعتماد التقرير وإرساله للعميل','')}
 });
+
+// ---- Visits ----
 function renderVisits(items){
-  $('s-all').textContent=items.length;$('s-new').textContent=items.filter(i=>i.status==='pending').length;
+  $('s-all').textContent=items.length;
+  $('s-new').textContent=items.filter(i=>i.status==='pending').length;
   const list=$('visits-list');
   if(!items.length){list.innerHTML='<div class="card"><div class="empty">لا توجد طلبات حالياً.</div></div>';return}
   list.innerHTML=items.map(it=>{
@@ -355,28 +542,41 @@ function renderVisits(items){
     </div>`;
   }).join('');
 }
+
 async function loadVisits(){
   Mc($('visits-msg'));const s=getS();if(!s)return;
   try{$('refresh-btn').disabled=true;const r=await api(CONFIG.N8N_VISITS,{engineer_id:s.id||null,phone:s.phone||''});renderVisits(r.visits||r.data||[]);}
   catch(e){M($('visits-msg'),'error',e.message||'تعذر تحميل الطلبات.');renderVisits([])}
   finally{$('refresh-btn').disabled=false}
 }
+
 window.acceptV=async id=>{
   const s=getS();if(!s||!id)return;
   try{
     const r=await api(CONFIG.N8N_ACCEPT,{visit_id:id,engineer_id:s.id||null,engineer_name:s.name||'',engineer_phone:s.phone||''});
-    if(r.success){M($('visits-msg'),'success','✅ تم قبول الطلب.');loadVisits();}
+    if(r.success){M($('visits-msg'),'success','✅ تم قبول الطلب بنجاح.');loadVisits();}
     else M($('visits-msg'),'error',r.message||'تعذر قبول الطلب.');
   }catch(e){M($('visits-msg'),'error',e.message)}
 };
+
 window.startInspect=it=>{
-  curVisit=it;$('r-id').value=it.id||'';
-  $('i-num').textContent=it.visit_number||'—';$('i-client').textContent=it.client_name||'—';
-  $('i-phone').textContent=it.client_phone||'—';$('i-prop').textContent=it.property_type||'—';
-  $('i-city').textContent=it.city||'—';$('i-dist').textContent=it.district||'—';
+  imgs=[];aiData=null;locData=null;
+  $('imgs-preview').innerHTML='';$('imgs-msg').style.display='none';
+  $('ai-table').style.display='none';$('next-card').style.display='none';
+  $('loc-box').style.display='none';$('loc-lat').value='';$('loc-lng').value='';
+  const lb=$('loc-btn');lb.textContent='📍 تحديد موقعي الحالي';lb.style.background='';lb.disabled=false;
+  $('analyze-btn').disabled=true;
+  $('r-id').value=it.id||'';
+  $('i-num').textContent=it.visit_number||'—';
+  $('i-client').textContent=it.client_name||'—';
+  $('i-phone').textContent=it.client_phone||'—';
+  $('i-prop').textContent=it.property_type||'—';
+  $('i-city').textContent=it.city||'—';
+  $('i-dist').textContent=it.district||'—';
   $('i-desc').textContent=it.description||'—';
   Mc($('inspect-msg'));setPage('pg-inspect');
 };
+
 $('login-form').addEventListener('submit',async e=>{
   e.preventDefault();Mc($('auth-msg'));
   const payload={phone:$('lp').value.replace(/\s+/g,''),password:$('lpass').value};
@@ -385,15 +585,27 @@ $('login-form').addEventListener('submit',async e=>{
   load($('login-btn'),true,'دخول','جاري التحقق...');
   try{
     const r=await api(CONFIG.N8N_LOGIN,payload);
-    if(r.success&&r.engineer){saveS(r.engineer);$('eng-pill').textContent=r.engineer.name||r.engineer.engineer_name||'المهندس';showUI(true);setPage('pg-visits');loadVisits();}
-    else M($('auth-msg'),'error',r.message||'بيانات الدخول غير صحيحة.');
+    if(r.success&&r.engineer){
+      saveS(r.engineer);$('eng-pill').textContent=r.engineer.name||r.engineer.engineer_name||'المهندس';
+      showUI(true);setPage('pg-visits');loadVisits();
+    }else M($('auth-msg'),'error',r.message||'بيانات الدخول غير صحيحة.');
   }catch(e){M($('auth-msg'),'error',e.message||'فشل الاتصال.')}
   finally{load($('login-btn'),false,'دخول','')}
 });
+
 $('refresh-btn').addEventListener('click',loadVisits);
-$('logout-btn').addEventListener('click',()=>{clearS();imgs=[];aiData=null;locData=null;showUI(false);setPage('pg-auth');});
-document.querySelectorAll('.nav-item').forEach(n=>{n.addEventListener('click',()=>{if(!getS())return;setPage(n.dataset.pg)});});
-(()=>{const s=getS();if(s){$('eng-pill').textContent=s.name||s.engineer_name||'المهندس';showUI(true);setPage('pg-visits');loadVisits();}else{showUI(false);setPage('pg-auth')}})();
+$('logout-btn').addEventListener('click',()=>{
+  clearS();imgs=[];aiData=null;locData=null;showUI(false);setPage('pg-auth');
+});
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.addEventListener('click',()=>{if(!getS())return;setPage(n.dataset.pg)});
+});
+
+(()=>{
+  const s=getS();
+  if(s){$('eng-pill').textContent=s.name||s.engineer_name||'المهندس';showUI(true);setPage('pg-visits');loadVisits();}
+  else{showUI(false);setPage('pg-auth')}
+})();
 </script>
 </body>
 </html>
