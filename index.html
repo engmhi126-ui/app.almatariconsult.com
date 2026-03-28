@@ -1080,13 +1080,22 @@
 
       requestsList.innerHTML = items.map(item => {
         const statusObj = mapStatusLabel(item.status);
-        const idValue = item.visitnumber || item.id || '—';
-        const propertyType = item.property_type || '—';
-        const district = item.district || '—';
-        const city = item.city || '—';
-        const date = item.preferred_date || '—';
-        const time = item.preferred_time || '—';
-        const description = item.description || '—';
+        const idValue = item.visit_number || item.visitnumber || item.id || '—';
+
+        // report section
+        let reportSection = '';
+        if (item.report_text || item.report_status) {
+          reportSection = `
+            <div style="margin-top:10px;padding:10px;background:rgba(46,127,232,.08);border:1px solid rgba(46,127,232,.18);border-radius:10px">
+              <div style="font-size:11px;color:#9dc7ff;font-weight:800;margin-bottom:6px">📋 التقرير</div>
+              ${item.report_status ? `<div style="font-size:11px;color:var(--text2)">الحالة: <strong style="color:var(--text)">${escapeHtml(item.report_status)}</strong></div>` : ''}
+              ${item.report_text ? `<div style="font-size:11px;color:var(--text2);margin-top:4px;line-height:1.6">${escapeHtml(String(item.report_text).slice(0,120))}${item.report_text.length>120?'...':''}</div>` : ''}
+              ${item.ai_summary ? `<div style="font-size:11px;color:#c4b5fd;margin-top:6px;font-weight:700">🤖 ${escapeHtml(item.ai_summary)}</div>` : ''}
+              ${item.ai_client_message ? `<div style="font-size:11px;color:var(--text2);margin-top:4px">${escapeHtml(item.ai_client_message)}</div>` : ''}
+              ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" style="display:inline-block;margin-top:6px;font-size:11px;color:#60a5fa;font-weight:700">📄 تحميل التقرير PDF</a>` : ''}
+            </div>
+          `;
+        }
 
         return `
           <div class="card">
@@ -1099,34 +1108,34 @@
               <div class="request-grid">
                 <div class="request-item">
                   <div class="k">نوع العقار</div>
-                  <div class="v">${escapeHtml(String(propertyType))}</div>
+                  <div class="v">${escapeHtml(String(item.property_type || '—'))}</div>
                 </div>
-
                 <div class="request-item">
                   <div class="k">المدينة</div>
-                  <div class="v">${escapeHtml(String(city))}</div>
+                  <div class="v">${escapeHtml(String(item.city || '—'))}</div>
                 </div>
-
                 <div class="request-item">
                   <div class="k">الحي</div>
-                  <div class="v">${escapeHtml(String(district))}</div>
+                  <div class="v">${escapeHtml(String(item.district || '—'))}</div>
                 </div>
-
                 <div class="request-item">
                   <div class="k">التاريخ</div>
-                  <div class="v">${escapeHtml(String(date))}</div>
+                  <div class="v">${escapeHtml(String(item.preferred_date || '—'))}</div>
                 </div>
-
                 <div class="request-item">
                   <div class="k">الفترة</div>
-                  <div class="v">${escapeHtml(String(time))}</div>
+                  <div class="v">${escapeHtml(String(item.preferred_time || '—'))}</div>
                 </div>
-
                 <div class="request-item">
+                  <div class="k">المهندس</div>
+                  <div class="v">${escapeHtml(String(item.engineer_name || 'لم يُعيَّن بعد'))}</div>
+                </div>
+                <div class="request-item" style="grid-column:1/-1">
                   <div class="k">الوصف</div>
-                  <div class="v">${escapeHtml(String(description))}</div>
+                  <div class="v">${escapeHtml(String(item.description || '—'))}</div>
                 </div>
               </div>
+              ${reportSection}
             </div>
           </div>
         `;
@@ -1146,7 +1155,7 @@
         refreshRequestsBtn.disabled = true;
 
         const payload = {
-          client_id: session.id || null,
+          client_id: session.user_id || session.id || null,
           national_id: session.national_id || '',
           phone: session.phone || ''
         };
@@ -1191,20 +1200,18 @@
         const result = await postJson(CONFIG.N8N_CLIENT_REGISTER_WEBHOOK, payload);
 
         if (result.success) {
-          // بناء بيانات الجلسة من رد السيرفر أو من النموذج كاحتياط
           const clientData = result.client || result.user || {};
           const user = {
-            id:          clientData.id          || clientData.client_id || null,
-            client_id:   clientData.client_id   || clientData.id        || null,
+            id:          clientData.user_id      || clientData.id          || null,
+            client_id:   clientData.client_id    || clientData.id          || null,
             user_id:     clientData.user_id      || null,
-            name:        clientData.name         || clientData.full_name || payload.full_name,
-            full_name:   clientData.full_name    || clientData.name      || payload.full_name,
+            name:        clientData.name         || clientData.full_name   || payload.full_name,
+            full_name:   clientData.full_name    || clientData.name        || payload.full_name,
             national_id: clientData.national_id  || payload.national_id,
             phone:       clientData.phone        || payload.phone,
             city:        clientData.city         || payload.city,
             village:     clientData.village      || payload.village
           };
-
           saveSession(user);
           bootAuthenticatedUI();
           showMessage(requestMsg, 'info', 'تم إنشاء الحساب بنجاح. يمكنك الآن تقديم طلب خدمة.');
@@ -1260,7 +1267,7 @@
       if (!session) return showMessage(requestMsg, 'error', 'يجب تسجيل الدخول أولاً.');
 
       const payload = {
-        client_id: session.id || null,
+        client_id: session.user_id || session.id || null,
         full_name: session.full_name || session.name || '',
         national_id: session.national_id || '',
         phone: session.phone || '',
