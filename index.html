@@ -1,926 +1,1342 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#050D18">
-<title>المطري كونسلت</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#050D18" />
+  <title>المطري كونسلت — بوابة العميل</title>
 
-<script>
-const CONFIG = {
-  SUPABASE_URL: 'https://qxklfethbynwcxswacwj.supabase.co',
-  SUPABASE_ANON_KEY: 'sb_publishable_4XFM8bqK0sotKphEBE0sWA_eWM38XTq',
-  N8N_WEBHOOK_URL: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-request',
-  N8N_GET_REQUESTS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-my-requests',
-  N8N_REPORT_STATUS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/client-report-status'
-};
-</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-<style>
-:root {
-  --bg:#050D18;
-  --bg2:#080F1C;
-  --surface:#0C1929;
-  --surface2:#0F2035;
-  --border:rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.12);
-  --gold:#D4A843;
-  --gold2:#F0C060;
-  --gold-dim:rgba(212,168,67,0.15);
-  --blue:#2E7FE8;
-  --blue-dim:rgba(46,127,232,0.12);
-  --green:#34C97A;
-  --green-dim:rgba(52,201,122,0.12);
-  --red:#E85454;
-  --red-dim:rgba(232,84,84,0.12);
-  --text:#EEF2F8;
-  --text2:#8BA5C4;
-  --text3:#4A6A8A;
-  --radius:16px;
-  --shadow:0 8px 32px rgba(0,0,0,0.4);
-}
+  <script>
+    const CONFIG = {
+      APP_NAME: 'المطري كونسلت',
 
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-html, body { height:100%; overflow:hidden; }
-body {
-  background:var(--bg);
-  font-family:'Cairo', -apple-system, sans-serif;
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-}
-input, textarea, select, button { font-family:inherit; }
-input:focus, textarea:focus, select:focus { outline:none; }
-img { max-width:100%; }
+      N8N_CLIENT_REGISTER_WEBHOOK: 'https://YOUR-N8N-DOMAIN/webhook/client-register',
+      N8N_CLIENT_LOGIN_WEBHOOK: 'https://YOUR-N8N-DOMAIN/webhook/client-login',
+      N8N_CREATE_ENGINEERING_REQUEST_WEBHOOK: 'https://YOUR-N8N-DOMAIN/webhook/create-engineering-request',
+      N8N_GET_MY_REQUESTS_WEBHOOK: 'https://YOUR-N8N-DOMAIN/webhook/client-my-requests'
+    };
+  </script>
 
-#app {
-  display:flex; flex-direction:column;
-  height:100%; height:100dvh;
-  max-width:430px; margin:0 auto;
-  position:relative; overflow:hidden;
-  background:var(--bg);
-}
-#app::before {
-  content:'';
-  position:fixed; inset:0; z-index:0;
-  background-image:
-    linear-gradient(rgba(46,127,232,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(46,127,232,0.03) 1px, transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-}
+  <style>
+    :root{
+      --bg:#050D18;
+      --bg2:#08111F;
+      --surface:#0C1929;
+      --surface2:#102238;
+      --border:rgba(255,255,255,0.08);
+      --border2:rgba(255,255,255,0.14);
+      --gold:#D4A843;
+      --gold2:#F0C060;
+      --blue:#2E7FE8;
+      --green:#2DBE73;
+      --green2:#178A52;
+      --red:#E45A5A;
+      --text:#EEF2F8;
+      --text2:#90A8C7;
+      --text3:#5E7797;
+      --shadow:0 8px 30px rgba(0,0,0,0.35);
+    }
 
-#header {
-  background:rgba(8,15,28,0.95);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:0 16px;
-  height:58px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:space-between;
-  position:relative; z-index:50;
-}
-.logo { display:flex; align-items:center; gap:10px; }
-.logo-mark {
-  width:36px; height:36px; border-radius:10px;
-  background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
-  display:flex; align-items:center; justify-content:center;
-  font-size:18px; font-weight:900; color:#fff;
-  box-shadow:0 2px 12px rgba(212,168,67,.35), inset 0 1px 0 rgba(255,255,255,.2);
-}
-.logo-text .name { font-size:14px; font-weight:800; color:var(--text); line-height:1.2; }
-.logo-text .tag { font-size:10px; color:var(--gold); font-weight:600; }
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-.header-right { display:flex; align-items:center; gap:8px; }
-#user-pill {
-  display:none; align-items:center; gap:6px;
-  background:var(--surface); border:1px solid var(--border2);
-  border-radius:20px; padding:5px 12px;
-  font-size:12px; color:var(--blue); font-weight:600;
-}
-#logout-btn {
-  background:var(--surface); border:1px solid var(--border);
-  color:var(--text3); font-size:14px; cursor:pointer;
-  padding:6px 10px; border-radius:8px; display:none;
-}
+    html, body{
+      height:100%;
+      overflow:hidden;
+    }
 
-#pages { flex:1; overflow:hidden; position:relative; z-index:1; }
-.page {
-  position:absolute; inset:0;
-  overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:20px 16px 100px;
-  opacity:0; pointer-events:none;
-  transform:translateY(12px);
-  transition:opacity .22s ease, transform .22s ease;
-}
-.page.active { opacity:1; pointer-events:all; transform:translateY(0); }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Cairo',sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
 
-#bottom-nav {
-  flex-shrink:0;
-  background:rgba(8,15,28,0.97);
-  backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);
-  display:flex;
-  padding-bottom:env(safe-area-inset-bottom, 0px);
-  position:relative; z-index:50;
-  min-height:64px;
-}
-.nav-item {
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:4px; cursor:pointer; border:none; background:none;
-  color:var(--text3); font-size:10px; font-weight:700;
-  transition:all .2s; padding:8px 4px;
-}
-.nav-item .nav-icon { font-size:22px; line-height:1; }
-.nav-item.active { color:var(--gold); }
+    input, button, select, textarea{
+      font-family:inherit;
+    }
 
-.page-tag {
-  font-size:10px; color:var(--gold); font-weight:700;
-  letter-spacing:2.5px; margin-bottom:6px; text-align:center;
-}
-.page-title { font-size:24px; font-weight:900; text-align:center; }
-.page-sub { font-size:13px; color:var(--text2); text-align:center; margin-top:6px; line-height:1.6; }
-.page-head { margin-bottom:24px; }
+    button{
+      cursor:pointer;
+    }
 
-.card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:16px; margin-bottom:12px;
-}
-.field { margin-bottom:14px; }
-.label {
-  display:block; font-size:12px; font-weight:700;
-  color:var(--text2); margin-bottom:7px;
-}
-.req { color:var(--red); }
-input[type=text], input[type=tel], input[type=date], textarea, select {
-  width:100%;
-  background:var(--surface2);
-  border:1.5px solid var(--border);
-  border-radius:12px;
-  padding:13px 14px;
-  color:var(--text); font-size:15px; font-weight:600;
-  appearance:none;
-}
-input:focus, textarea:focus, select:focus {
-  border-color:var(--blue) !important;
-  box-shadow:0 0 0 3px rgba(46,127,232,0.12);
-}
-textarea { resize:none; line-height:1.7; }
-.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    textarea{
+      resize:none;
+    }
 
-.btn {
-  width:100%; padding:14px 20px; border-radius:13px;
-  font-size:15px; font-weight:800; cursor:pointer;
-  border:none; transition:all .18s;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-}
-.btn-gold {
-  background:linear-gradient(135deg, var(--gold), #9A6B12);
-  color:#fff;
-  box-shadow:0 4px 20px rgba(212,168,67,.3), inset 0 1px 0 rgba(255,255,255,.15);
-}
-.btn-outline {
-  background:transparent;
-  color:var(--text2);
-  border:1.5px solid var(--border2);
-}
-.btn-green {
-  background:linear-gradient(135deg, #22B868, #148049);
-  color:#fff;
-}
-.btn:disabled { opacity:.45; cursor:not-allowed; }
+    #app{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      height:100dvh;
+      max-width:430px;
+      margin:0 auto;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top right, rgba(212,168,67,.07), transparent 28%),
+        linear-gradient(180deg, #07111d 0%, #050D18 100%);
+    }
 
-.upload-zone {
-  border:2px dashed var(--border2); border-radius:var(--radius);
-  padding:24px 16px; text-align:center;
-  background:var(--surface); cursor:pointer; margin-bottom:16px;
-}
-.upload-icon { font-size:32px; margin-bottom:8px; }
-.upload-label { font-size:13px; color:var(--text2); font-weight:600; }
-.upload-hint { font-size:11px; color:var(--text3); margin-top:4px; }
-#client-photo-input { display:none; }
-.photo-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px; }
-.photo-thumb {
-  aspect-ratio:1; border-radius:10px; overflow:hidden;
-  position:relative; background:var(--surface2);
-  border:1px solid var(--border);
-}
-.photo-thumb img { width:100%; height:100%; object-fit:cover; }
-.photo-thumb .del {
-  position:absolute; top:4px; left:4px;
-  background:rgba(0,0,0,.75); border:none; border-radius:50%;
-  width:24px; height:24px; color:#fff; font-size:11px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-}
+    #app::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(46,127,232,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,127,232,0.03) 1px, transparent 1px);
+      background-size:40px 40px;
+    }
 
-.visit-card {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius); padding:16px; margin-bottom:10px;
-}
-.vc-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
-.vc-num { font-size:12px; font-weight:800; color:var(--gold); font-family:monospace; }
-.vc-client { font-size:15px; font-weight:700; margin-bottom:4px; }
-.vc-meta { font-size:12px; color:var(--text2); }
+    #header{
+      background:rgba(8,15,28,0.95);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:0 16px;
+      height:58px;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:relative;
+      z-index:50;
+    }
 
-.status-pill {
-  display:inline-flex; align-items:center; gap:5px;
-  padding:5px 12px; border-radius:20px;
-  font-size:10px; font-weight:800;
-}
-.sp-new_request, .sp-new { background:rgba(46,127,232,.12); color:#7ABCFF; border:1px solid rgba(46,127,232,.25); }
-.sp-accepted { background:rgba(52,201,122,.12); color:#70EEA0; border:1px solid rgba(52,201,122,.25); }
-.sp-scheduled { background:rgba(46,127,232,.12); color:#90CAF9; border:1px solid rgba(46,127,232,.25); }
-.sp-analyzing { background:rgba(100,180,255,.1); color:#90D4FF; border:1px solid rgba(100,180,255,.2); }
-.sp-under_review, .sp-pending_review { background:rgba(180,120,255,.12); color:#C899FF; border:1px solid rgba(180,120,255,.25); }
-.sp-approved, .sp-sent, .sp-completed { background:rgba(52,201,122,.18); color:#50FF90; border:1px solid rgba(52,201,122,.35); }
-.sp-cancelled { background:rgba(232,84,84,.1); color:#FF8A8A; border:1px solid rgba(232,84,84,.2); }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
 
-#loading {
-  position:fixed; inset:0; z-index:200;
-  background:rgba(5,13,24,.9); backdrop-filter:blur(12px);
-  display:none; align-items:center; justify-content:center;
-  flex-direction:column; gap:16px;
-}
-#loading.show { display:flex; }
-.spinner {
-  width:44px; height:44px; border-radius:50%;
-  border:3px solid var(--surface2); border-top-color:var(--gold);
-  animation:spin .75s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-.loading-text { font-size:14px; color:var(--text2); font-weight:600; }
+    .logo-mark{
+      width:36px;
+      height:36px;
+      border-radius:10px;
+      background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      box-shadow:0 2px 12px rgba(212,168,67,.35);
+      flex-shrink:0;
+    }
 
-#toast {
-  position:fixed; bottom:88px; left:50%; transform:translateX(-50%) translateY(16px);
-  background:var(--surface); border:1px solid var(--border2);
-  border-radius:12px; padding:11px 20px;
-  font-size:13px; font-weight:700; color:var(--text);
-  z-index:300; opacity:0; transition:all .28s;
-  white-space:nowrap; pointer-events:none;
-}
-#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-#toast.error { background:rgba(60,15,15,.95); border-color:rgba(232,84,84,.4); color:#FF9999; }
-#toast.success { background:rgba(10,30,20,.95); border-color:rgba(52,201,122,.4); color:#90EEC0; }
+    .logo-text .name{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      line-height:1.2;
+    }
 
-#login-overlay {
-  position:fixed; inset:0; z-index:100;
-  background:var(--bg);
-  display:flex; align-items:center; justify-content:center;
-  padding:24px;
-}
-.login-box { width:100%; max-width:360px; }
-.login-logo { text-align:center; margin-bottom:36px; }
-.login-mark {
-  width:76px; height:76px; border-radius:22px;
-  background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
-  display:flex; align-items:center; justify-content:center;
-  font-size:34px; font-weight:900; color:#fff;
-  margin:0 auto 16px;
-}
-.login-title { font-size:24px; font-weight:900; margin-bottom:5px; }
-.login-sub { font-size:13px; color:var(--text2); font-weight:600; }
-.divider { height:1px; background:var(--border); margin:24px 0; }
+    .logo-text .tag{
+      font-size:10px;
+      color:var(--gold);
+      font-weight:600;
+    }
 
-.role-btn {
-  width:100%; padding:16px 20px; border-radius:14px;
-  font-size:15px; font-weight:800; cursor:pointer;
-  border:1.5px solid var(--border); background:var(--surface);
-  color:var(--text); text-align:center;
-  display:flex; align-items:center; gap:12px;
-  margin-bottom:10px;
-}
-.role-icon { font-size:28px; }
-.role-info { text-align:right; }
-.role-title { font-size:15px; font-weight:800; }
-.role-sub { font-size:11px; color:var(--text2); margin-top:2px; font-weight:600; }
+    .header-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
 
-.empty-state { text-align:center; padding:50px 20px; }
-.empty-icon { font-size:52px; margin-bottom:14px; opacity:.6; }
-.empty-title { font-size:17px; font-weight:800; margin-bottom:6px; color:var(--text2); }
-.empty-sub { font-size:13px; color:var(--text3); line-height:1.7; }
+    #user-pill{
+      display:none;
+      align-items:center;
+      gap:6px;
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:20px;
+      padding:5px 12px;
+      font-size:12px;
+      color:var(--blue);
+      font-weight:700;
+      max-width:150px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
-@media (max-width:640px) {
-  .grid2 { grid-template-columns:1fr; }
-}
-</style>
+    #logout-btn{
+      background:var(--surface);
+      border:1px solid var(--border);
+      color:var(--text3);
+      font-size:13px;
+      cursor:pointer;
+      padding:6px 10px;
+      border-radius:8px;
+      display:none;
+    }
+
+    #pages{
+      flex:1;
+      overflow:hidden;
+      position:relative;
+      z-index:1;
+    }
+
+    .page{
+      position:absolute;
+      inset:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:20px 16px 92px;
+      opacity:0;
+      pointer-events:none;
+      transform:translateY(12px);
+      transition:opacity .22s ease, transform .22s ease;
+    }
+
+    .page.active{
+      opacity:1;
+      pointer-events:all;
+      transform:translateY(0);
+    }
+
+    #bottom-nav{
+      flex-shrink:0;
+      background:rgba(8,15,28,0.97);
+      backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);
+      display:flex;
+      padding-bottom:env(safe-area-inset-bottom, 0px);
+      position:relative;
+      z-index:50;
+      min-height:64px;
+    }
+
+    .nav-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      cursor:pointer;
+      border:none;
+      background:none;
+      color:var(--text3);
+      font-size:10px;
+      font-weight:700;
+      transition:all .2s;
+      padding:8px 4px;
+    }
+
+    .nav-item .nav-icon{
+      font-size:22px;
+      line-height:1;
+    }
+
+    .nav-item.active{
+      color:var(--gold);
+    }
+
+    .page-tag{
+      font-size:10px;
+      color:var(--gold);
+      font-weight:700;
+      letter-spacing:2.5px;
+      margin-bottom:6px;
+      text-align:center;
+    }
+
+    .page-title{
+      font-size:24px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .page-sub{
+      font-size:13px;
+      color:var(--text2);
+      text-align:center;
+      margin-top:6px;
+      line-height:1.7;
+    }
+
+    .page-head{
+      margin-bottom:24px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(16,34,56,.97), rgba(12,25,41,.97));
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:15px;
+      box-shadow:var(--shadow);
+      margin-bottom:14px;
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    .label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--text2);
+      margin-bottom:7px;
+    }
+
+    .req{
+      color:var(--red);
+    }
+
+    input[type=text],
+    input[type=tel],
+    input[type=password],
+    input[type=date],
+    textarea,
+    select{
+      width:100%;
+      background:var(--surface2);
+      border:1.5px solid var(--border);
+      border-radius:12px;
+      padding:13px 14px;
+      color:var(--text);
+      font-size:15px;
+      font-weight:600;
+      appearance:none;
+    }
+
+    input[readonly]{
+      opacity:.92;
+    }
+
+    input:focus, textarea:focus, select:focus{
+      outline:none;
+      border-color:var(--blue) !important;
+      box-shadow:0 0 0 3px rgba(46,127,232,0.12);
+    }
+
+    textarea{
+      line-height:1.7;
+      min-height:98px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .btn{
+      width:100%;
+      padding:14px 20px;
+      border-radius:13px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      border:none;
+      transition:all .18s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn-gold{
+      background:linear-gradient(135deg, var(--gold), #9A6B12);
+      color:#fff;
+      box-shadow:0 4px 20px rgba(212,168,67,.3);
+    }
+
+    .btn-outline{
+      background:transparent;
+      color:var(--text2);
+      border:1.5px solid var(--border2);
+    }
+
+    .btn-green{
+      background:linear-gradient(135deg, #22B868, #148049);
+      color:#fff;
+    }
+
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .switcher{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:6px;
+    }
+
+    .switch-btn{
+      border:none;
+      background:transparent;
+      color:var(--text2);
+      padding:12px 10px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:800;
+      transition:.18s ease;
+    }
+
+    .switch-btn.active{
+      background:linear-gradient(135deg, rgba(212,168,67,.18), rgba(212,168,67,.08));
+      color:#fff;
+      border:1px solid rgba(212,168,67,.28);
+    }
+
+    .panel{
+      display:none;
+    }
+
+    .panel.active{
+      display:block;
+    }
+
+    .msg{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 13px;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.7;
+      font-weight:700;
+    }
+
+    .msg.show{
+      display:block;
+    }
+
+    .msg.success{
+      background:rgba(45,190,115,.12);
+      border:1px solid rgba(45,190,115,.30);
+      color:#81e7af;
+    }
+
+    .msg.error{
+      background:rgba(228,90,90,.10);
+      border:1px solid rgba(228,90,90,.28);
+      color:#ffb0b0;
+    }
+
+    .msg.info{
+      background:rgba(46,127,232,.10);
+      border:1px solid rgba(46,127,232,.28);
+      color:#9dc7ff;
+    }
+
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--text3);
+      line-height:1.7;
+    }
+
+    .service-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .service-card{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .service-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(212,168,67,.28);
+    }
+
+    .service-card.disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .service-icon{
+      font-size:28px;
+      margin-bottom:8px;
+    }
+
+    .service-title{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      margin-bottom:5px;
+    }
+
+    .service-sub{
+      font-size:11px;
+      color:var(--text2);
+      line-height:1.7;
+    }
+
+    .mini-grid{
+      display:grid;
+      gap:10px;
+    }
+
+    .profile-item{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .profile-item .k{
+      font-size:11px;
+      color:var(--text3);
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .profile-item .v{
+      font-size:14px;
+      color:var(--text);
+      font-weight:800;
+    }
+
+    .request-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+
+    .request-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .request-id{
+      font-size:13px;
+      font-weight:800;
+      color:var(--gold2);
+    }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:88px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .status-pending{
+      background:rgba(212,168,67,.14);
+      color:var(--gold2);
+      border:1px solid rgba(212,168,67,.28);
+    }
+
+    .status-progress{
+      background:rgba(46,127,232,.12);
+      color:#8fc2ff;
+      border:1px solid rgba(46,127,232,.28);
+    }
+
+    .status-done{
+      background:rgba(45,190,115,.12);
+      color:#84ebb0;
+      border:1px solid rgba(45,190,115,.28);
+    }
+
+    .request-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .request-item{
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:10px;
+      padding:9px;
+    }
+
+    .request-item .k{
+      font-size:10px;
+      color:var(--text3);
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .request-item .v{
+      font-size:12px;
+      color:var(--text);
+      font-weight:700;
+      line-height:1.6;
+      word-break:break-word;
+    }
+
+    .empty-state{
+      text-align:center;
+      color:var(--text2);
+      font-size:13px;
+      line-height:1.8;
+      padding:18px 10px;
+    }
+
+    @media (max-width:360px){
+      .grid2,
+      .service-grid,
+      .request-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<div id="loading">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loading-text">جارٍ المعالجة...</div>
-</div>
-
-<div id="toast"></div>
-
-<div id="login-overlay">
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="login-mark">م</div>
-      <div class="login-title">المطري كونسلت</div>
-      <div class="login-sub">المستشار مؤتمن</div>
-    </div>
-
-    <div id="login-role-select">
-      <div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px;font-weight:600;letter-spacing:1px">اختر طريقة الدخول</div>
-      <button class="role-btn" onclick="showLoginForm()">
-        <span class="role-icon">🏠</span>
-        <div class="role-info">
-          <div class="role-title">صاحب عقار</div>
-          <div class="role-sub">طلب فحص هندسي جديد أو متابعة طلبك</div>
+  <div id="app">
+    <header id="header">
+      <div class="logo">
+        <div class="logo-mark">م</div>
+        <div class="logo-text">
+          <div class="name">المطري كونسلت</div>
+          <div class="tag">بوابة العميل</div>
         </div>
+      </div>
+
+      <div class="header-right">
+        <div id="user-pill"></div>
+        <button id="logout-btn" type="button">خروج</button>
+      </div>
+    </header>
+
+    <main id="pages">
+      <section id="auth-page" class="page active">
+        <div class="page-head">
+          <div class="page-tag">ALMATARI CONSULT</div>
+          <div class="page-title">أهلاً بك</div>
+          <div class="page-sub">أنشئ حسابك أو سجل الدخول للوصول إلى خدمات المكتب ومتابعة الطلبات.</div>
+        </div>
+
+        <div class="card">
+          <div class="switcher">
+            <button class="switch-btn active" id="show-register-btn" type="button">تسجيل جديد</button>
+            <button class="switch-btn" id="show-login-btn" type="button">تسجيل دخول</button>
+          </div>
+
+          <div id="auth-msg" class="msg"></div>
+
+          <div id="register-panel" class="panel active">
+            <form id="register-form">
+              <div class="field">
+                <label class="label">الاسم الكامل <span class="req">*</span></label>
+                <input id="reg-name" type="text" placeholder="اكتب الاسم الكامل" required />
+              </div>
+
+              <div class="field">
+                <label class="label">رقم الهوية <span class="req">*</span></label>
+                <input id="reg-national-id" type="text" inputmode="numeric" placeholder="مثال: 1234567890" required />
+              </div>
+
+              <div class="field">
+                <label class="label">رقم الجوال <span class="req">*</span></label>
+                <input id="reg-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" required />
+              </div>
+
+              <div class="grid2">
+                <div class="field">
+                  <label class="label">المدينة <span class="req">*</span></label>
+                  <input id="reg-city" type="text" placeholder="مثال: جيزان" required />
+                </div>
+
+                <div class="field">
+                  <label class="label">القرية <span class="req">*</span></label>
+                  <input id="reg-village" type="text" placeholder="اكتب القرية" required />
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">كلمة المرور <span class="req">*</span></label>
+                <input id="reg-password" type="password" placeholder="أدخل كلمة مرور قوية" required />
+              </div>
+
+              <button id="register-submit-btn" class="btn btn-gold" type="submit">إنشاء الحساب</button>
+              <div class="hint">سيتم إنشاء الحساب عبر الخادم مباشرة وليس من داخل المتصفح.</div>
+            </form>
+          </div>
+
+          <div id="login-panel" class="panel">
+            <form id="login-form">
+              <div class="field">
+                <label class="label">رقم الهوية أو رقم الجوال <span class="req">*</span></label>
+                <input id="login-identifier" type="text" placeholder="اكتب رقم الهوية أو الجوال" required />
+              </div>
+
+              <div class="field">
+                <label class="label">كلمة المرور <span class="req">*</span></label>
+                <input id="login-password" type="password" placeholder="أدخل كلمة المرور" required />
+              </div>
+
+              <button id="login-submit-btn" class="btn btn-green" type="submit">دخول</button>
+              <div class="hint">بعد الدخول سيتم استخدام بياناتك تلقائيًا عند تقديم طلب الخدمة.</div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="home-page" class="page">
+        <div class="page-head">
+          <div class="page-tag">CLIENT HOME</div>
+          <div class="page-title">لوحة العميل</div>
+          <div class="page-sub">اختر الخدمة المطلوبة أو راجع بياناتك وطلباتك السابقة.</div>
+        </div>
+
+        <div class="card">
+          <div class="service-grid">
+            <div class="service-card" id="service-engineering-card">
+              <div class="service-icon">🏗️</div>
+              <div class="service-title">طلب إشراف هندسي</div>
+              <div class="service-sub">إرسال طلب زيارة إشرافية ببياناتك المسجلة مباشرة.</div>
+            </div>
+
+            <div class="service-card disabled">
+              <div class="service-icon">📐</div>
+              <div class="service-title">طلب رفع مساحي</div>
+              <div class="service-sub">قريبًا</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="mini-grid">
+            <div class="profile-item">
+              <div class="k">الاسم</div>
+              <div class="v" id="home-name">—</div>
+            </div>
+            <div class="profile-item">
+              <div class="k">رقم الجوال</div>
+              <div class="v" id="home-phone">—</div>
+            </div>
+            <div class="profile-item">
+              <div class="k">المدينة</div>
+              <div class="v" id="home-city">—</div>
+            </div>
+            <div class="profile-item">
+              <div class="k">القرية</div>
+              <div class="v" id="home-village">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="request-page" class="page">
+        <div class="page-head">
+          <div class="page-tag">ENGINEERING REQUEST</div>
+          <div class="page-title">طلب إشراف هندسي</div>
+          <div class="page-sub">بياناتك الأساسية مأخوذة من حسابك تلقائيًا، وأنت تحتاج فقط لإكمال بيانات الزيارة.</div>
+        </div>
+
+        <div id="request-msg" class="msg"></div>
+
+        <div class="card">
+          <div class="grid2">
+            <div class="field">
+              <label class="label">اسم العميل</label>
+              <input id="req-client-name" type="text" readonly />
+            </div>
+
+            <div class="field">
+              <label class="label">رقم الجوال</label>
+              <input id="req-client-phone" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label class="label">المدينة</label>
+              <input id="req-client-city" type="text" readonly />
+            </div>
+
+            <div class="field">
+              <label class="label">القرية</label>
+              <input id="req-client-village" type="text" readonly />
+            </div>
+          </div>
+
+          <form id="engineering-request-form">
+            <div class="field">
+              <label class="label">نوع العقار <span class="req">*</span></label>
+              <select id="property-type" required>
+                <option value="">اختر نوع العقار</option>
+                <option value="فيلا">فيلا</option>
+                <option value="عمارة">عمارة</option>
+                <option value="محلات">محلات</option>
+                <option value="استراحة">استراحة</option>
+                <option value="مسجد">مسجد</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">الحي <span class="req">*</span></label>
+              <input id="district" type="text" placeholder="اكتب اسم الحي" required />
+            </div>
+
+            <div class="field">
+              <label class="label">وصف الطلب <span class="req">*</span></label>
+              <textarea id="description" placeholder="اكتب تفاصيل الحالة أو نوع الزيارة المطلوبة" required></textarea>
+            </div>
+
+            <div class="grid2">
+              <div class="field">
+                <label class="label">التاريخ <span class="req">*</span></label>
+                <input id="preferred-date" type="date" required />
+              </div>
+
+              <div class="field">
+                <label class="label">الفترة <span class="req">*</span></label>
+                <select id="preferred-time" required>
+                  <option value="">اختر الفترة</option>
+                  <option value="صباح">صباح</option>
+                  <option value="مساء">مساء</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="submit-request-btn" class="btn btn-gold" type="submit">إرسال الطلب</button>
+            <div class="hint">لن نطلب منك الاسم أو الجوال أو المدينة مرة أخرى، لأنها مرتبطة بحسابك تلقائيًا.</div>
+          </form>
+        </div>
+      </section>
+
+      <section id="my-requests-page" class="page">
+        <div class="page-head">
+          <div class="page-tag">MY REQUESTS</div>
+          <div class="page-title">طلباتي</div>
+          <div class="page-sub">تابع حالة طلباتك الحالية والسابقة.</div>
+        </div>
+
+        <div id="requests-msg" class="msg"></div>
+
+        <div class="card">
+          <button id="refresh-requests-btn" class="btn btn-outline" type="button">تحديث الطلبات</button>
+        </div>
+
+        <div id="requests-list"></div>
+      </section>
+    </main>
+
+    <nav id="bottom-nav">
+      <button class="nav-item active" data-page="home-page" type="button">
+        <span class="nav-icon">🏠</span>
+        <span>الرئيسية</span>
       </button>
-      <div class="divider"></div>
-      <div style="text-align:center;font-size:12px;color:var(--text3)">
-        للاستفسار: واتساب
-        <span style="color:var(--gold);font-weight:800">0538986031</span>
-      </div>
-    </div>
 
-    <div id="login-form-wrap" style="display:none">
-      <div style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center">🏠 دخول صاحب العقار</div>
+      <button class="nav-item" data-page="request-page" type="button">
+        <span class="nav-icon">📝</span>
+        <span>طلب خدمة</span>
+      </button>
 
-      <div id="client-step-phone">
-        <div class="field">
-          <label class="label">رقم جوالك <span class="req">*</span></label>
-          <input type="tel" id="login-phone" placeholder="05XXXXXXXX" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        </div>
-        <button class="btn btn-gold" onclick="checkClientPhone()">التالي ←</button>
-        <button class="btn btn-outline" onclick="backToRoles()" style="margin-top:8px">← رجوع</button>
-      </div>
-
-      <div id="client-step-existing" style="display:none">
-        <div style="text-align:center;padding:16px 0 20px">
-          <div style="font-size:40px;margin-bottom:10px">👋</div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:4px">أهلاً بعودتك!</div>
-          <div style="font-size:13px;color:var(--text2)" id="existing-client-name">جارٍ التحميل...</div>
-        </div>
-        <button class="btn btn-gold" onclick="loginExistingClient()">دخول لحسابي ←</button>
-        <button class="btn btn-outline" onclick="resetClientStep()" style="margin-top:8px">← تغيير الرقم</button>
-      </div>
-
-      <div id="client-step-new" style="display:none">
-        <div style="background:var(--blue-dim);border:1px solid rgba(46,127,232,.3);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center">
-          <div style="font-size:13px;color:var(--text2)">رقم جديد — أكمل بياناتك لإنشاء حساب</div>
-        </div>
-        <div class="field">
-          <label class="label">اسمك الكامل <span class="req">*</span></label>
-          <input type="text" id="login-name-new" placeholder="محمد أحمد">
-        </div>
-        <div class="field">
-          <label class="label">المدينة</label>
-          <select id="login-city-new">
-            <option value="جازان">جازان</option>
-            <option value="أبو عريش">أبو عريش</option>
-            <option value="صبيا">صبيا</option>
-            <option value="العارضة">العارضة</option>
-            <option value="صامطة">صامطة</option>
-            <option value="أخرى">أخرى</option>
-          </select>
-        </div>
-        <button class="btn btn-gold" onclick="registerNewClient()">إنشاء حساب ←</button>
-        <button class="btn btn-outline" onclick="resetClientStep()" style="margin-top:8px">← رجوع</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="app">
-  <div id="header">
-    <div class="logo">
-      <div class="logo-mark">م</div>
-      <div class="logo-text">
-        <div class="name">المطري كونسلت</div>
-        <div class="tag">المستشار مؤتمن</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <div id="user-pill"><span id="user-name-display"></span></div>
-      <button id="logout-btn" onclick="logout()">⏻</button>
-    </div>
+      <button class="nav-item" data-page="my-requests-page" type="button">
+        <span class="nav-icon">📂</span>
+        <span>طلباتي</span>
+      </button>
+    </nav>
   </div>
 
-  <div id="pages">
-    <div class="page active" id="page-home">
-      <div class="page-head">
-        <div class="page-tag">نظام الفحص الهندسي</div>
-        <div class="page-title">طلب فحص العقار</div>
-        <div class="page-sub">أرسل طلبك ويتواصل معك المكتب</div>
-      </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-      <div id="client-form-wrap">
-        <div class="field">
-          <label class="label">اسمك الكامل <span class="req">*</span></label>
-          <input type="text" id="cf-name" placeholder="محمد العنزي">
-        </div>
-        <div class="field">
-          <label class="label">رقم الجوال <span class="req">*</span></label>
-          <input type="tel" id="cf-phone" placeholder="05XXXXXXXX" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        </div>
-        <div class="grid2">
-          <div>
-            <label class="label">المدينة <span class="req">*</span></label>
-            <select id="cf-city">
-              <option value="">— اختر المدينة —</option>
-              <option>جازان</option>
-              <option>أبو عريش</option>
-              <option>صبيا</option>
-              <option>العارضة</option>
-              <option>صامطة</option>
-              <option>بيش</option>
-              <option>فيفا</option>
-              <option>الدرب</option>
-              <option>أحد المسارحة</option>
-              <option>الريث</option>
-              <option>أخرى</option>
-            </select>
-          </div>
-          <div>
-            <label class="label">نوع العقار <span class="req">*</span></label>
-            <select id="cf-type">
-              <option value="فيلا">فيلا</option>
-              <option value="شقة">شقة</option>
-              <option value="تجاري">تجاري</option>
-              <option value="أرض">أرض</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">الحي <span class="req">*</span></label>
-          <input type="text" id="cf-district" placeholder="اسم الحي...">
-        </div>
-        <div class="grid2">
-          <div>
-            <label class="label">نوع الزيارة <span class="req">*</span></label>
-            <select id="cf-visit-type">
-              <option value="general_inspection">معاينة عامة</option>
-              <option value="foundations">قواعد</option>
-              <option value="columns">أعمدة</option>
-              <option value="roof">سقف</option>
-              <option value="finishing">تشطيبات</option>
-            </select>
-          </div>
-          <div>
-            <label class="label">التاريخ المناسب <span class="req">*</span></label>
-            <input type="date" id="cf-date">
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">الفترة المناسبة <span class="req">*</span></label>
-          <select id="cf-time">
-            <option value="">— اختر الفترة —</option>
-            <option value="08:00 ص - 12:00 م">صباحاً (8-12)</option>
-            <option value="04:00 م - 09:00 م">مساءً (4-9)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label class="label">وصف المشكلة أو الهدف <span class="req">*</span></label>
-          <textarea id="cf-desc" rows="4" placeholder="صف المشكلة أو هدف الفحص..."></textarea>
-        </div>
+    const SESSION_KEY = 'almatari_client_session_v2';
 
-        <div class="field">
-          <label class="label">صور المشكلة (اختياري)</label>
-          <div class="upload-zone" onclick="document.getElementById('client-photo-input').click()">
-            <div class="upload-icon">📎</div>
-            <div class="upload-label">اضغط لإضافة صور</div>
-            <div class="upload-hint">حتى 5 صور</div>
-          </div>
-          <input type="file" id="client-photo-input" accept="image/*" multiple onchange="handleClientPhotos(event)">
-          <div class="photo-grid" id="client-photos-grid"></div>
-        </div>
+    const authPage = $('auth-page');
+    const homePage = $('home-page');
+    const requestPage = $('request-page');
+    const myRequestsPage = $('my-requests-page');
 
-        <button class="btn btn-gold" onclick="submitClientRequest()">إرسال الطلب ✉️</button>
-      </div>
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const bottomNav = $('bottom-nav');
 
-      <div id="client-success" style="display:none">
-        <div style="text-align:center;padding:24px 0">
-          <div style="font-size:64px;margin-bottom:12px">✅</div>
-          <div style="font-size:22px;font-weight:900;margin-bottom:6px">تم إرسال طلبك!</div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:20px">
-            رقم طلبك: <strong style="color:var(--gold)" id="success-visit-num">MC-2026-XXXX</strong><br>
-            سيتواصل معك المكتب قريباً
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-gold" onclick="goToMyRequests()">📋 عرض طلباتي</button>
-            <button class="btn btn-outline" onclick="resetClientForm()">+ إرسال طلب جديد</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    const userPill = $('user-pill');
+    const logoutBtn = $('logout-btn');
 
-    <div class="page" id="page-my-requests">
-      <div class="page-head">
-        <div class="page-tag">طلباتي</div>
-        <div class="page-title">طلباتي السابقة</div>
-        <div class="page-sub">جميع طلبات الفحص الخاصة بك</div>
-      </div>
-      <div id="my-requests-list"></div>
-    </div>
-  </div>
+    const showRegisterBtn = $('show-register-btn');
+    const showLoginBtn = $('show-login-btn');
+    const registerPanel = $('register-panel');
+    const loginPanel = $('login-panel');
 
-  <nav id="bottom-nav">
-    <button class="nav-item active" onclick="navTo('home',this)" id="nav-home">
-      <span class="nav-icon">🏠</span>
-      <span>طلب فحص</span>
-    </button>
-    <button class="nav-item" onclick="navTo('my-requests',this)" id="nav-my-requests">
-      <span class="nav-icon">📋</span>
-      <span>طلباتي</span>
-    </button>
-  </nav>
-</div>
+    const authMsg = $('auth-msg');
+    const requestMsg = $('request-msg');
+    const requestsMsg = $('requests-msg');
 
-<script>
-const STATE = {
-  user: null,
-  clientPhotos: [],
-  pendingVisit: null
-};
+    const registerForm = $('register-form');
+    const loginForm = $('login-form');
+    const engineeringRequestForm = $('engineering-request-form');
 
-function toast(msg, type='') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'show ' + type;
-  setTimeout(() => el.className = '', 2800);
-}
+    const registerSubmitBtn = $('register-submit-btn');
+    const loginSubmitBtn = $('login-submit-btn');
+    const submitRequestBtn = $('submit-request-btn');
 
-function showLoading(txt='جارٍ المعالجة...') {
-  document.getElementById('loading-text').textContent = txt;
-  document.getElementById('loading').classList.add('show');
-}
-function hideLoading() {
-  document.getElementById('loading').classList.remove('show');
-}
+    const serviceEngineeringCard = $('service-engineering-card');
+    const requestsList = $('requests-list');
+    const refreshRequestsBtn = $('refresh-requests-btn');
 
-function navTo(page, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page)?.classList.add('active');
-  if (btn) btn.classList.add('active');
-  if (page === 'my-requests') loadMyRequests();
-}
-
-function statusLabel(s) {
-  const m = {
-    new_request:'طلب جديد',
-    new:'طلب جديد',
-    accepted:'تم القبول',
-    scheduled:'مجدول',
-    analyzing:'جارٍ التحليل',
-    under_review:'قيد المراجعة',
-    pending_review:'قيد المراجعة',
-    approved:'التقرير جاهز',
-    sent:'تم الإرسال',
-    completed:'مكتمل',
-    cancelled:'ملغي'
-  };
-  return m[s] || s;
-}
-
-function formatDate(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' });
-}
-
-async function supaFetch(path, opts = {}) {
-  const url = CONFIG.SUPABASE_URL + '/rest/v1/' + path;
-  const res = await fetch(url, {
-    ...opts,
-    headers: {
-      'apikey': CONFIG.SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-      ...(opts.headers || {})
+    function setLoading(button, isLoading, normalText, loadingText){
+      if (!button) return;
+      button.disabled = isLoading;
+      button.textContent = isLoading ? loadingText : normalText;
     }
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  const txt = await res.text();
-  return txt ? JSON.parse(txt) : null;
-}
-const dbGet = (table, query='') => supaFetch(table + '?' + query);
-const dbInsert = (table, body) => supaFetch(table, { method:'POST', body: JSON.stringify(body) });
 
-function showLoginForm() {
-  document.getElementById('login-role-select').style.display = 'none';
-  document.getElementById('login-form-wrap').style.display = 'block';
-  resetClientStep();
-}
-function backToRoles() {
-  document.getElementById('login-role-select').style.display = 'block';
-  document.getElementById('login-form-wrap').style.display = 'none';
-}
-function resetClientStep() {
-  document.getElementById('client-step-phone').style.display = 'block';
-  document.getElementById('client-step-existing').style.display = 'none';
-  document.getElementById('client-step-new').style.display = 'none';
-}
-
-let foundClient = null;
-
-async function checkClientPhone() {
-  const phone = document.getElementById('login-phone').value.trim();
-  if (!phone || phone.length < 9) {
-    toast('أدخل رقم الجوال بشكل صحيح', 'error');
-    return;
-  }
-  const cleanPhone = phone.replace(/^(\+966|966)/, '0');
-  showLoading('جارٍ البحث...');
-  try {
-    const existing = await dbGet('clients', `phone_hash=eq.${cleanPhone}&limit=1`);
-    hideLoading();
-    document.getElementById('client-step-phone').style.display = 'none';
-    if (existing && existing.length > 0) {
-      foundClient = existing[0];
-      document.getElementById('existing-client-name').textContent = (foundClient.name || 'عزيزي العميل') + ' — ' + cleanPhone;
-      document.getElementById('client-step-existing').style.display = 'block';
-    } else {
-      foundClient = null;
-      document.getElementById('client-step-new').style.display = 'block';
+    function showMessage(target, type, text){
+      if (!target) return;
+      target.className = 'msg show ' + type;
+      target.textContent = text;
     }
-  } catch (e) {
-    hideLoading();
-    toast('خطأ في البحث', 'error');
-  }
-}
 
-function loginExistingClient() {
-  if (!foundClient) return;
-  const phone = document.getElementById('login-phone').value.trim().replace(/^(\+966|966)/, '0');
-  STATE.user = {
-    id: foundClient.id,
-    name: foundClient.name || 'عزيزي العميل',
-    phone,
-    role: 'client'
-  };
-  onLoginSuccess();
-}
+    function hideMessage(target){
+      if (!target) return;
+      target.className = 'msg';
+      target.textContent = '';
+    }
 
-async function registerNewClient() {
-  const name = document.getElementById('login-name-new').value.trim();
-  const city = document.getElementById('login-city-new').value;
-  const phone = document.getElementById('login-phone').value.trim().replace(/^(\+966|966)/, '0');
+    function normalizePhone(phone){
+      return String(phone || '').replace(/\s+/g, '').trim();
+    }
 
-  if (!name) {
-    toast('أدخل اسمك الكامل', 'error');
-    return;
-  }
+    function validSaudiPhone(phone){
+      const p = normalizePhone(phone);
+      return /^05\d{8}$/.test(p) || /^9665\d{8}$/.test(p);
+    }
 
-  showLoading('جارٍ إنشاء حسابك...');
-  try {
-    const rec = await dbInsert('clients', {
-      name,
-      phone_hash: phone,
-      phone_last4: phone.slice(-4),
-      city
-    });
-    const clientId = Array.isArray(rec) ? rec[0]?.id : rec?.id;
-    hideLoading();
-    STATE.user = { id: clientId, name, phone, role:'client' };
-    onLoginSuccess();
-  } catch (e) {
-    hideLoading();
-    toast('خطأ في إنشاء الحساب', 'error');
-  }
-}
+    function validNationalId(id){
+      return String(id || '').replace(/\D/g, '').length >= 10;
+    }
 
-function onLoginSuccess() {
-  document.getElementById('login-overlay').style.display = 'none';
-  document.getElementById('user-pill').style.display = 'flex';
-  document.getElementById('logout-btn').style.display = 'block';
-  document.getElementById('user-name-display').textContent = STATE.user.name;
+    function setAuthMode(mode){
+      const isRegister = mode === 'register';
+      showRegisterBtn.classList.toggle('active', isRegister);
+      showLoginBtn.classList.toggle('active', !isRegister);
+      registerPanel.classList.toggle('active', isRegister);
+      loginPanel.classList.toggle('active', !isRegister);
+      hideMessage(authMsg);
+    }
 
-  document.getElementById('cf-name').value = STATE.user.name || '';
-  document.getElementById('cf-phone').value = STATE.user.phone || '';
-  toast('أهلًا ' + STATE.user.name + ' 👋', 'success');
-}
+    function saveSession(data){
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    }
 
-function logout() {
-  STATE.user = null;
-  STATE.clientPhotos = [];
-  STATE.pendingVisit = null;
-  document.getElementById('login-overlay').style.display = 'flex';
-  document.getElementById('user-pill').style.display = 'none';
-  document.getElementById('logout-btn').style.display = 'none';
-  document.getElementById('login-role-select').style.display = 'block';
-  document.getElementById('login-form-wrap').style.display = 'none';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-home').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('nav-home').classList.add('active');
-  toast('تم تسجيل الخروج', 'success');
-}
+    function getSession(){
+      try{
+        return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      } catch(e){
+        return null;
+      }
+    }
 
-function handleClientPhotos(e) {
-  const files = Array.from(e.target.files).slice(0, 5);
-  const grid = document.getElementById('client-photos-grid');
-  grid.innerHTML = '';
-  STATE.clientPhotos = files;
-  files.forEach((f, i) => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const div = document.createElement('div');
-      div.className = 'photo-thumb';
-      div.innerHTML = `<img src="${ev.target.result}"><button class="del" onclick="removeClientPhoto(${i})">✕</button>`;
-      grid.appendChild(div);
-    };
-    reader.readAsDataURL(f);
-  });
-}
-function removeClientPhoto(i) {
-  STATE.clientPhotos.splice(i, 1);
-  document.getElementById('client-photo-input').value = '';
-  const grid = document.getElementById('client-photos-grid');
-  grid.innerHTML = '';
-  STATE.clientPhotos.forEach((f, idx) => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const div = document.createElement('div');
-      div.className = 'photo-thumb';
-      div.innerHTML = `<img src="${ev.target.result}"><button class="del" onclick="removeClientPhoto(${idx})">✕</button>`;
-      grid.appendChild(div);
-    };
-    reader.readAsDataURL(f);
-  });
-}
+    function clearSession(){
+      localStorage.removeItem(SESSION_KEY);
+    }
 
-async function submitClientRequest() {
-  const name = document.getElementById('cf-name').value.trim();
-  const phone = document.getElementById('cf-phone').value.trim();
-  const city = document.getElementById('cf-city').value;
-  const district = document.getElementById('cf-district').value.trim();
-  const date = document.getElementById('cf-date').value;
-  const time = document.getElementById('cf-time').value;
-  const desc = document.getElementById('cf-desc').value.trim();
-  const propType = document.getElementById('cf-type').value;
-  const visitType = document.getElementById('cf-visit-type').value;
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-  if (!STATE.user?.id) { toast('سجل الدخول أولًا', 'error'); return; }
-  if (!name) { toast('الاسم مطلوب', 'error'); return; }
-  if (!phone || phone.length < 9) { toast('رقم الجوال غير صالح', 'error'); return; }
-  if (!city) { toast('اختر المدينة', 'error'); return; }
-  if (!district) { toast('اسم الحي مطلوب', 'error'); return; }
-  if (!date) { toast('اختر التاريخ المناسب', 'error'); return; }
-  if (!time) { toast('اختر الفترة المناسبة', 'error'); return; }
-  if (!desc) { toast('وصف المشكلة مطلوب', 'error'); return; }
+      const text = await res.text();
+      let data = {};
+      try{
+        data = text ? JSON.parse(text) : {};
+      } catch(e){
+        data = { raw: text };
+      }
 
-  showLoading('جارٍ إرسال طلبك...');
+      if (!res.ok) {
+        throw new Error(data.message || 'تعذر تنفيذ الطلب.');
+      }
 
-  try {
-    const response = await fetch(CONFIG.N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({
-        client_id: STATE.user.id,
-        name,
-        phone,
-        city,
-        district,
-        property_type: propType,
-        visit_type: visitType,
-        description: desc,
-        preferred_date: date,
-        preferred_time: time
-      })
+      return data;
+    }
+
+    function isAuthenticated(){
+      return !!getSession();
+    }
+
+    function showAuthState(isLoggedIn){
+      if (isLoggedIn) {
+        userPill.style.display = 'inline-flex';
+        logoutBtn.style.display = 'inline-flex';
+        bottomNav.style.display = 'flex';
+      } else {
+        userPill.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        bottomNav.style.display = 'none';
+      }
+    }
+
+    function fillHeaderUser(session){
+      userPill.textContent = session?.name || session?.full_name || 'العميل';
+    }
+
+    function fillHome(session){
+      $('home-name').textContent = session?.name || session?.full_name || '—';
+      $('home-phone').textContent = session?.phone || '—';
+      $('home-city').textContent = session?.city || '—';
+      $('home-village').textContent = session?.village || '—';
+    }
+
+    function fillRequestIdentity(session){
+      $('req-client-name').value = session?.name || session?.full_name || '';
+      $('req-client-phone').value = session?.phone || '';
+      $('req-client-city').value = session?.city || '';
+      $('req-client-village').value = session?.village || '';
+    }
+
+    function setPage(pageId){
+      [authPage, homePage, requestPage, myRequestsPage].forEach(p => p.classList.remove('active'));
+
+      const pageMap = {
+        'auth-page': authPage,
+        'home-page': homePage,
+        'request-page': requestPage,
+        'my-requests-page': myRequestsPage
+      };
+
+      if (pageMap[pageId]) {
+        pageMap[pageId].classList.add('active');
+      }
+
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.page === pageId);
+      });
+    }
+
+    function bootAuthenticatedUI(){
+      const session = getSession();
+      if (!session) return;
+      showAuthState(true);
+      fillHeaderUser(session);
+      fillHome(session);
+      fillRequestIdentity(session);
+      setPage('home-page');
+    }
+
+    function bootGuestUI(){
+      showAuthState(false);
+      setAuthMode('register');
+      setPage('auth-page');
+    }
+
+    function mapStatusLabel(status){
+      const s = String(status || '').toLowerCase();
+
+      if (['completed', 'done'].includes(s)) {
+        return { cls: 'status-done', text: 'مكتمل' };
+      }
+      if (['accepted', 'in_progress', 'review'].includes(s)) {
+        return { cls: 'status-progress', text: 'قيد المعالجة' };
+      }
+      if (['cancelled'].includes(s)) {
+        return { cls: 'status-pending', text: 'ملغي' };
+      }
+      return { cls: 'status-pending', text: 'بانتظار التنفيذ' };
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function renderRequests(items){
+      if (!Array.isArray(items) || !items.length) {
+        requestsList.innerHTML = `
+          <div class="card">
+            <div class="empty-state">لا توجد طلبات حالياً.</div>
+          </div>
+        `;
+        return;
+      }
+
+      requestsList.innerHTML = items.map(item => {
+        const statusObj = mapStatusLabel(item.status);
+        const idValue = item.visitnumber || item.id || '—';
+        const propertyType = item.property_type || '—';
+        const district = item.district || '—';
+        const city = item.city || '—';
+        const date = item.preferred_date || '—';
+        const time = item.preferred_time || '—';
+        const description = item.description || '—';
+
+        return `
+          <div class="card">
+            <div class="request-card">
+              <div class="request-top">
+                <div class="request-id">رقم الطلب: ${escapeHtml(String(idValue))}</div>
+                <div class="status-badge ${statusObj.cls}">${statusObj.text}</div>
+              </div>
+
+              <div class="request-grid">
+                <div class="request-item">
+                  <div class="k">نوع العقار</div>
+                  <div class="v">${escapeHtml(String(propertyType))}</div>
+                </div>
+
+                <div class="request-item">
+                  <div class="k">المدينة</div>
+                  <div class="v">${escapeHtml(String(city))}</div>
+                </div>
+
+                <div class="request-item">
+                  <div class="k">الحي</div>
+                  <div class="v">${escapeHtml(String(district))}</div>
+                </div>
+
+                <div class="request-item">
+                  <div class="k">التاريخ</div>
+                  <div class="v">${escapeHtml(String(date))}</div>
+                </div>
+
+                <div class="request-item">
+                  <div class="k">الفترة</div>
+                  <div class="v">${escapeHtml(String(time))}</div>
+                </div>
+
+                <div class="request-item">
+                  <div class="k">الوصف</div>
+                  <div class="v">${escapeHtml(String(description))}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadMyRequests(){
+      hideMessage(requestsMsg);
+      const session = getSession();
+
+      if (!session) {
+        renderRequests([]);
+        return;
+      }
+
+      try {
+        refreshRequestsBtn.disabled = true;
+
+        const payload = {
+          client_id: session.id || null,
+          national_id: session.national_id || '',
+          phone: session.phone || ''
+        };
+
+        const result = await postJson(CONFIG.N8N_GET_MY_REQUESTS_WEBHOOK, payload);
+        const items = result.requests || [];
+        renderRequests(items);
+      } catch (err) {
+        showMessage(requestsMsg, 'error', err.message || 'تعذر تحميل الطلبات.');
+        renderRequests([]);
+      } finally {
+        refreshRequestsBtn.disabled = false;
+      }
+    }
+
+    showRegisterBtn.addEventListener('click', () => setAuthMode('register'));
+    showLoginBtn.addEventListener('click', () => setAuthMode('login'));
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessage(authMsg);
+
+      const payload = {
+        full_name: $('reg-name').value.trim(),
+        national_id: $('reg-national-id').value.replace(/\D/g, ''),
+        phone: normalizePhone($('reg-phone').value),
+        city: $('reg-city').value.trim(),
+        village: $('reg-village').value.trim(),
+        password: $('reg-password').value
+      };
+
+      if (!payload.full_name) return showMessage(authMsg, 'error', 'يرجى إدخال الاسم الكامل.');
+      if (!validNationalId(payload.national_id)) return showMessage(authMsg, 'error', 'رقم الهوية غير صحيح.');
+      if (!validSaudiPhone(payload.phone)) return showMessage(authMsg, 'error', 'رقم الجوال غير صحيح.');
+      if (!payload.city) return showMessage(authMsg, 'error', 'يرجى إدخال المدينة.');
+      if (!payload.village) return showMessage(authMsg, 'error', 'يرجى إدخال القرية.');
+      if (!payload.password || payload.password.length < 6) return showMessage(authMsg, 'error', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+
+      setLoading(registerSubmitBtn, true, 'إنشاء الحساب', 'جاري إنشاء الحساب...');
+
+      try {
+        const result = await postJson(CONFIG.N8N_CLIENT_REGISTER_WEBHOOK, payload);
+
+        if (result.success) {
+          const user = result.client || result.user || {
+            id: result.id || null,
+            name: payload.full_name,
+            full_name: payload.full_name,
+            national_id: payload.national_id,
+            phone: payload.phone,
+            city: payload.city,
+            village: payload.village
+          };
+
+          saveSession(user);
+          bootAuthenticatedUI();
+          showMessage(requestMsg, 'info', 'تم إنشاء الحساب بنجاح. يمكنك الآن تقديم طلب خدمة.');
+          setPage('request-page');
+        } else {
+          showMessage(authMsg, 'error', result.message || 'تعذر إنشاء الحساب.');
+        }
+      } catch (err) {
+        showMessage(authMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      } finally {
+        setLoading(registerSubmitBtn, false, 'إنشاء الحساب', 'جاري إنشاء الحساب...');
+      }
     });
 
-    const result = await response.json().catch(() => ({}));
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessage(authMsg);
 
-    if (!response.ok || result.success === false) {
-      throw new Error(result.message || 'تعذر إرسال الطلب');
-    }
+      const payload = {
+        identifier: $('login-identifier').value.trim(),
+        password: $('login-password').value
+      };
 
-    hideLoading();
+      if (!payload.identifier) return showMessage(authMsg, 'error', 'يرجى إدخال رقم الهوية أو الجوال.');
+      if (!payload.password) return showMessage(authMsg, 'error', 'يرجى إدخال كلمة المرور.');
 
-    document.getElementById('client-form-wrap').style.display = 'none';
-    document.getElementById('success-visit-num').textContent = result.visit_number || 'MC-NEW';
-    document.getElementById('client-success').style.display = 'block';
+      setLoading(loginSubmitBtn, true, 'دخول', 'جاري التحقق...');
 
-    STATE.pendingVisit = {
-      visit_number: result.visit_number || 'MC-NEW',
-      property_type: propType,
-      city,
-      district,
-      preferred_date: date,
-      preferred_time: time,
-      status: 'new_request',
-      created_at: new Date().toISOString()
-    };
+      try {
+        const result = await postJson(CONFIG.N8N_CLIENT_LOGIN_WEBHOOK, payload);
 
-    toast('تم إرسال طلبك بنجاح ✅', 'success');
-  } catch (e) {
-    hideLoading();
-    toast(e.message || 'حدث خطأ في الإرسال', 'error');
-  }
-}
+        if (result.success && (result.client || result.user)) {
+          const user = result.client || result.user;
+          saveSession(user);
+          bootAuthenticatedUI();
+          setPage('home-page');
+        } else {
+          showMessage(authMsg, 'error', result.message || 'بيانات الدخول غير صحيحة.');
+        }
+      } catch (err) {
+        showMessage(authMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      } finally {
+        setLoading(loginSubmitBtn, false, 'دخول', 'جاري التحقق...');
+      }
+    });
 
-function goToMyRequests() {
-  navTo('my-requests', document.getElementById('nav-my-requests'));
-}
+    engineeringRequestForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessage(requestMsg);
 
-function resetClientForm() {
-  ['cf-name','cf-phone','cf-district','cf-desc','cf-date'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('cf-city').value = '';
-  document.getElementById('cf-type').value = 'فيلا';
-  document.getElementById('cf-visit-type').value = 'general_inspection';
-  document.getElementById('cf-time').value = '';
-  document.getElementById('client-photo-input').value = '';
-  document.getElementById('client-photos-grid').innerHTML = '';
-  STATE.clientPhotos = [];
-  document.getElementById('client-success').style.display = 'none';
-  document.getElementById('client-form-wrap').style.display = 'block';
+      const session = getSession();
 
-  if (STATE.user) {
-    document.getElementById('cf-name').value = STATE.user.name || '';
-    document.getElementById('cf-phone').value = STATE.user.phone || '';
-  }
-}
+      if (!session) return showMessage(requestMsg, 'error', 'يجب تسجيل الدخول أولاً.');
 
-async function loadMyRequests() {
-  const el = document.getElementById('my-requests-list');
-  el.innerHTML = '<div class="empty-state"><div class="empty-title">جارٍ التحميل...</div></div>';
+      const payload = {
+        client_id: session.id || null,
+        full_name: session.full_name || session.name || '',
+        national_id: session.national_id || '',
+        phone: session.phone || '',
+        city: session.city || '',
+        village: session.village || '',
+        property_type: $('property-type').value,
+        district: $('district').value.trim(),
+        description: $('description').value.trim(),
+        preferred_date: $('preferred-date').value,
+        preferred_time: $('preferred-time').value,
+        service_type: 'engineering_supervision'
+      };
 
-  if (!STATE.user?.phone) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">يرجى تسجيل الدخول</div></div>';
-    return;
-  }
+      if (!payload.property_type) return showMessage(requestMsg, 'error', 'يرجى اختيار نوع العقار.');
+      if (!payload.district) return showMessage(requestMsg, 'error', 'يرجى إدخال الحي.');
+      if (!payload.description) return showMessage(requestMsg, 'error', 'يرجى إدخال وصف الطلب.');
+      if (!payload.preferred_date) return showMessage(requestMsg, 'error', 'يرجى اختيار التاريخ.');
+      if (!payload.preferred_time) return showMessage(requestMsg, 'error', 'يرجى اختيار الفترة.');
 
-  try {
-    const url = CONFIG.N8N_GET_REQUESTS_WEBHOOK + '?phone=' + encodeURIComponent(STATE.user.phone);
-    const res = await fetch(url);
-    const data = await res.json().catch(() => ({}));
+      setLoading(submitRequestBtn, true, 'إرسال الطلب', 'جاري الإرسال...');
 
-    let requests = data.requests || [];
-    if (STATE.pendingVisit) {
-      const found = requests.find(r => r.visit_number === STATE.pendingVisit.visit_number);
-      if (!found) requests = [STATE.pendingVisit, ...requests];
-    }
+      try {
+        const result = await postJson(CONFIG.N8N_CREATE_ENGINEERING_REQUEST_WEBHOOK, payload);
 
-    if (!requests.length) {
-      el.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-title">لا توجد طلبات بعد</div>
-          <div class="empty-sub">اضغط "طلب فحص" لإرسال طلبك الأول</div>
-        </div>`;
-      return;
-    }
+        if (result.success) {
+          const requestNumber = result.visitnumber || result.visit_id || result.request_id || '—';
+          showMessage(requestMsg, 'success', 'تم إرسال الطلب بنجاح. رقم الطلب: ' + requestNumber);
+          engineeringRequestForm.reset();
+          fillRequestIdentity(session);
+          loadMyRequests();
+          setTimeout(() => setPage('my-requests-page'), 700);
+        } else {
+          showMessage(requestMsg, 'error', result.message || 'تعذر إرسال الطلب.');
+        }
+      } catch (err) {
+        showMessage(requestMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      } finally {
+        setLoading(submitRequestBtn, false, 'إرسال الطلب', 'جاري الإرسال...');
+      }
+    });
 
-    el.innerHTML = requests.map(v => `
-      <div class="visit-card">
-        <div class="vc-top">
-          <div class="vc-num">${v.visit_number || '—'}</div>
-          <span class="status-pill sp-${v.status || 'new_request'}">${statusLabel(v.status || 'new_request')}</span>
-        </div>
-        <div class="vc-client">🏠 ${(v.property_type || '—')} — ${(v.city || '—')}</div>
-        <div class="vc-meta">📍 ${(v.district || '—')}</div>
-        <div class="vc-meta">📅 ${(v.preferred_date || '—')} | ⏰ ${(v.preferred_time || '—')}</div>
-        <div class="vc-meta" style="margin-top:4px">${formatDate(v.created_at)}</div>
-        ${['approved','sent','completed'].includes(v.status) ? `
-          <button class="btn btn-green" style="margin-top:10px" onclick="checkReportStatus('${v.visit_number}')">📄 متابعة التقرير</button>
-        ` : ''}
-      </div>
-    `).join('');
-  } catch (e) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">خطأ في تحميل الطلبات</div></div>';
-  }
-}
+    serviceEngineeringCard.addEventListener('click', () => {
+      if (!isAuthenticated()) return;
+      setPage('request-page');
+    });
 
-async function checkReportStatus(visitNumber) {
-  showLoading('جارٍ جلب حالة التقرير...');
-  try {
-    const url = CONFIG.N8N_REPORT_STATUS_WEBHOOK + '?visit_number=' + encodeURIComponent(visitNumber);
-    const res = await fetch(url);
-    const data = await res.json().catch(() => ({}));
-    hideLoading();
+    refreshRequestsBtn.addEventListener('click', loadMyRequests);
 
-    if (data.report_url) {
-      window.open(data.report_url, '_blank');
-      return;
-    }
+    logoutBtn.addEventListener('click', () => {
+      clearSession();
+      registerForm.reset();
+      loginForm.reset();
+      engineeringRequestForm.reset();
+      hideMessage(authMsg);
+      hideMessage(requestMsg);
+      hideMessage(requestsMsg);
+      requestsList.innerHTML = '';
+      bootGuestUI();
+    });
 
-    toast(data.message || 'التقرير قيد الإعداد', 'success');
-  } catch (e) {
-    hideLoading();
-    toast('تعذر جلب حالة التقرير', 'error');
-  }
-}
+    navItems.forEach(item => {
+      item.addEventListener('click', async () => {
+        if (!isAuthenticated()) return;
+        const pageId = item.dataset.page;
+        setPage(pageId);
+        if (pageId === 'my-requests-page') {
+          await loadMyRequests();
+        }
+      });
+    });
 
-(function initDateMin(){
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const el = document.getElementById('cf-date');
-  if (el) el.min = tomorrow.toISOString().split('T')[0];
-})();
-</script>
+    (function init(){
+      const session = getSession();
+      if (session) {
+        bootAuthenticatedUI();
+      } else {
+        bootGuestUI();
+      }
+    })();
+  </script>
 </body>
 </html>
