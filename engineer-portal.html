@@ -568,6 +568,8 @@ window.openManual = () => {
   fillAITable({summary:'',severity:'medium',defects:[''],recommendations:[''],client_message:''});
   M($('inspect-msg'),'info','يمكنك تعبئة النتائج يدوياً الآن.');
 };
+
+window.startInspect=it=>{
   imgs=[];aiData=null;locData=null;
   $('imgs-preview').innerHTML='';$('imgs-msg').style.display='none';
   $('ai-table').style.display='none';$('next-card').style.display='none';
