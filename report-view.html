@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>تقرير زيارة — المطري كونسلت</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#f5f5f5;color:#111;direction:rtl}
+    .container{max-width:800px;margin:0 auto;background:#fff;padding:30px;box-shadow:0 2px 20px rgba(0,0,0,.1)}
+    .header{text-align:center;border-bottom:3px solid #D4A843;padding-bottom:20px;margin-bottom:24px}
+    .logo{font-size:22px;font-weight:900;color:#D4A843;margin-bottom:4px}
+    .logo-sub{font-size:13px;color:#666}
+    .report-title{font-size:18px;font-weight:700;color:#111;margin-top:12px}
+    .report-num{font-size:13px;color:#888;margin-top:4px}
+    .section{margin-bottom:22px}
+    .section-title{font-size:14px;font-weight:800;background:#f8f4e8;border-right:4px solid #D4A843;padding:8px 12px;margin-bottom:12px;color:#333}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{background:#fafafa;border:1px solid #e5e5e5;border-radius:8px;padding:10px}
+    .field .k{font-size:10px;color:#888;margin-bottom:3px;font-weight:700}
+    .field .v{font-size:14px;font-weight:700;color:#111}
+    .report-text{background:#fafafa;border:1px solid #e5e5e5;border-radius:8px;padding:14px;font-size:13px;line-height:1.9;white-space:pre-wrap;color:#222}
+    .ai-box{background:#f5f0ff;border:1px solid #c4b5fd;border-radius:8px;padding:14px;margin-top:14px}
+    .ai-title{font-size:13px;font-weight:800;color:#7C3AED;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .ai-summary{font-size:13px;line-height:1.7;color:#333;margin-bottom:8px}
+    .sev{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:8px}
+    .sev-low{background:#dcfce7;color:#166534}.sev-medium{background:#fef9c3;color:#713f12}.sev-high{background:#fee2e2;color:#991b1b}
+    .ai-list{list-style:none;padding:0}
+    .ai-list li{font-size:12px;color:#444;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05);line-height:1.6}
+    .ai-list li:before{content:'• ';color:#7C3AED;font-weight:700}
+    .client-msg{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-top:10px;font-size:13px;color:#1e40af;font-style:italic;line-height:1.7}
+    .contractor-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px}
+    .footer{margin-top:30px;text-align:center;padding-top:16px;border-top:1px solid #e5e5e5}
+    .footer p{font-size:11px;color:#888;margin-bottom:4px}
+    .footer .stamp{font-size:13px;color:#D4A843;font-weight:700;margin-top:8px}
+    .actions{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:100}
+    .btn-print{padding:12px 24px;background:#D4A843;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 15px rgba(212,168,67,.4)}
+    .btn-close{padding:12px 20px;background:#666;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+    .loading{text-align:center;padding:60px;font-size:16px;color:#888}
+    .error{text-align:center;padding:60px;color:#dc2626;font-size:16px}
+    @media print{
+      body{background:#fff}
+      .container{box-shadow:none;padding:15px}
+      .actions{display:none}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="content"><div class="loading">⏳ جاري تحميل التقرير...</div></div>
+</div>
+<div class="actions" id="actions" style="display:none">
+  <button class="btn-print" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+  <button class="btn-close" onclick="window.close()">✕ إغلاق</button>
+</div>
+
+<script>
+const SUPABASE_URL='https://qxklfethbynwcxswacwj.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110';
+
+const esc=s=>String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+const sevAr={low:'منخفض 🟢',medium:'متوسط 🟡',high:'مرتفع 🔴'};
+const sevCls={low:'sev-low',medium:'sev-medium',high:'sev-high'};
+
+async function loadReport(){
+  const params=new URLSearchParams(window.location.search);
+  const visitId=params.get('id');
+  const dataParam=params.get('data');
+
+  // Preview mode: data passed via URL
+  if(dataParam){
+    try{
+      const decoded=JSON.parse(decodeURIComponent(atob(dataParam)));
+      renderReport(decoded);
+      return;
+    }catch(e){
+      document.getElementById('content').innerHTML='<div class="error">❌ خطأ في قراءة بيانات التقرير.</div>';
+      return;
+    }
+  }
+
+  // View mode: fetch from Supabase by visit_id
+  if(!visitId){
+    document.getElementById('content').innerHTML='<div class="error">❌ لم يتم تحديد رقم التقرير.</div>';
+    return;
+  }
+
+  try{
+    const res=await fetch(
+      `${SUPABASE_URL}/rest/v1/v_visit_reports_full?visit_id=eq.${visitId}&select=*&limit=1`,
+      {headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}}
+    );
+    const data=await res.json();
+    if(!data.length){
+      // Try from visits view
+      const res2=await fetch(
+        `${SUPABASE_URL}/rest/v1/v_visits_full?id=eq.${visitId}&select=*&limit=1`,
+        {headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}}
+      );
+      const data2=await res2.json();
+      if(data2.length) renderReport({...data2[0],report_text:data2[0].description});
+      else document.getElementById('content').innerHTML='<div class="error">❌ لم يتم العثور على التقرير.</div>';
+      return;
+    }
+    renderReport(data[0]);
+  }catch(e){
+    document.getElementById('content').innerHTML=`<div class="error">❌ خطأ في تحميل التقرير: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderReport(r){
+  const today=new Date().toLocaleDateString('ar-SA');
+  document.getElementById('content').innerHTML=`
+    <div class="header">
+      <div class="logo">المطري كونسلت</div>
+      <div class="logo-sub">للاستشارات الهندسية</div>
+      <div class="report-title">تقرير زيارة إشرافية</div>
+      <div class="report-num">رقم الطلب: ${esc(r.visit_number||'—')} &nbsp;|&nbsp; التاريخ: ${esc(r.preferred_date||today)}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">👤 بيانات العميل</div>
+      <div class="grid">
+        <div class="field"><div class="k">اسم العميل</div><div class="v">${esc(r.client_name||'—')}</div></div>
+        <div class="field"><div class="k">رقم الجوال</div><div class="v">${esc(r.client_phone||'—')}</div></div>
+        <div class="field"><div class="k">المدينة</div><div class="v">${esc(r.city||'—')}</div></div>
+        <div class="field"><div class="k">الحي</div><div class="v">${esc(r.district||'—')}</div></div>
+        <div class="field"><div class="k">نوع العقار</div><div class="v">${esc(r.property_type||'—')}</div></div>
+        <div class="field"><div class="k">الفترة المفضلة</div><div class="v">${esc(r.preferred_time||'—')}</div></div>
+      </div>
+    </div>
+
+    ${r.contractor_name?`
+    <div class="section">
+      <div class="section-title">👷 بيانات المقاول</div>
+      <div class="contractor-box">
+        <div class="grid">
+          <div class="field"><div class="k">اسم المقاول</div><div class="v">${esc(r.contractor_name)}</div></div>
+          ${r.contractor_phone?`<div class="field"><div class="k">جوال المقاول</div><div class="v">${esc(r.contractor_phone)}</div></div>`:''}
+        </div>
+      </div>
+    </div>`:''}
+
+    <div class="section">
+      <div class="section-title">👷 بيانات المهندس</div>
+      <div class="grid">
+        <div class="field"><div class="k">المهندس المشرف</div><div class="v">${esc(r.engineer_name||'—')}</div></div>
+        <div class="field"><div class="k">حالة الزيارة</div><div class="v">${esc(r.visit_status||r.status||'—')}</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📋 نص التقرير</div>
+      <div class="report-text">${esc(r.report_text||'لا يوجد نص تقرير')}</div>
+    </div>
+
+    ${r.ai_summary?`
+    <div class="section">
+      <div class="section-title">🤖 تحليل الذكاء الاصطناعي</div>
+      <div class="ai-box">
+        <div class="ai-title">🤖 نتائج تحليل Claude AI</div>
+        <div class="ai-summary">${esc(r.ai_summary)}</div>
+        ${r.ai_severity?`<span class="sev ${sevCls[r.ai_severity]||'sev-medium'}">درجة الخطورة: ${sevAr[r.ai_severity]||r.ai_severity}</span>`:''}
+        ${r.ai_defects?.length?`<div style="margin-top:8px;font-size:12px;font-weight:700;color:#333">العيوب المرصودة:</div><ul class="ai-list">${r.ai_defects.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
+        ${r.ai_recommendations?.length?`<div style="margin-top:8px;font-size:12px;font-weight:700;color:#333">التوصيات:</div><ul class="ai-list">${r.ai_recommendations.map(rec=>`<li>${esc(rec)}</li>`).join('')}</ul>`:''}
+        ${r.ai_client_message?`<div class="client-msg">"${esc(r.ai_client_message)}"</div>`:''}
+      </div>
+    </div>`:''}
+
+    <div class="footer">
+      <p>هذا التقرير صادر من منصة المطري كونسلت للاستشارات الهندسية</p>
+      <p>تاريخ الإصدار: ${today}</p>
+      <div class="stamp">المطري كونسلت ✦ إشراف هندسي معتمد</div>
+    </div>`;
+  document.getElementById('actions').style.display='flex';
+  document.title=`تقرير ${r.visit_number||''}`;
+}
+
+loadReport();
+</script>
+</body>
+</html>
