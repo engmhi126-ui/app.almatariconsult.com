@@ -1046,16 +1046,11 @@
 
     function mapStatusLabel(status){
       const s = String(status || '').toLowerCase();
-
-      if (['completed', 'done'].includes(s)) {
-        return { cls: 'status-done', text: 'مكتمل' };
-      }
-      if (['accepted', 'in_progress', 'review'].includes(s)) {
-        return { cls: 'status-progress', text: 'قيد المعالجة' };
-      }
-      if (['cancelled'].includes(s)) {
-        return { cls: 'status-pending', text: 'ملغي' };
-      }
+      if (['completed', 'done'].includes(s))                         return { cls: 'status-done',     text: 'مكتمل ✓' };
+      if (['in_progress'].includes(s))                               return { cls: 'status-progress', text: 'قيد الفحص' };
+      if (['accepted'].includes(s))                                  return { cls: 'status-progress', text: 'تم القبول' };
+      if (['review'].includes(s))                                    return { cls: 'status-progress', text: 'مراجعة التقرير' };
+      if (['cancelled'].includes(s))                                 return { cls: 'status-pending',  text: 'ملغي' };
       return { cls: 'status-pending', text: 'بانتظار التنفيذ' };
     }
 
@@ -1070,75 +1065,66 @@
 
     function renderRequests(items){
       if (!Array.isArray(items) || !items.length) {
-        requestsList.innerHTML = `
-          <div class="card">
-            <div class="empty-state">لا توجد طلبات حالياً.</div>
-          </div>
-        `;
+        requestsList.innerHTML = `<div class="card"><div class="empty-state">لا توجد طلبات حالياً.</div></div>`;
         return;
       }
 
       requestsList.innerHTML = items.map(item => {
         const statusObj = mapStatusLabel(item.status);
-        const idValue = item.visit_number || item.visitnumber || item.id || '—';
+        const idValue   = item.visit_number || item.visitnumber || item.id || '—';
 
-        // report section
+        // قسم المهندس
+        const engSection = item.engineer_name ? `
+          <div class="request-item" style="grid-column:1/-1;background:rgba(46,127,232,.06);border-color:rgba(46,127,232,.15)">
+            <div class="k">👷 المهندس المعيّن</div>
+            <div class="v" style="color:#8fc2ff">${escapeHtml(item.engineer_name)}</div>
+          </div>` : '';
+
+        // قسم المقاول
+        const contractorSection = item.contractor_name ? `
+          <div class="request-item" style="grid-column:1/-1;background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15)">
+            <div class="k">🔧 المقاول</div>
+            <div class="v" style="color:#fcd34d">${escapeHtml(item.contractor_name)}${item.contractor_phone ? ' — ' + escapeHtml(item.contractor_phone) : ''}</div>
+          </div>` : '';
+
+        // قسم التقرير
         let reportSection = '';
-        if (item.report_text || item.report_status) {
+        if (item.report_text || item.ai_summary) {
+          const sevColors = { low: '#86efac', medium: '#fcd34d', high: '#fca5a5' };
+          const sevLabels = { low: 'منخفض 🟢', medium: 'متوسط 🟡', high: 'مرتفع 🔴' };
           reportSection = `
-            <div style="margin-top:10px;padding:10px;background:rgba(46,127,232,.08);border:1px solid rgba(46,127,232,.18);border-radius:10px">
-              <div style="font-size:11px;color:#9dc7ff;font-weight:800;margin-bottom:6px">📋 التقرير</div>
-              ${item.report_status ? `<div style="font-size:11px;color:var(--text2)">الحالة: <strong style="color:var(--text)">${escapeHtml(item.report_status)}</strong></div>` : ''}
-              ${item.report_text ? `<div style="font-size:11px;color:var(--text2);margin-top:4px;line-height:1.6">${escapeHtml(String(item.report_text).slice(0,120))}${item.report_text.length>120?'...':''}</div>` : ''}
-              ${item.ai_summary ? `<div style="font-size:11px;color:#c4b5fd;margin-top:6px;font-weight:700">🤖 ${escapeHtml(item.ai_summary)}</div>` : ''}
-              ${item.ai_client_message ? `<div style="font-size:11px;color:var(--text2);margin-top:4px">${escapeHtml(item.ai_client_message)}</div>` : ''}
-              ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" style="display:inline-block;margin-top:6px;font-size:11px;color:#60a5fa;font-weight:700">📄 تحميل التقرير PDF</a>` : ''}
-            </div>
-          `;
+            <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:12px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="background:linear-gradient(135deg,#7C3AED,#2E7FE8);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px">التقرير</span>
+                ${item.report_status ? `<span style="font-size:11px;color:var(--text2)">${escapeHtml(item.report_status)}</span>` : ''}
+              </div>
+              ${item.ai_summary ? `<div style="font-size:12px;color:#c4b5fd;font-weight:700;margin-bottom:6px">🤖 ${escapeHtml(item.ai_summary)}</div>` : ''}
+              ${item.ai_severity ? `<div style="font-size:11px;margin-bottom:6px">درجة الخطورة: <strong style="color:${sevColors[item.ai_severity]||'#fcd34d'}">${sevLabels[item.ai_severity]||item.ai_severity}</strong></div>` : ''}
+              ${item.report_text ? `<div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:6px">${escapeHtml(String(item.report_text).slice(0,200))}${item.report_text.length>200?'...':''}</div>` : ''}
+              ${item.ai_client_message ? `<div style="font-size:12px;color:#9dc7ff;font-style:italic;margin-bottom:6px">"${escapeHtml(item.ai_client_message)}"</div>` : ''}
+              ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#60a5fa;font-weight:700;margin-top:4px">📄 تحميل التقرير PDF</a>` : ''}
+            </div>`;
         }
 
         return `
           <div class="card">
             <div class="request-card">
               <div class="request-top">
-                <div class="request-id">رقم الطلب: ${escapeHtml(String(idValue))}</div>
+                <div class="request-id">طلب: ${escapeHtml(String(idValue))}</div>
                 <div class="status-badge ${statusObj.cls}">${statusObj.text}</div>
               </div>
-
               <div class="request-grid">
-                <div class="request-item">
-                  <div class="k">نوع العقار</div>
-                  <div class="v">${escapeHtml(String(item.property_type || '—'))}</div>
-                </div>
-                <div class="request-item">
-                  <div class="k">المدينة</div>
-                  <div class="v">${escapeHtml(String(item.city || '—'))}</div>
-                </div>
-                <div class="request-item">
-                  <div class="k">الحي</div>
-                  <div class="v">${escapeHtml(String(item.district || '—'))}</div>
-                </div>
-                <div class="request-item">
-                  <div class="k">التاريخ</div>
-                  <div class="v">${escapeHtml(String(item.preferred_date || '—'))}</div>
-                </div>
-                <div class="request-item">
-                  <div class="k">الفترة</div>
-                  <div class="v">${escapeHtml(String(item.preferred_time || '—'))}</div>
-                </div>
-                <div class="request-item">
-                  <div class="k">المهندس</div>
-                  <div class="v">${escapeHtml(String(item.engineer_name || 'لم يُعيَّن بعد'))}</div>
-                </div>
-                <div class="request-item" style="grid-column:1/-1">
-                  <div class="k">الوصف</div>
-                  <div class="v">${escapeHtml(String(item.description || '—'))}</div>
-                </div>
+                <div class="request-item"><div class="k">نوع العقار</div><div class="v">${escapeHtml(String(item.property_type||'—'))}</div></div>
+                <div class="request-item"><div class="k">المدينة</div><div class="v">${escapeHtml(String(item.city||'—'))}</div></div>
+                <div class="request-item"><div class="k">الحي</div><div class="v">${escapeHtml(String(item.district||'—'))}</div></div>
+                <div class="request-item"><div class="k">التاريخ</div><div class="v">${escapeHtml(String(item.preferred_date||'—'))}</div></div>
+                <div class="request-item"><div class="k">الفترة</div><div class="v">${escapeHtml(String(item.preferred_time||'—'))}</div></div>
+                <div class="request-item"><div class="k">الوصف</div><div class="v">${escapeHtml(String(item.description||'—'))}</div></div>
+                ${engSection}${contractorSection}
               </div>
               ${reportSection}
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
 
@@ -1202,8 +1188,8 @@
         if (result.success) {
           const clientData = result.client || result.user || {};
           const user = {
-            id:          clientData.user_id      || clientData.id          || null,
-            client_id:   clientData.client_id    || clientData.id          || null,
+            id:          clientData.user_id     || clientData.id          || null,
+            client_id:   clientData.client_id   || clientData.id          || null,
             user_id:     clientData.user_id      || null,
             name:        clientData.name         || clientData.full_name   || payload.full_name,
             full_name:   clientData.full_name    || clientData.name        || payload.full_name,
