@@ -281,7 +281,9 @@
           <div class="field"><label class="label">اسم المقاول</label><input id="r-cname" type="text" placeholder="أدخل اسم المقاول"/></div>
           <div class="field"><label class="label">جوال المقاول</label><input id="r-cphone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" maxlength="10"/></div>
         </div>
-        <div class="card"><button id="submit-btn" class="btn btn-green" type="submit">✅ اعتماد التقرير وإرساله للعميل</button></div>
+        <div class="card"><button id="submit-btn" class="btn btn-green" type="submit">✅ اعتماد التقرير وإرساله للعميل</button>
+          <button type="button" class="btn btn-outline" style="margin-top:10px" onclick="previewReport()">👁️ معاينة التقرير قبل الإرسال</button>
+        </div>
       </form>
     </section>
 
@@ -483,6 +485,42 @@ async function saveImgRecords(visitId,urls,engId){
   for(const url of urls)await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/visit_images`,{method:'POST',headers:{apikey:CONFIG.SUPABASE_KEY,Authorization:`Bearer ${CONFIG.SUPABASE_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({visit_id:visitId,image_url:url,uploaded_by:engId})});
 }
 
+window.previewReport = () => {
+  const s=getS();
+  const visitId=$('r-id').value;
+  if(!visitId) return alert('يجب فتح الطلب أولاً من صفحة الفحص.');
+  const finalAI={
+    summary:$('ai-edit-summary').value.trim()||aiData?.summary||null,
+    severity:$('ai-edit-severity').value||aiData?.severity||null,
+    defects:getDefects(),
+    recommendations:getRecs(),
+    client_message:$('ai-edit-client-msg').value.trim()||aiData?.client_message||null
+  };
+  const previewData={
+    visit_number:$('r-id').value,
+    client_name:$('i-client').textContent,
+    client_phone:$('i-phone').textContent,
+    city:$('i-city').textContent,
+    district:$('i-dist').textContent,
+    property_type:$('i-prop').textContent,
+    preferred_time:'',
+    preferred_date:new Date().toISOString().split('T')[0],
+    engineer_name:s?.name||s?.engineer_name||'—',
+    contractor_name:$('r-cname').value.trim()||null,
+    contractor_phone:$('r-cphone').value.trim()||null,
+    report_text:$('r-text').value.trim(),
+    visit_status:$('r-vstatus').value,
+    ai_summary:finalAI.summary,
+    ai_severity:finalAI.severity,
+    ai_defects:finalAI.defects,
+    ai_recommendations:finalAI.recommendations,
+    ai_client_message:finalAI.client_message
+  };
+  sessionStorage.setItem('report_preview', JSON.stringify(previewData));
+  const url=`https://engmhi126-ui.github.io/app.almatariconsult.com/report-view.html?mode=preview`;
+  window.open(url,'_blank');
+};
+
 // ---- Submit Report ----
 $('report-form').addEventListener('submit',async e=>{
   e.preventDefault();Mc($('report-msg'));
@@ -493,6 +531,11 @@ $('report-form').addEventListener('submit',async e=>{
   if(!$('r-status').value)return M($('report-msg'),'error','اختر حالة التقرير.');
   if(!$('r-vstatus').value)return M($('report-msg'),'error','اختر حالة الزيارة.');
   if(!$('r-text').value.trim())return M($('report-msg'),'error','اكتب ملاحظات التقرير.');
+
+  // توليد رابط التقرير تلقائياً
+  const visitId=$('r-id').value;
+  const reportUrl=`https://engmhi126-ui.github.io/app.almatariconsult.com/report-view.html?id=${visitId}`;
+  if(!$('r-pdf').value.trim()) $('r-pdf').value=reportUrl;
 
   // Capture final AI data from edited table
   const finalAI={
