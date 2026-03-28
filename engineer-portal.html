@@ -1,1102 +1,619 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#050D18" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <meta name="theme-color" content="#050D18"/>
   <title>المطري كونسلت — بوابة المهندس</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
   <script>
     const CONFIG = {
-      APP_NAME: 'المطري كونسلت',
-
-      N8N_ENGINEER_LOGIN_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-login',
-      N8N_ENGINEER_GET_VISITS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-get-visits',
-      N8N_ENGINEER_ACCEPT_VISIT_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-accept-visit',
-      N8N_ENGINEER_SUBMIT_REPORT_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-submit-report'
+      SUPABASE_URL: 'https://qxklfethbynwcxswacwj.supabase.co',
+      SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110',
+      CLAUDE_API_KEY: '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',
+      N8N_BASE: 'https://n8n.srv1243842.hstgr.cloud/webhook',
     };
   </script>
-
   <style>
     :root{
-      --bg:#050D18;
-      --bg2:#08111F;
-      --surface:#0C1929;
-      --surface2:#102238;
-      --border:rgba(255,255,255,0.08);
-      --border2:rgba(255,255,255,0.14);
-      --gold:#D4A843;
-      --gold2:#F0C060;
-      --blue:#2E7FE8;
-      --green:#2DBE73;
-      --green2:#178A52;
-      --red:#E45A5A;
-      --text:#EEF2F8;
-      --text2:#90A8C7;
-      --text3:#5E7797;
-      --shadow:0 8px 30px rgba(0,0,0,0.35);
-    }
-
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html, body{
-      height:100%;
-      overflow:hidden;
-    }
-
-    body{
-      background:var(--bg);
-      color:var(--text);
-      font-family:'Cairo',sans-serif;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    input, button, select, textarea{
-      font-family:inherit;
-    }
-
-    button{
-      cursor:pointer;
-    }
-
-    textarea{
-      resize:none;
-    }
-
-    #app{
-      display:flex;
-      flex-direction:column;
-      height:100%;
-      height:100dvh;
-      max-width:460px;
-      margin:0 auto;
-      position:relative;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at top right, rgba(212,168,67,.07), transparent 28%),
-        linear-gradient(180deg, #07111d 0%, #050D18 100%);
-    }
-
-    #app::before{
-      content:'';
-      position:fixed;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      background-image:
-        linear-gradient(rgba(46,127,232,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(46,127,232,0.03) 1px, transparent 1px);
-      background-size:40px 40px;
-    }
-
-    #header{
-      background:rgba(8,15,28,0.95);
-      backdrop-filter:blur(20px);
-      border-bottom:1px solid var(--border);
-      padding:0 16px;
-      height:58px;
-      flex-shrink:0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      position:relative;
-      z-index:50;
-    }
-
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .logo-mark{
-      width:36px;
-      height:36px;
-      border-radius:10px;
-      background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:18px;
-      font-weight:900;
-      color:#fff;
-      box-shadow:0 2px 12px rgba(212,168,67,.35);
-      flex-shrink:0;
-    }
-
-    .logo-text .name{
-      font-size:14px;
-      font-weight:800;
-      color:var(--text);
-      line-height:1.2;
-    }
-
-    .logo-text .tag{
-      font-size:10px;
-      color:var(--gold);
-      font-weight:600;
-    }
-
-    .header-right{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    #engineer-pill{
-      display:none;
-      align-items:center;
-      gap:6px;
-      background:var(--surface);
-      border:1px solid var(--border2);
-      border-radius:20px;
-      padding:5px 12px;
-      font-size:12px;
-      color:var(--blue);
-      font-weight:700;
-      max-width:160px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    #logout-btn{
-      background:var(--surface);
-      border:1px solid var(--border);
-      color:var(--text3);
-      font-size:13px;
-      cursor:pointer;
-      padding:6px 10px;
-      border-radius:8px;
-      display:none;
-    }
-
-    #pages{
-      flex:1;
-      overflow:hidden;
-      position:relative;
-      z-index:1;
-    }
-
-    .page{
-      position:absolute;
-      inset:0;
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
-      padding:20px 16px 92px;
-      opacity:0;
-      pointer-events:none;
-      transform:translateY(12px);
-      transition:opacity .22s ease, transform .22s ease;
-    }
-
-    .page.active{
-      opacity:1;
-      pointer-events:all;
-      transform:translateY(0);
-    }
-
-    #bottom-nav{
-      flex-shrink:0;
-      background:rgba(8,15,28,0.97);
-      backdrop-filter:blur(20px);
-      border-top:1px solid var(--border);
-      display:flex;
-      padding-bottom:env(safe-area-inset-bottom, 0px);
-      position:relative;
-      z-index:50;
-      min-height:64px;
-    }
-
-    .nav-item{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:4px;
-      cursor:pointer;
-      border:none;
-      background:none;
-      color:var(--text3);
-      font-size:10px;
-      font-weight:700;
-      transition:all .2s;
-      padding:8px 4px;
-    }
-
-    .nav-item .nav-icon{
-      font-size:22px;
-      line-height:1;
-    }
-
-    .nav-item.active{
-      color:var(--gold);
-    }
-
-    .page-tag{
-      font-size:10px;
-      color:var(--gold);
-      font-weight:700;
-      letter-spacing:2.5px;
-      margin-bottom:6px;
-      text-align:center;
-    }
-
-    .page-title{
-      font-size:24px;
-      font-weight:900;
-      text-align:center;
-    }
-
-    .page-sub{
-      font-size:13px;
-      color:var(--text2);
-      text-align:center;
-      margin-top:6px;
-      line-height:1.7;
-    }
-
-    .page-head{
-      margin-bottom:24px;
-    }
-
-    .card{
-      background:linear-gradient(180deg, rgba(16,34,56,.97), rgba(12,25,41,.97));
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:15px;
-      box-shadow:var(--shadow);
-      margin-bottom:14px;
-    }
-
-    .field{
-      margin-bottom:14px;
-    }
-
-    .label{
-      display:block;
-      font-size:12px;
-      font-weight:700;
-      color:var(--text2);
-      margin-bottom:7px;
-    }
-
-    .req{
-      color:var(--red);
-    }
-
-    input[type=text],
-    input[type=tel],
-    input[type=password],
-    input[type=date],
-    textarea,
-    select{
-      width:100%;
-      background:var(--surface2);
-      border:1.5px solid var(--border);
-      border-radius:12px;
-      padding:13px 14px;
-      color:var(--text);
-      font-size:15px;
-      font-weight:600;
-      appearance:none;
-    }
-
-    input:focus, textarea:focus, select:focus{
-      outline:none;
-      border-color:var(--blue) !important;
-      box-shadow:0 0 0 3px rgba(46,127,232,0.12);
-    }
-
-    textarea{
-      line-height:1.7;
-      min-height:110px;
-    }
-
-    .grid2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .btn{
-      width:100%;
-      padding:14px 20px;
-      border-radius:13px;
-      font-size:15px;
-      font-weight:800;
-      cursor:pointer;
-      border:none;
-      transition:all .18s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-    }
-
-    .btn-gold{
-      background:linear-gradient(135deg, var(--gold), #9A6B12);
-      color:#fff;
-      box-shadow:0 4px 20px rgba(212,168,67,.3);
-    }
-
-    .btn-outline{
-      background:transparent;
-      color:var(--text2);
-      border:1.5px solid var(--border2);
-    }
-
-    .btn-green{
-      background:linear-gradient(135deg, #22B868, #148049);
-      color:#fff;
-    }
-
-    .btn-red{
-      background:linear-gradient(135deg, #E45A5A, #B63E3E);
-      color:#fff;
-    }
-
-    .btn:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-    }
-
-    .msg{
-      display:none;
-      margin-bottom:14px;
-      padding:12px 13px;
-      border-radius:12px;
-      font-size:13px;
-      line-height:1.7;
-      font-weight:700;
-    }
-
-    .msg.show{ display:block; }
-    .msg.success{
-      background:rgba(45,190,115,.12);
-      border:1px solid rgba(45,190,115,.30);
-      color:#81e7af;
-    }
-    .msg.error{
-      background:rgba(228,90,90,.10);
-      border:1px solid rgba(228,90,90,.28);
-      color:#ffb0b0;
-    }
-    .msg.info{
-      background:rgba(46,127,232,.10);
-      border:1px solid rgba(46,127,232,.28);
-      color:#9dc7ff;
-    }
-
-    .hint{
-      margin-top:8px;
-      font-size:12px;
-      color:var(--text3);
-      line-height:1.7;
-    }
-
-    .visit-card{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-      margin-bottom:12px;
-    }
-
-    .visit-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .visit-number{
-      font-size:13px;
-      font-weight:900;
-      color:var(--gold2);
-    }
-
-    .status-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:88px;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:800;
-    }
-
-    .status-pending{
-      background:rgba(212,168,67,.14);
-      color:var(--gold2);
-      border:1px solid rgba(212,168,67,.28);
-    }
-
-    .status-progress{
-      background:rgba(46,127,232,.12);
-      color:#8fc2ff;
-      border:1px solid rgba(46,127,232,.28);
-    }
-
-    .status-done{
-      background:rgba(45,190,115,.12);
-      color:#84ebb0;
-      border:1px solid rgba(45,190,115,.28);
-    }
-
-    .visit-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin-bottom:12px;
-    }
-
-    .visit-item{
-      background:rgba(255,255,255,.02);
-      border:1px solid rgba(255,255,255,.05);
-      border-radius:10px;
-      padding:9px;
-    }
-
-    .visit-item .k{
-      font-size:10px;
-      color:var(--text3);
-      margin-bottom:4px;
-      font-weight:700;
-    }
-
-    .visit-item .v{
-      font-size:12px;
-      color:var(--text);
-      font-weight:700;
-      line-height:1.6;
-      word-break:break-word;
-    }
-
-    .visit-actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .empty-state{
-      text-align:center;
-      color:var(--text2);
-      font-size:13px;
-      line-height:1.8;
-      padding:18px 10px;
-    }
-
-    .section-title{
-      font-size:15px;
-      font-weight:900;
-      margin-bottom:12px;
-      color:var(--text);
-    }
-
-    .mini-stat{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px;
-      text-align:center;
-    }
-
-    .mini-stat .num{
-      font-size:20px;
-      font-weight:900;
-      color:var(--gold2);
-      margin-bottom:4px;
-    }
-
-    .mini-stat .txt{
-      font-size:11px;
-      color:var(--text2);
-      font-weight:700;
-    }
-
-    @media (max-width:360px){
-      .grid2, .visit-grid, .visit-actions{
-        grid-template-columns:1fr;
-      }
-    }
+      --bg:#06101E;--surface:#0D1F35;--surface2:#112540;--surface3:#162B48;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+      --gold:#D4A843;--gold2:#F0C060;--gold3:rgba(212,168,67,0.12);
+      --blue:#2E7FE8;--green:#22B868;--red:#E45A5A;
+      --text:#EEF2F8;--text2:#8FAFC8;--text3:#4E6B8A;
+      --shadow:0 4px 20px rgba(0,0,0,0.4);--radius:16px;--radius-sm:10px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;overflow:hidden}
+    body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;-webkit-font-smoothing:antialiased}
+    input,button,select,textarea{font-family:inherit}
+    button{cursor:pointer;border:none;background:none}
+    textarea{resize:none}
+    #app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:430px;margin:0 auto;position:relative;overflow:hidden;background:linear-gradient(180deg,#07111d 0%,var(--bg) 100%)}
+    #header{background:rgba(6,16,30,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 14px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:50}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#7A5010);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;box-shadow:0 2px 14px rgba(212,168,67,.4);flex-shrink:0}
+    .logo-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.2}
+    .logo-tag{font-size:10px;color:var(--gold);font-weight:600}
+    .header-right{display:flex;align-items:center;gap:6px}
+    #power-btn{width:34px;height:34px;border-radius:50%;background:rgba(228,90,90,.12);border:1px solid rgba(228,90,90,.3);color:var(--red);font-size:15px;display:none;align-items:center;justify-content:center}
+    #eng-badge{display:none;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);font-weight:700;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #pages{flex:1;overflow:hidden;position:relative;z-index:1}
+    .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 80px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .2s,transform .2s}
+    .page.active{opacity:1;pointer-events:all;transform:translateY(0)}
+    #bottom-nav{flex-shrink:0;background:rgba(6,16,30,0.98);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:none;padding-bottom:env(safe-area-inset-bottom,0px);position:relative;z-index:50;min-height:62px}
+    .nav-bar{display:flex;width:100%}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:9px;font-weight:700;transition:all .2s;padding:8px 2px}
+    .nav-item .ni{font-size:20px;line-height:1}
+    .nav-item.active{color:var(--gold)}
+    .card{background:linear-gradient(180deg,rgba(13,31,53,.98),rgba(9,21,38,.98));border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+    .card-gold{border-color:rgba(212,168,67,.25)}
+    .sec-tag{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:2px;margin-bottom:4px;text-align:center}
+    .page-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:4px}
+    .page-sub{font-size:12px;color:var(--text2);text-align:center;line-height:1.7}
+    .page-head{margin-bottom:18px}
+    .sec-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:10px}
+    .field{margin-bottom:12px}
+    .label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px}
+    .req{color:var(--red)}
+    input[type=text],input[type=tel],input[type=password],input[type=date],textarea,select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 13px;color:var(--text);font-size:14px;font-weight:600;appearance:none}
+    input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(46,127,232,.12)}
+    textarea{line-height:1.7;min-height:90px}
+    input[readonly]{opacity:.8}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .btn{width:100%;padding:13px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:800;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),#9A6B12);color:#fff;box-shadow:0 4px 18px rgba(212,168,67,.28)}
+    .btn-green{background:linear-gradient(135deg,#22B868,#148049);color:#fff}
+    .btn-blue{background:linear-gradient(135deg,#2E7FE8,#1E60B7);color:#fff}
+    .btn-outline{background:transparent;color:var(--text2);border:1.5px solid var(--border2)}
+    .btn-sm{padding:8px 12px;font-size:12px;border-radius:8px;width:auto}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .msg{display:none;margin-bottom:12px;padding:11px 12px;border-radius:var(--radius-sm);font-size:12px;line-height:1.7;font-weight:700}
+    .msg.show{display:block}
+    .msg.success{background:rgba(34,184,104,.1);border:1px solid rgba(34,184,104,.3);color:#81e7af}
+    .msg.error{background:rgba(228,90,90,.1);border:1px solid rgba(228,90,90,.28);color:#ffb0b0}
+    .msg.info{background:rgba(46,127,232,.1);border:1px solid rgba(46,127,232,.28);color:#9dc7ff}
+    .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+    .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center}
+    .stat-num{font-size:22px;font-weight:900;color:var(--gold2)}
+    .stat-lbl{font-size:10px;color:var(--text2);font-weight:700;margin-top:2px}
+    .element-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .el-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;cursor:pointer;transition:all .18s}
+    .el-card:active{transform:scale(.97)}
+    .el-card.selected{border-color:var(--blue);background:rgba(46,127,232,.12);box-shadow:0 0 0 2px rgba(46,127,232,.3)}
+    .el-icon{font-size:26px;margin-bottom:6px;display:block}
+    .el-name{font-size:12px;font-weight:700;color:var(--text2)}
+    .el-card.selected .el-name{color:var(--blue)}
+    .upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .upload-zone:hover{border-color:var(--gold);background:rgba(212,168,67,.04)}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .upload-icon{font-size:28px;margin-bottom:6px}
+    .upload-txt{font-size:12px;color:var(--text2);font-weight:700}
+    .upload-sub{font-size:10px;color:var(--text3);margin-top:3px}
+    .imgs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+    .img-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+    .img-thumb img{width:100%;height:100%;object-fit:cover}
+    .img-rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);color:#fff;width:20px;height:20px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .img-count-txt{font-size:10px;color:var(--text3);text-align:center;margin-top:5px}
+    .safety-box{background:rgba(228,90,90,.06);border:1px solid rgba(228,90,90,.2);border-radius:var(--radius-sm);padding:13px;display:flex;align-items:center;gap:10px;cursor:pointer}
+    .safety-box.active{background:rgba(228,90,90,.14);border-color:rgba(228,90,90,.4)}
+    .toggle{width:42px;height:24px;border-radius:12px;background:var(--surface3);position:relative;transition:.2s;flex-shrink:0}
+    .toggle::after{content:'';position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+    .toggle.on{background:var(--red)}
+    .toggle.on::after{right:calc(100% - 21px)}
+    .safety-txt .t{font-size:13px;font-weight:800;color:var(--text)}
+    .safety-txt .s{font-size:10px;color:var(--text3);margin-top:2px}
+    .loc-box{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 13px;display:flex;align-items:center;gap:10px}
+    .loc-icon{font-size:22px;flex-shrink:0}
+    .loc-info{flex:1}
+    .loc-coords{font-size:12px;color:var(--text);font-weight:700}
+    .loc-status{font-size:10px;color:var(--text3);margin-top:2px}
+    .loc-btn{background:var(--blue);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;white-space:nowrap}
+    .map-link{display:none;margin-top:8px}
+    .map-link a{color:var(--blue);font-size:11px;font-weight:700}
+    .ai-box{background:rgba(46,127,232,.06);border:1px solid rgba(46,127,232,.18);border-radius:var(--radius-sm);padding:13px;margin-top:10px;display:none}
+    .ai-box.show{display:block}
+    .ai-spin{width:28px;height:28px;border:3px solid rgba(46,127,232,.3);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ai-spin-txt{font-size:12px;color:#9dc7ff;font-weight:700;text-align:center}
+    .ai-res{background:rgba(34,184,104,.06);border:1px solid rgba(34,184,104,.2);border-radius:var(--radius-sm);padding:13px;margin-top:10px;display:none}
+    .ai-res.show{display:block}
+    .ai-res-hd{font-size:12px;font-weight:900;color:#84ebb0;margin-bottom:10px}
+    .ai-row{margin-bottom:8px}
+    .ai-row .k{font-size:10px;color:var(--text3);font-weight:700;margin-bottom:3px}
+    .ai-row .v{font-size:12px;color:var(--text);font-weight:600;line-height:1.7}
+    .sev-low{color:#84ebb0}.sev-mid{color:var(--gold2)}.sev-high{color:#ffb0b0}
+    .rep-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:10px}
+    .rep-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .rep-num{font-size:13px;font-weight:900;color:var(--gold2)}
+    .badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800}
+    .badge-pending{background:rgba(212,168,67,.14);color:var(--gold2);border:1px solid rgba(212,168,67,.28)}
+    .badge-done{background:rgba(34,184,104,.12);color:#84ebb0;border:1px solid rgba(34,184,104,.28)}
+    .badge-progress{background:rgba(46,127,232,.12);color:#8fc2ff;border:1px solid rgba(46,127,232,.28)}
+    .rep-info{font-size:12px;color:var(--text2);line-height:1.9}
+    .rep-info span{display:block}
+    .rep-actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+    .search-box{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;font-size:13px;color:var(--text);font-weight:600;width:100%;margin-bottom:12px}
+    .search-box::placeholder{color:var(--text3)}
+    .filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+    .filter-btn{padding:7px 13px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid var(--border2);color:var(--text2);background:var(--surface2);cursor:pointer;transition:.15s}
+    .filter-btn.active{background:var(--gold3);border-color:rgba(212,168,67,.4);color:var(--gold2)}
+    .visit-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:10px}
+    .visit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .visit-num{font-size:13px;font-weight:900;color:var(--gold2)}
+    .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+    .vi{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:8px}
+    .vi .k{font-size:9px;color:var(--text3);font-weight:700;margin-bottom:3px}
+    .vi .v{font-size:11px;color:var(--text);font-weight:700;word-break:break-word;line-height:1.5}
+    .vacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .empty{text-align:center;color:var(--text3);font-size:13px;padding:30px 10px}
+    @media(max-width:360px){.element-grid,.grid2,.vgrid,.vacts,.imgs-grid,.stats-row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div id="app">
-    <header id="header">
-      <div class="logo">
-        <div class="logo-mark">م</div>
-        <div class="logo-text">
-          <div class="name">المطري كونسلت</div>
-          <div class="tag">بوابة المهندس</div>
-        </div>
+<div id="app">
+  <header id="header">
+    <div class="logo">
+      <div class="logo-mark">م</div>
+      <div>
+        <div class="logo-name">المطري كونسلت</div>
+        <div class="logo-tag" id="h-tag">بوابة المهندس</div>
       </div>
+    </div>
+    <div class="header-right">
+      <div id="eng-badge"></div>
+      <button id="power-btn" onclick="doLogout()">⏻</button>
+    </div>
+  </header>
 
-      <div class="header-right">
-        <div id="engineer-pill"></div>
-        <button id="logout-btn" type="button">خروج</button>
+  <main id="pages">
+    <!-- AUTH -->
+    <section id="pg-auth" class="page active">
+      <div style="height:30px"></div>
+      <div class="page-head">
+        <div class="sec-tag">ENGINEER PORTAL</div>
+        <div class="page-title">دخول المهندس</div>
+        <div class="page-sub">سجل الدخول للوصول إلى الطلبات والتقارير</div>
       </div>
-    </header>
+      <div id="auth-msg" class="msg"></div>
+      <div class="card">
+        <form id="login-form">
+          <div class="field"><label class="label">رقم الجوال <span class="req">*</span></label>
+            <input id="l-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" maxlength="10" required/></div>
+          <div class="field"><label class="label">كلمة المرور <span class="req">*</span></label>
+            <input id="l-pass" type="password" placeholder="أدخل كلمة المرور" required/></div>
+          <button id="login-btn" class="btn btn-gold" type="submit">دخول</button>
+        </form>
+      </div>
+    </section>
 
-    <main id="pages">
-      <section id="auth-page" class="page active">
-        <div class="page-head">
-          <div class="page-tag">ENGINEER PORTAL</div>
-          <div class="page-title">دخول المهندس</div>
-          <div class="page-sub">سجل الدخول للوصول إلى الطلبات وقبولها ورفع التقارير.</div>
-        </div>
 
-        <div id="auth-msg" class="msg"></div>
-
-        <div class="card">
-          <form id="login-form">
-            <div class="field">
-              <label class="label">رقم الجوال <span class="req">*</span></label>
-              <input id="login-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" required />
-            </div>
-
-            <div class="field">
-              <label class="label">كلمة المرور <span class="req">*</span></label>
-              <input id="login-password" type="password" placeholder="أدخل كلمة المرور" required />
-            </div>
-
-            <button id="login-submit-btn" class="btn btn-gold" type="submit">دخول</button>
-            <div class="hint">التحقق يتم من خلال الخادم مباشرة وليس من الواجهة.</div>
-          </form>
-        </div>
-      </section>
-
-      <section id="dashboard-page" class="page">
-        <div class="page-head">
-          <div class="page-tag">ENGINEER DASHBOARD</div>
-          <div class="page-title">لوحة المهندس</div>
-          <div class="page-sub">راجع الطلبات الجديدة والطلبات المقبولة وابدأ إعداد التقارير.</div>
-        </div>
-
-        <div class="grid2">
-          <div class="mini-stat">
-            <div class="num" id="stat-all">0</div>
-            <div class="txt">إجمالي الطلبات</div>
-          </div>
-          <div class="mini-stat">
-            <div class="num" id="stat-pending">0</div>
-            <div class="txt">طلبات جديدة</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <button id="refresh-visits-btn" class="btn btn-outline" type="button">تحديث الطلبات</button>
-        </div>
-
-        <div id="visits-msg" class="msg"></div>
-        <div id="visits-list"></div>
-      </section>
-
-      <section id="report-page" class="page">
-        <div class="page-head">
-          <div class="page-tag">REPORT FORM</div>
-          <div class="page-title">إعداد التقرير</div>
-          <div class="page-sub">اكتب ملاحظاتك الفنية واعتمد حالة الزيارة.</div>
-        </div>
-
-        <div id="report-msg" class="msg"></div>
-
-        <div class="card">
-          <div class="section-title">بيانات الطلب</div>
-
-          <div class="grid2">
-            <div class="field">
-              <label class="label">رقم الطلب</label>
-              <input id="report-visitnumber" type="text" readonly />
-            </div>
-            <div class="field">
-              <label class="label">اسم العميل</label>
-              <input id="report-full-name" type="text" readonly />
-            </div>
-          </div>
-
-          <div class="grid2">
-            <div class="field">
-              <label class="label">نوع العقار</label>
-              <input id="report-property-type" type="text" readonly />
-            </div>
-            <div class="field">
-              <label class="label">الحي</label>
-              <input id="report-district" type="text" readonly />
-            </div>
-          </div>
-
-          <form id="report-form">
-            <input id="report-visit-id" type="hidden" />
-
-            <div class="field">
-              <label class="label">حالة التقرير <span class="req">*</span></label>
-              <select id="report-status" required>
-                <option value="">اختر الحالة</option>
-                <option value="review">يحتاج مراجعة</option>
-                <option value="completed">مكتمل</option>
-                <option value="cancelled">ملغي</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="label">حالة الزيارة <span class="req">*</span></label>
-              <select id="visit-status" required>
-                <option value="">اختر الحالة</option>
-                <option value="accepted">مقبول</option>
-                <option value="in_progress">قيد المعالجة</option>
-                <option value="completed">منجز</option>
-                <option value="cancelled">ملغي</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="label">ملاحظات التقرير <span class="req">*</span></label>
-              <textarea id="report-text" placeholder="اكتب الملاحظات الفنية، العيوب، البنود، التوصيات..." required></textarea>
-            </div>
-
-            <div class="field">
-              <label class="label">رابط ملف التقرير PDF</label>
-              <input id="report-file-url" type="text" placeholder="ضع رابط التقرير عند توفره" />
-            </div>
-
-            <div class="field">
-              <label class="label">ملاحظات إضافية للإدارة</label>
-              <textarea id="admin-notes" placeholder="أي ملاحظات داخلية إضافية"></textarea>
-            </div>
-
-            <button id="submit-report-btn" class="btn btn-green" type="submit">حفظ التقرير</button>
-          </form>
-        </div>
-      </section>
-    </main>
-
-    <nav id="bottom-nav">
-      <button class="nav-item active" data-page="dashboard-page" type="button">
-        <span class="nav-icon">📋</span>
-        <span>الطلبات</span>
-      </button>
-
-      <button class="nav-item" data-page="report-page" type="button">
-        <span class="nav-icon">📝</span>
-        <span>التقرير</span>
-      </button>
-    </nav>
+<!-- HOME -->
+<section id="pg-home" class="page">
+  <div class="page-head">
+    <div class="sec-tag">DASHBOARD</div>
+    <div class="page-title">الرئيسية</div>
   </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">إجمالي</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-pending">0</div><div class="stat-lbl">جديدة</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">منجزة</div></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">⚡ إجراء سريع</div>
+    <div class="grid2">
+      <button class="btn btn-gold" onclick="navTo('pg-inspect')">🔍 فحص عنصر</button>
+      <button class="btn btn-outline" onclick="navTo('pg-review')">📋 المراجعة</button>
+    </div>
+  </div>
+  <div id="home-msg" class="msg"></div>
+  <div id="home-visits"></div>
+</section>
+
+<!-- INSPECT -->
+<section id="pg-inspect" class="page">
+  <div class="page-head">
+    <div class="sec-tag">FIELD INSPECTION</div>
+    <div class="page-title">فحص عنصر</div>
+  </div>
+  <div id="inspect-msg" class="msg"></div>
+  <div class="card">
+    <div class="sec-title">اختر الطلب <span class="req">*</span></div>
+    <select id="visit-select"><option value="">اختر طلب زيارة...</option></select>
+  </div>
+  <div class="card">
+    <div class="sec-title">نوع العنصر <span class="req">*</span></div>
+    <div class="element-grid" id="element-grid">
+      <div class="el-card" data-val="رقاب"><span class="el-icon">🔩</span><div class="el-name">رقاب</div></div>
+      <div class="el-card" data-val="اساسات"><span class="el-icon">⛏️</span><div class="el-name">اساسات</div></div>
+      <div class="el-card" data-val="خنزيرة"><span class="el-icon">🧱</span><div class="el-name">خنزيرة</div></div>
+      <div class="el-card" data-val="مباني"><span class="el-icon">🏗️</span><div class="el-name">مباني</div></div>
+      <div class="el-card" data-val="اعمدة"><span class="el-icon">🏛️</span><div class="el-name">اعمدة</div></div>
+      <div class="el-card" data-val="ميدة"><span class="el-icon">➖</span><div class="el-name">ميدة</div></div>
+      <div class="el-card" data-val="اعتاب"><span class="el-icon">🚪</span><div class="el-name">اعتاب</div></div>
+      <div class="el-card" data-val="سلم"><span class="el-icon">🪜</span><div class="el-name">سلم</div></div>
+      <div class="el-card" data-val="سقف"><span class="el-icon">🏠</span><div class="el-name">سقف</div></div>
+      <div class="el-card" data-val="أخرى"><span class="el-icon">📝</span><div class="el-name">أخرى</div></div>
+      <div class="el-card" data-val="رطوبة"><span class="el-icon">💧</span><div class="el-name">رطوبة</div></div>
+      <div class="el-card" data-val="شرخ"><span class="el-icon">⚡</span><div class="el-name">شرخ</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="grid2">
+      <div class="field"><label class="label">رقم العنصر</label><input id="el-num" type="text" placeholder="COL-01"/></div>
+      <div class="field"><label class="label">موقع العنصر</label><input id="el-loc" type="text" placeholder="الدور الأول"/></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-title">صور العنصر <span class="req">*</span> <span style="font-size:10px;color:var(--text3);font-weight:600">(1-6 صور)</span></div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="img-input" accept="image/*" multiple/>
+      <div class="upload-icon">📷</div>
+      <div class="upload-txt">اضغط لرفع صور الموقع</div>
+      <div class="upload-sub">JPG · PNG · HEIC — حتى 6 صور</div>
+    </div>
+    <div class="imgs-grid" id="imgs-preview"></div>
+    <div class="img-count-txt" id="img-count"></div>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="safety-box" id="safety-box" onclick="toggleSafety()">
+      <div class="toggle" id="safety-toggle"></div>
+      <div class="safety-txt">
+        <div class="t">⚠️ يوجد خطر فوري على السلامة؟</div>
+        <div class="s">فعّل هذا إذا كان العنصر يشكّل خطراً مباشراً</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="field"><label class="label">ملاحظات المهندس</label>
+      <textarea id="eng-notes" placeholder="أي ملاحظات إضافية..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">📍 موقع العنصر الجغرافي</div>
+    <div class="loc-box">
+      <div class="loc-icon">🗺️</div>
+      <div class="loc-info">
+        <div class="loc-coords" id="loc-coords">لم يتم التحديد بعد</div>
+        <div class="loc-status" id="loc-status">اضغط لتحديد الموقع الحالي</div>
+      </div>
+      <button class="loc-btn" id="loc-btn" onclick="getLocation()">📍 تحديد</button>
+    </div>
+    <div class="map-link" id="map-link"><a id="map-a" href="#" target="_blank">✅ تم التحديد — عرض على الخريطة</a></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">🤖 التحليل الذكي للصور</div>
+    <div class="grid2" style="gap:8px;margin-bottom:8px">
+      <button id="ai-btn" class="btn btn-green" onclick="runAI()" disabled>🤖 إرسال للتحليل الذكي</button>
+      <button class="btn btn-outline" onclick="skipAI()">✏️ تسجيل يدوي</button>
+    </div>
+    <div style="font-size:10px;color:var(--text3)">يدوي — إذا كان الاتصال ضعيفاً أو تريد إدخال النتائج مباشرة</div>
+    <div class="ai-box" id="ai-loading"><div class="ai-spin"></div><div class="ai-spin-txt">جاري تحليل صور العنصر...</div></div>
+    <div class="ai-res" id="ai-result">
+      <div class="ai-res-hd">✅ نتيجة التحليل الذكي</div>
+      <div class="ai-row"><div class="k">الملخص</div><div class="v" id="ai-summary">—</div></div>
+      <div class="ai-row"><div class="k">درجة الخطورة</div><div class="v" id="ai-sev">—</div></div>
+      <div class="ai-row"><div class="k">العيوب المرصودة</div><div class="v" id="ai-defects">—</div></div>
+      <div class="ai-row"><div class="k">التوصيات</div><div class="v" id="ai-recs">—</div></div>
+      <div class="ai-row"><div class="k">رسالة للعميل</div><div class="v" id="ai-client">—</div></div>
+    </div>
+  </div>
+  <div class="card card-gold">
+    <div class="sec-title">🔧 بيانات المقاول — تُضاف للتقرير</div>
+    <div class="grid2">
+      <div class="field"><label class="label">اسم المقاول (اختياري)</label><input id="cont-name" type="text" placeholder="اسم المقاول..."/></div>
+      <div class="field"><label class="label">جوال المقاول</label><input id="cont-phone" type="tel" placeholder="05XXXXXXXX" maxlength="10"/></div>
+    </div>
+    <div class="field"><label class="label">ملاحظات المهندس النهائية</label>
+      <textarea id="final-notes" placeholder="ملاحظات تُضاف للتقرير..."></textarea></div>
+  </div>
+  <button id="submit-btn" class="btn btn-gold" onclick="submitInspection()">✅ حفظ الفحص</button>
+  <div style="height:10px"></div>
+</section>
+
+<!-- REVIEW -->
+<section id="pg-review" class="page">
+  <div class="page-head"><div class="sec-tag">PENDING REVIEW</div><div class="page-title">المراجعة</div></div>
+  <input class="search-box" id="review-search" type="search" placeholder="🔍 ابحث برقم الجوال..." oninput="renderReview()"/>
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+    <button class="filter-btn" onclick="setFilter('pending',this)">جديدة</button>
+    <button class="filter-btn" onclick="setFilter('accepted',this)">مقبولة</button>
+    <button class="filter-btn" onclick="setFilter('in_progress',this)">قيد التنفيذ</button>
+    <button class="filter-btn" onclick="refreshVisits()">🔄 تحديث</button>
+  </div>
+  <div id="review-msg" class="msg"></div>
+  <div id="review-list"></div>
+</section>
+
+<!-- REPORTS -->
+<section id="pg-reports" class="page">
+  <div class="page-head"><div class="sec-tag">APPROVED REPORTS</div><div class="page-title">التقارير المعتمدة</div></div>
+  <input class="search-box" id="rep-search" type="search" placeholder="🔍 ابحث برقم جوال العميل..." oninput="renderReports()"/>
+  <div id="reports-msg" class="msg"></div>
+  <div id="reports-list"></div>
+</section>
+
+
+  </main>
+
+  <nav id="bottom-nav">
+    <div class="nav-bar">
+      <button class="nav-item" data-page="pg-home" onclick="navTo('pg-home')"><span class="ni">🏠</span><span>الرئيسية</span></button>
+      <button class="nav-item active" data-page="pg-inspect" onclick="navTo('pg-inspect')"><span class="ni">🔍</span><span>فحص عنصر</span></button>
+      <button class="nav-item" data-page="pg-review" onclick="navTo('pg-review')"><span class="ni">✅</span><span>المراجعة</span></button>
+      <button class="nav-item" data-page="pg-reports" onclick="navTo('pg-reports')"><span class="ni">📄</span><span>التقارير</span></button>
+    </div>
+  </nav>
+</div>
+
+<script>
+const SESSION_KEY='almatari_eng_v3';
+let session=null,allVisits=[],uploadedImgs=[],locationData=null,aiResult=null,safetyOn=false,selectedEl='',reviewFilter='all';
+const $=id=>document.getElementById(id);
+function showMsg(el,t,txt){if(!el)return;el.className='msg show '+t;el.textContent=txt;}
+function hideMsg(el){if(el){el.className='msg';el.textContent='';}}
+function esc(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
+function setBtn(b,l,n,lt){if(!b)return;b.disabled=l;b.textContent=l?lt:n;}
+async function api(path,payload){
+  const res=await fetch(CONFIG.N8N_BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const txt=await res.text();let d={};try{d=JSON.parse(txt);}catch(e){}
+  if(!res.ok)throw new Error(d.message||'خطأ');return d;
+}
+function saveSession(d){localStorage.setItem(SESSION_KEY,JSON.stringify(d));session=d;}
+function loadSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null');}catch(e){return null;}}
+function clearSession(){localStorage.removeItem(SESSION_KEY);session=null;}
+
+function navTo(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $(pg)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===pg));
+  if(pg==='pg-home'){updateStats();renderHomeVisits();}
+  if(pg==='pg-review'){renderReview();}
+  if(pg==='pg-reports'){renderReports();}
+  if(pg==='pg-inspect'){populateSelect();}
+}
+
+$('login-form').addEventListener('submit',async e=>{
+  e.preventDefault();hideMsg($('auth-msg'));
+  setBtn($('login-btn'),true,'دخول','جاري التحقق...');
+  try{
+    const res=await api('/engineer-login',{phone:$('l-phone').value.trim(),password:$('l-pass').value});
+    if(res.success&&res.engineer){saveSession(res.engineer);bootUI();}
+    else showMsg($('auth-msg'),'error',res.message||'بيانات غير صحيحة');
+  }catch(err){showMsg($('auth-msg'),'error',err.message||'فشل الاتصال');}
+  finally{setBtn($('login-btn'),false,'دخول','جاري التحقق...');}
+});
+
+function bootUI(){
+  session=loadSession();
+  if(!session){showGuestUI();return;}
+  $('eng-badge').textContent='م. '+(session.name||session.engineer_name||'المهندس');
+  $('eng-badge').style.display='inline-flex';
+  $('power-btn').style.display='flex';
+  $('bottom-nav').style.display='block';
+  $('h-tag').textContent='المستشار مؤتمن';
+  navTo('pg-home');
+  loadVisitsData();
+}
+function showGuestUI(){
+  $('eng-badge').style.display='none';$('power-btn').style.display='none';
+  $('bottom-nav').style.display='none';$('h-tag').textContent='بوابة المهندس';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('pg-auth').classList.add('active');
+}
+function doLogout(){clearSession();allVisits=[];uploadedImgs=[];locationData=null;aiResult=null;$('login-form').reset();showGuestUI();}
+window.doLogout=doLogout;
+
+async function loadVisitsData(){
+  try{const res=await api('/engineer-get-visits',{engineer_id:session?.id,phone:session?.phone});
+    allVisits=res.visits||res.data||[];updateStats();renderHomeVisits();renderReview();renderReports();populateSelect();
+  }catch(err){console.error(err);}
+}
+async function refreshVisits(){showMsg($('review-msg'),'info','⏳ جاري التحديث...');await loadVisitsData();hideMsg($('review-msg'));}
+window.refreshVisits=refreshVisits;
+
+function updateStats(){
+  $('s-total').textContent=allVisits.length;
+  $('s-pending').textContent=allVisits.filter(v=>['pending','accepted'].includes(v.status)).length;
+  $('s-done').textContent=allVisits.filter(v=>v.status==='completed').length;
+}
+function populateSelect(){
+  const s=$('visit-select');
+  const active=allVisits.filter(v=>!['completed','cancelled'].includes(v.status));
+  s.innerHTML='<option value="">اختر طلب زيارة...</option>'+
+    active.map(v=><option value="${esc(v.id)}">${esc(v.visit_number||v.visitnumber||v.id)} — ${esc(v.client_name||v.full_name||'')}</option>).join('');
+}
+function statusBadge(s){
+  if(['completed','done'].includes(s))return{cls:'badge-done',txt:'منجز'};
+  if(['accepted','in_progress','review'].includes(s))return{cls:'badge-progress',txt:'قيد المعالجة'};
+  if(s==='cancelled')return{cls:'badge-pending',txt:'ملغي'};
+  return{cls:'badge-pending',txt:'جديد'};
+}
+function renderHomeVisits(){
+  const el=$('home-visits');
+  const recent=allVisits.filter(v=>v.status!=='completed').slice(0,3);
+  if(!recent.length){el.innerHTML='<div class="empty">لا توجد طلبات جديدة</div>';return;}
+  el.innerHTML='<div class="card"><div class="sec-title">آخر الطلبات</div>'+recent.map(v=>{
+    const st=statusBadge(v.status);
+    return`<div class="visit-card">
+      <div class="visit-top"><div class="visit-num">${esc(v.visit_number||v.visitnumber||'—')}</div><span class="badge ${st.cls}">${st.txt}</span></div>
+      <div class="vgrid">
+        <div class="vi"><div class="k">العميل</div><div class="v">${esc(v.client_name||v.full_name||'—')}</div></div>
+        <div class="vi"><div class="k">الجوال</div><div class="v">${esc(v.client_phone||v.phone||'—')}</div></div>
+        <div class="vi"><div class="k">نوع العقار</div><div class="v">${esc(v.property_type||'—')}</div></div>
+        <div class="vi"><div class="k">الحي</div><div class="v">${esc(v.district||'—')}</div></div>
+      </div>
+      <div class="vacts">
+        <button class="btn btn-gold btn-sm" onclick="acceptVisit('${esc(v.id)}')">قبول</button>
+        <button class="btn btn-outline btn-sm" onclick="startInspect('${esc(v.id)}')">🔍 فحص</button>
+      </div>
+    </div>`;}).join('')+'</div>';
+}
+
+let rvFilter='all';
+function setFilter(f,btn){rvFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderReview();}
+window.setFilter=setFilter;
+function renderReview(){
+  const el=$('review-list');if(!el)return;
+  let list=allVisits.filter(v=>v.status!=='completed');
+  if(rvFilter!=='all')list=list.filter(v=>v.status===rvFilter);
+  const q=($('review-search')?.value||'').toLowerCase();
+  if(q)list=list.filter(v=>(v.client_phone||v.phone||'').includes(q)||(v.client_name||v.full_name||'').toLowerCase().includes(q));
+  if(!list.length){el.innerHTML='<div class="empty">لا توجد نتائج</div>';return;}
+  el.innerHTML=list.map(v=>{const st=statusBadge(v.status);return`<div class="rep-card">
+    <div class="rep-top"><div class="rep-num">${esc(v.visit_number||v.visitnumber||'—')}</div><span class="badge ${st.cls}">${st.txt}</span></div>
+    <div class="rep-info">
+      <span>👤 ${esc(v.client_name||v.full_name||'—')} · ${esc(v.client_phone||v.phone||'—')}</span>
+      <span>🏠 ${esc(v.property_type||'—')} — ${esc(v.district||'—')}</span>
+      <span>📅 ${esc(v.preferred_date||'—')}</span>
+    </div>
+    <div class="rep-actions">
+      <button class="btn btn-gold btn-sm" onclick="acceptVisit('${esc(v.id)}')">قبول</button>
+      <button class="btn btn-blue btn-sm" onclick="startInspect('${esc(v.id)}')">🔍 فحص</button>
+    </div>
+  </div>`;}).join('');
+}
+function renderReports(){
+  const el=$('reports-list');if(!el)return;
+  let list=allVisits.filter(v=>v.status==='completed');
+  const q=($('rep-search')?.value||'').toLowerCase();
+  if(q)list=list.filter(v=>(v.client_phone||v.phone||'').includes(q)||(v.client_name||v.full_name||'').toLowerCase().includes(q));
+  if(!list.length){el.innerHTML='<div class="empty">لا توجد تقارير معتمدة بعد</div>';return;}
+  el.innerHTML=list.map(v=>`<div class="rep-card">
+    <div class="rep-top"><div class="rep-num">${esc(v.visit_number||v.visitnumber||'—')}</div><span class="badge badge-done">معتمد</span></div>
+    <div class="rep-info">
+      <span>👤 ${esc(v.client_name||v.full_name||'—')} · ${esc(v.client_phone||v.phone||'—')}</span>
+      <span>🏠 ${esc(v.property_type||'—')} — ${esc(v.district||'—')}</span>
+      <span>📅 ${esc(v.preferred_date||'—')}</span>
+    </div>
+    <div class="rep-actions">
+      <button class="btn btn-blue btn-sm" onclick="alert('إرسال للعميل — قريباً')">📱 إرسال للعميل</button>
+      <button class="btn btn-green btn-sm" onclick="alert('تحميل PDF — قريباً')">📥 تحميل PDF</button>
+      <button class="btn btn-outline btn-sm" onclick="alert('بيانات المقاول — قريباً')">🔧 للمقاول</button>
+    </div>
+  </div>`).join('');
+}
+
+async function acceptVisit(id){
+  if(!session||!id)return;
+  try{const res=await api('/engineer-accept-visit',{visit_id:id,engineer_id:session.id,engineer_phone:session.phone});
+    if(res.success){await loadVisitsData();showMsg($('review-msg'),'success','✅ تم قبول الطلب');}
+    else showMsg($('review-msg'),'error',res.message||'تعذر القبول');
+  }catch(err){showMsg($('review-msg'),'error',err.message);}
+}
+window.acceptVisit=acceptVisit;
+function startInspect(id){navTo('pg-inspect');populateSelect();setTimeout(()=>{$('visit-select').value=id;},100);}
+window.startInspect=startInspect;
+
+document.querySelectorAll('.el-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.el-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');selectedEl=card.dataset.val;
+  });
+});
+function toggleSafety(){safetyOn=!safetyOn;$('safety-toggle').classList.toggle('on',safetyOn);$('safety-box').classList.toggle('active',safetyOn);}
+window.toggleSafety=toggleSafety;
+
+$('img-input').addEventListener('change',async e=>{
+  for(const f of Array.from(e.target.files)){
+    if(uploadedImgs.length>=6)break;
+    const b64=await toB64(f);uploadedImgs.push({file:f,b64});
+  }
+  renderImgs();e.target.value='';
+});
+function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});}
+function renderImgs(){
+  const p=$('imgs-preview');
+  if(!uploadedImgs.length){p.innerHTML='';$('img-count').textContent='';$('ai-btn').disabled=true;return;}
+  p.innerHTML=uploadedImgs.map((img,i)=><div class="img-thumb"><img src="${img.b64}" alt=""/><div class="img-rm" onclick="removeImg(${i})">×</div></div>).join('');
+  $('img-count').textContent=${uploadedImgs.length} صورة مرفوعة;$('ai-btn').disabled=false;
+}
+window.removeImg=i=>{uploadedImgs.splice(i,1);renderImgs();};
+
+function getLocation(){
+  if(!navigator.geolocation){alert('المتصفح لا يدعم تحديد الموقع');return;}
+  $('loc-status').textContent='⏳ جاري التحديد...';$('loc-btn').disabled=true;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);
+    locationData={lat,lng};
+    $('loc-coords').textContent=${lat}, ${lng};$('loc-status').textContent='✅ تم التحديد بنجاح';
+    $('loc-btn').textContent='📍 تحديث';$('loc-btn').disabled=false;
+    $('map-a').href=https://www.google.com/maps?q=${lat},${lng};$('map-link').style.display='block';
+  },()=>{$('loc-status').textContent='❌ تعذر التحديد';$('loc-btn').disabled=false;},{enableHighAccuracy:true,timeout:15000});
+}
+window.getLocation=getLocation;
+
+async function runAI(){
+  if(!uploadedImgs.length){showMsg($('inspect-msg'),'error','ارفع صورة أولاً');return;}
+  $('ai-loading').classList.add('show');$('ai-result').classList.remove('show');$('ai-btn').disabled=true;
+  try{
+    const imgs=uploadedImgs.map(img=>{const[hdr,data]=img.b64.split(',');const mt=hdr.match(/:(.*?);/)[1];return{type:'image',source:{type:'base64',media_type:mt,data}};});
+    const locTxt=locationData?\nموقع العنصر: ${locationData.lat}, ${locationData.lng}:'';
+    const elTxt=selectedEl?نوع العنصر: ${selectedEl}\n:'';
+    const prompt=أنت مهندس مدني خبير. حلّل هذه الصور.\n${elTxt}${locTxt}\nأخرج JSON فقط:\n{"summary":"ملخص","severity":"low أو medium أو high","defects":["عيب"],"recommendations":["توصية"],"client_message":"رسالة للعميل"};
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':CONFIG.CLAUDE_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1024,messages:[{role:'user',content:[...imgs,{type:'text',text:prompt}]}]})});
+    const d=await res.json();const raw=d.content?.[0]?.text||'{}';
+    let p;try{p=JSON.parse(raw.replace(/json|/g,'').trim());}catch(e){p={summary:raw,severity:'medium',defects:[],recommendations:[],client_message:raw};}
+    aiResult=p;
+    $('ai-summary').textContent=p.summary||'—';
+    const sev=p.severity||'medium';
+    $('ai-sev').textContent=sev==='low'?'🟢 منخفض':sev==='high'?'🔴 مرتفع':'🟡 متوسط';
+    $('ai-sev').className='v sev-'+(sev==='low'?'low':sev==='high'?'high':'mid');
+    $('ai-defects').innerHTML=(p.defects||[]).length?p.defects.map(d=>• ${esc(d)}).join('<br>'):'لا توجد عيوب';
+    $('ai-recs').innerHTML=(p.recommendations||[]).length?p.recommendations.map(r=>• ${esc(r)}).join('<br>'):'—';
+    $('ai-client').textContent=p.client_message||'—';
+    $('ai-result').classList.add('show');
+    if(!$('eng-notes').value&&p.summary)$('eng-notes').value=الملخص: ${p.summary}\n\nالعيوب:\n${(p.defects||[]).map(d=>- ${d}).join('\n')}\n\nالتوصيات:\n${(p.recommendations||[]).map(r=>- ${r}).join('\n')};
+  }catch(err){showMsg($('inspect-msg'),'error','فشل التحليل: '+err.message);}
+  finally{$('ai-loading').classList.remove('show');$('ai-btn').disabled=false;}
+}
+window.runAI=runAI;
+function skipAI(){$('ai-result').classList.remove('show');$('ai-loading').classList.remove('show');showMsg($('inspect-msg'),'info','أدخل ملاحظاتك يدوياً في الحقول أدناه.');}
+window.skipAI=skipAI;
+
+async function uploadImages(visitId){
+  const urls=[];
+  for(const img of uploadedImgs){
+    try{
+      const ext=img.file.name.split('.').pop()||'jpg';
+      const path=${visitId}/${Date.now()}_${Math.random().toString(36).substr(2,5)}.${ext};
+      const res=await fetch(${CONFIG.SUPABASE_URL}/storage/v1/object/visit-images/${path},{method:'POST',headers:{apikey:CONFIG.SUPABASE_KEY,Authorization:Bearer ${CONFIG.SUPABASE_KEY},'Content-Type':img.file.type||'image/jpeg'},body:img.file});
+      if(res.ok)urls.push(${CONFIG.SUPABASE_URL}/storage/v1/object/public/visit-images/${path});
+    }catch(e){console.error(e);}
+  }
+  return urls;
+}
+
+async function submitInspection(){
+  hideMsg($('inspect-msg'));
+  if(!$('visit-select').value)return showMsg($('inspect-msg'),'error','اختر طلب الزيارة أولاً');
+  if(!selectedEl)return showMsg($('inspect-msg'),'error','اختر نوع العنصر');
+  if(!uploadedImgs.length)return showMsg($('inspect-msg'),'error','⚠️ يجب رفع صورة واحدة على الأقل');
+  if(!locationData)return showMsg($('inspect-msg'),'error','⚠️ يجب تحديد الموقع الجغرافي');
+  const btn=$('submit-btn');setBtn(btn,true,'✅ حفظ الفحص','⏳ جاري الرفع...');
+  try{
+    showMsg($('inspect-msg'),'info','⏳ جاري رفع الصور...');
+    const visitId=$('visit-select').value;
+    const imgUrls=await uploadImages(visitId);
+    const payload={visit_id:visitId,element_type:selectedEl,element_number:$('el-num').value.trim(),element_location:$('el-loc').value.trim(),safety_hazard:safetyOn,engineer_notes:$('eng-notes').value.trim(),contractor_name:$('cont-name').value.trim(),contractor_phone:$('cont-phone').value.trim(),final_notes:$('final-notes').value.trim(),location_lat:locationData.lat,location_lng:locationData.lng,location_url:https://www.google.com/maps?q=${locationData.lat},${locationData.lng},image_urls:imgUrls,report_status:'completed',visit_status:safetyOn?'review':'completed',report_text:$('eng-notes').value.trim()||(aiResult?.summary||''),engineer_id:session?.id,engineer_name:session?.name||session?.engineer_name||'',engineer_phone:session?.phone||'',ai_summary:aiResult?.summary||null,ai_severity:aiResult?.severity||null,ai_defects:aiResult?.defects||[],ai_recommendations:aiResult?.recommendations||[],ai_client_message:aiResult?.client_message||null};
+    const res=await api('/engineer-submit-report',payload);
+    if(res.success){
+      showMsg($('inspect-msg'),'success','✅ تم حفظ الفحص بنجاح!');
+      uploadedImgs=[];locationData=null;aiResult=null;safetyOn=false;selectedEl='';
+      renderImgs();$('loc-coords').textContent='لم يتم التحديد بعد';$('loc-status').textContent='اضغط لتحديد الموقع الحالي';$('map-link').style.display='none';$('ai-result').classList.remove('show');$('safety-toggle').classList.remove('on');$('safety-box').classList.remove('active');
+      document.querySelectorAll('.el-card').forEach(c=>c.classList.remove('selected'));
+      $('eng-notes').value='';$('cont-name').value='';$('cont-phone').value='';$('final-notes').value='';
+      await loadVisitsData();
+    }else showMsg($('inspect-msg'),'error',res.message||'تعذر الحفظ');
+  }catch(err){showMsg($('inspect-msg'),'error',err.message||'فشل الاتصال');}
+  finally{setBtn(btn,false,'✅ حفظ الفحص','⏳ جاري الرفع...');}
+}
+window.submitInspection=submitInspection;
+
+(function init(){session=loadSession();if(session)bootUI();else showGuestUI();})();
+</script>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    const SESSION_KEY = 'almatari_engineer_session_v1';
-
-    const authPage = $('auth-page');
-    const dashboardPage = $('dashboard-page');
-    const reportPage = $('report-page');
-
-    const navItems = Array.from(document.querySelectorAll('.nav-item'));
-    const bottomNav = $('bottom-nav');
-
-    const engineerPill = $('engineer-pill');
-    const logoutBtn = $('logout-btn');
-
-    const authMsg = $('auth-msg');
-    const visitsMsg = $('visits-msg');
-    const reportMsg = $('report-msg');
-
-    const loginForm = $('login-form');
-    const reportForm = $('report-form');
-
-    const loginSubmitBtn = $('login-submit-btn');
-    const submitReportBtn = $('submit-report-btn');
-    const refreshVisitsBtn = $('refresh-visits-btn');
-
-    const visitsList = $('visits-list');
-
-    function setLoading(button, isLoading, normalText, loadingText){
-      if (!button) return;
-      button.disabled = isLoading;
-      button.textContent = isLoading ? loadingText : normalText;
-    }
-
-    function showMessage(target, type, text){
-      if (!target) return;
-      target.className = 'msg show ' + type;
-      target.textContent = text;
-    }
-
-    function hideMessage(target){
-      if (!target) return;
-      target.className = 'msg';
-      target.textContent = '';
-    }
-
-    function normalizePhone(phone){
-      return String(phone || '').replace(/\s+/g, '').trim();
-    }
-
-    async function postJson(url, payload){
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const text = await res.text();
-      let data = {};
-      try{
-        data = text ? JSON.parse(text) : {};
-      } catch(e){
-        data = { raw: text };
-      }
-
-      if (!res.ok) {
-        throw new Error(data.message || 'تعذر تنفيذ الطلب.');
-      }
-
-      return data;
-    }
-
-    function saveSession(data){
-      localStorage.setItem(SESSION_KEY, JSON.stringify(data));
-    }
-
-    function getSession(){
-      try{
-        return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
-      } catch(e){
-        return null;
-      }
-    }
-
-    function clearSession(){
-      localStorage.removeItem(SESSION_KEY);
-    }
-
-    function isAuthenticated(){
-      return !!getSession();
-    }
-
-    function showAuthState(isLoggedIn){
-      if (isLoggedIn) {
-        engineerPill.style.display = 'inline-flex';
-        logoutBtn.style.display = 'inline-flex';
-        bottomNav.style.display = 'flex';
-      } else {
-        engineerPill.style.display = 'none';
-        logoutBtn.style.display = 'none';
-        bottomNav.style.display = 'none';
-      }
-    }
-
-    function setPage(pageId){
-      [authPage, dashboardPage, reportPage].forEach(p => p.classList.remove('active'));
-
-      const pageMap = {
-        'auth-page': authPage,
-        'dashboard-page': dashboardPage,
-        'report-page': reportPage
-      };
-
-      if (pageMap[pageId]) {
-        pageMap[pageId].classList.add('active');
-      }
-
-      navItems.forEach(item => {
-        item.classList.toggle('active', item.dataset.page === pageId);
-      });
-    }
-
-    function fillHeaderEngineer(session){
-      engineerPill.textContent = session?.name || session?.engineer_name || 'المهندس';
-    }
-
-    function bootAuthenticatedUI(){
-      const session = getSession();
-      if (!session) return;
-      showAuthState(true);
-      fillHeaderEngineer(session);
-      setPage('dashboard-page');
-      loadVisits();
-    }
-
-    function bootGuestUI(){
-      showAuthState(false);
-      setPage('auth-page');
-    }
-
-    function mapStatusLabel(status){
-      const s = String(status || '').toLowerCase();
-
-      if (['completed', 'done'].includes(s)) {
-        return { cls: 'status-done', text: 'مكتمل' };
-      }
-      if (['accepted', 'in_progress', 'review'].includes(s)) {
-        return { cls: 'status-progress', text: 'قيد المعالجة' };
-      }
-      return { cls: 'status-pending', text: 'جديد' };
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function fillStats(items){
-      const total = Array.isArray(items) ? items.length : 0;
-      const pending = Array.isArray(items)
-        ? items.filter(i => ['pending', '', null, undefined].includes(i.status)).length
-        : 0;
-
-      $('stat-all').textContent = total;
-      $('stat-pending').textContent = pending;
-    }
-
-    function openReportForm(item){
-      $('report-visit-id').value = item.id || '';
-      $('report-visitnumber').value = item.visitnumber || '';
-      $('report-full-name').value = item.full_name || '';
-      $('report-property-type').value = item.property_type || '';
-      $('report-district').value = item.district || '';
-      $('report-status').value = item.report_status || '';
-      $('visit-status').value = item.status || '';
-      $('report-text').value = item.report_text || '';
-      $('report-file-url').value = item.report_file_url || '';
-      $('admin-notes').value = item.admin_notes || '';
-      hideMessage(reportMsg);
-      setPage('report-page');
-    }
-
-    function renderVisits(items){
-      fillStats(items);
-
-      if (!Array.isArray(items) || !items.length) {
-        visitsList.innerHTML = `
-          <div class="card">
-            <div class="empty-state">لا توجد طلبات حالياً.</div>
-          </div>
-        `;
-        return;
-      }
-
-      visitsList.innerHTML = items.map(item => {
-        const statusObj = mapStatusLabel(item.status);
-        return `
-          <div class="visit-card">
-            <div class="visit-top">
-              <div class="visit-number">رقم الطلب: ${escapeHtml(item.visitnumber || '—')}</div>
-              <div class="status-badge ${statusObj.cls}">${statusObj.text}</div>
-            </div>
-
-            <div class="visit-grid">
-              <div class="visit-item">
-                <div class="k">اسم العميل</div>
-                <div class="v">${escapeHtml(item.full_name || '—')}</div>
-              </div>
-              <div class="visit-item">
-                <div class="k">الجوال</div>
-                <div class="v">${escapeHtml(item.phone || '—')}</div>
-              </div>
-              <div class="visit-item">
-                <div class="k">المدينة</div>
-                <div class="v">${escapeHtml(item.city || '—')}</div>
-              </div>
-              <div class="visit-item">
-                <div class="k">نوع العقار</div>
-                <div class="v">${escapeHtml(item.property_type || '—')}</div>
-              </div>
-              <div class="visit-item">
-                <div class="k">الحي</div>
-                <div class="v">${escapeHtml(item.district || '—')}</div>
-              </div>
-              <div class="visit-item">
-                <div class="k">التاريخ</div>
-                <div class="v">${escapeHtml(item.preferred_date || '—')}</div>
-              </div>
-              <div class="visit-item" style="grid-column:1/-1;">
-                <div class="k">الوصف</div>
-                <div class="v">${escapeHtml(item.description || '—')}</div>
-              </div>
-            </div>
-
-            <div class="visit-actions">
-              <button class="btn btn-gold" onclick="acceptVisit('${String(item.id || '')}', '${String(item.visitnumber || '')}')">قبول الطلب</button>
-              <button class="btn btn-outline" onclick='openVisitReport(${JSON.stringify(item).replace(/'/g,"&#39;")})'>فتح التقرير</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function loadVisits(){
-      hideMessage(visitsMsg);
-      const session = getSession();
-      if (!session) return;
-
-      try{
-        refreshVisitsBtn.disabled = true;
-
-        const result = await postJson(CONFIG.N8N_ENGINEER_GET_VISITS_WEBHOOK, {
-          engineer_id: session.id || null,
-          phone: session.phone || ''
-        });
-
-        const items = result.visits || result.data || [];
-        renderVisits(items);
-      } catch(err){
-        showMessage(visitsMsg, 'error', err.message || 'تعذر تحميل الطلبات.');
-        renderVisits([]);
-      } finally {
-        refreshVisitsBtn.disabled = false;
-      }
-    }
-
-    async function acceptVisit(id, visitnumber){
-      const session = getSession();
-      if (!session || !id) return;
-
-      try{
-        const result = await postJson(CONFIG.N8N_ENGINEER_ACCEPT_VISIT_WEBHOOK, {
-          visit_id: id,
-          engineer_id: session.id || null,
-          engineer_name: session.name || session.engineer_name || '',
-          engineer_phone: session.phone || ''
-        });
-
-        if (result.success) {
-          showMessage(visitsMsg, 'success', 'تم قبول الطلب: ' + (visitnumber || id));
-          loadVisits();
-        } else {
-          showMessage(visitsMsg, 'error', result.message || 'تعذر قبول الطلب.');
-        }
-      } catch(err){
-        showMessage(visitsMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
-      }
-    }
-
-    function openVisitReport(item){
-      openReportForm(item);
-    }
-
-    window.acceptVisit = acceptVisit;
-    window.openVisitReport = openVisitReport;
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideMessage(authMsg);
-
-      const payload = {
-        phone: normalizePhone($('login-phone').value),
-        password: $('login-password').value
-      };
-
-      if (!payload.phone) return showMessage(authMsg, 'error', 'يرجى إدخال رقم الجوال.');
-      if (!payload.password) return showMessage(authMsg, 'error', 'يرجى إدخال كلمة المرور.');
-
-      setLoading(loginSubmitBtn, true, 'دخول', 'جاري التحقق...');
-
-      try{
-        const result = await postJson(CONFIG.N8N_ENGINEER_LOGIN_WEBHOOK, payload);
-
-        if (result.success && result.engineer) {
-          saveSession(result.engineer);
-          bootAuthenticatedUI();
-        } else {
-          showMessage(authMsg, 'error', result.message || 'بيانات الدخول غير صحيحة.');
-        }
-      } catch(err){
-        showMessage(authMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
-      } finally {
-        setLoading(loginSubmitBtn, false, 'دخول', 'جاري التحقق...');
-      }
-    });
-
-    reportForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideMessage(reportMsg);
-
-      const session = getSession();
-      if (!session) return showMessage(reportMsg, 'error', 'يجب تسجيل الدخول أولاً.');
-
-      const payload = {
-        visit_id: $('report-visit-id').value,
-        report_status: $('report-status').value,
-        visit_status: $('visit-status').value,
-        report_text: $('report-text').value.trim(),
-        report_file_url: $('report-file-url').value.trim(),
-        admin_notes: $('admin-notes').value.trim(),
-        engineer_id: session.id || null,
-        engineer_name: session.name || session.engineer_name || '',
-        engineer_phone: session.phone || ''
-      };
-
-      if (!payload.visit_id) return showMessage(reportMsg, 'error', 'لا يوجد طلب محدد.');
-      if (!payload.report_status) return showMessage(reportMsg, 'error', 'اختر حالة التقرير.');
-      if (!payload.visit_status) return showMessage(reportMsg, 'error', 'اختر حالة الزيارة.');
-      if (!payload.report_text) return showMessage(reportMsg, 'error', 'اكتب ملاحظات التقرير.');
-
-      setLoading(submitReportBtn, true, 'حفظ التقرير', 'جاري الحفظ...');
-
-      try{
-        const result = await postJson(CONFIG.N8N_ENGINEER_SUBMIT_REPORT_WEBHOOK, payload);
-
-        if (result.success) {
-          showMessage(reportMsg, 'success', 'تم حفظ التقرير بنجاح.');
-          loadVisits();
-        } else {
-          showMessage(reportMsg, 'error', result.message || 'تعذر حفظ التقرير.');
-        }
-      } catch(err){
-        showMessage(reportMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
-      } finally {
-        setLoading(submitReportBtn, false, 'حفظ التقرير', 'جاري الحفظ...');
-      }
-    });
-
-    refreshVisitsBtn.addEventListener('click', loadVisits);
-
-    logoutBtn.addEventListener('click', () => {
-      clearSession();
-      loginForm.reset();
-      reportForm.reset();
-      hideMessage(authMsg);
-      hideMessage(visitsMsg);
-      hideMessage(reportMsg);
-      visitsList.innerHTML = '';
-      bootGuestUI();
-    });
-
-    navItems.forEach(item => {
-      item.addEventListener('click', () => {
-        if (!isAuthenticated()) return;
-        setPage(item.dataset.page);
-      });
-    });
-
-    (function init(){
-      const session = getSession();
-      if (session) {
-        bootAuthenticatedUI();
-      } else {
-        bootGuestUI();
-      }
-    })();
-  </script>
 </body>
 </html>
