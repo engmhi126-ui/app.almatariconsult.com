@@ -117,6 +117,22 @@
 
     .sp::after{content:'...';animation:spanim 1.2s steps(4,end) infinite}
     @keyframes spanim{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
+
+    /* Done Report Card */
+    .rcard{background:rgba(45,190,115,.04);border:1px solid rgba(45,190,115,.15);border-radius:16px;padding:14px;margin-bottom:12px}
+    .rcard-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .rnum{font-size:13px;font-weight:900;color:#84ebb0}
+    .rdate{font-size:11px;color:var(--text3);font-weight:600}
+    .client-info{background:rgba(46,127,232,.08);border:1px solid rgba(46,127,232,.15);border-radius:10px;padding:10px;margin-bottom:10px}
+    .client-info .row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+    .client-info .row:last-child{margin-bottom:0}
+    .client-info .lbl{font-size:10px;color:var(--text3);font-weight:700;min-width:50px}
+    .client-info .val{font-size:13px;color:var(--text);font-weight:700}
+    .report-preview{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px}
+    .report-preview .rt{font-size:11px;color:var(--text2);line-height:1.7}
+    .pdf-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:linear-gradient(135deg,#22B868,#148049);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;border:none;cursor:pointer;width:100%}
+    .print-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:rgba(46,127,232,.15);color:#8fc2ff;border:1px solid rgba(46,127,232,.3);border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;width:100%;margin-top:8px}
+
     @media(max-width:360px){.g2,.vg,.va,.igrid{grid-template-columns:1fr}}
   </style>
 </head>
@@ -269,11 +285,20 @@
       </form>
     </section>
 
+    <!-- التقارير المنجزة -->
+    <section id="pg-done" class="page">
+      <div class="page-head"><div class="page-tag">COMPLETED REPORTS</div><div class="page-title">التقارير المنجزة</div><div class="page-sub">جميع الطلبات التي تم إنجازها وإرسال تقاريرها للعملاء.</div></div>
+      <div class="card"><button id="refresh-done-btn" class="btn btn-outline">🔄 تحديث التقارير</button></div>
+      <div id="done-msg" class="msg"></div>
+      <div id="done-list"></div>
+    </section>
+
   </main>
   <nav id="bottom-nav">
     <button class="nav-item active" data-pg="pg-visits"><span class="nav-icon">📋</span><span>الطلبات</span></button>
     <button class="nav-item" data-pg="pg-inspect"><span class="nav-icon">🔍</span><span>الفحص</span></button>
     <button class="nav-item" data-pg="pg-report"><span class="nav-icon">📝</span><span>التقرير</span></button>
+    <button class="nav-item" data-pg="pg-done"><span class="nav-icon">✅</span><span>المنجزة</span></button>
   </nav>
 </div>
 
@@ -295,7 +320,9 @@ async function api(url,body){
   if(!r.ok)throw new Error(d.message||'خطأ');return d;
 }
 function setPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  ['pg-auth','pg-visits','pg-inspect','pg-report','pg-done'].forEach(p=>{
+    const el=$(p);if(el)el.classList.remove('active');
+  });
   const pg=$(id);if(pg)pg.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.pg===id));
 }
@@ -522,9 +549,11 @@ $('report-form').addEventListener('submit',async e=>{
 function renderVisits(items){
   $('s-all').textContent=items.length;
   $('s-new').textContent=items.filter(i=>i.status==='pending').length;
+  // Only show non-completed in main list
+  const active=items.filter(i=>!['completed','cancelled'].includes(i.status));
   const list=$('visits-list');
-  if(!items.length){list.innerHTML='<div class="card"><div class="empty">لا توجد طلبات حالياً.</div></div>';return}
-  list.innerHTML=items.map(it=>{
+  if(!active.length){list.innerHTML='<div class="card"><div class="empty">لا توجد طلبات نشطة حالياً.</div></div>';return}
+  list.innerHTML=active.map(it=>{
     const b=statusBadge(it.status);
     const isAccepted=['accepted','in_progress','review'].includes(it.status);
     const isDone=['completed','cancelled'].includes(it.status);
@@ -604,12 +633,138 @@ $('login-form').addEventListener('submit',async e=>{
 });
 
 $('refresh-btn').addEventListener('click',loadVisits);
+$('refresh-done-btn').addEventListener('click',loadDone);
 $('logout-btn').addEventListener('click',()=>{
   clearS();imgs=[];aiData=null;locData=null;showUI(false);setPage('pg-auth');
 });
 document.querySelectorAll('.nav-item').forEach(n=>{
-  n.addEventListener('click',()=>{if(!getS())return;setPage(n.dataset.pg)});
+  n.addEventListener('click',()=>{
+    if(!getS())return;
+    setPage(n.dataset.pg);
+    if(n.dataset.pg==='pg-done') loadDone();
+  });
 });
+
+// ---- Completed Reports ----
+async function loadDone(){
+  Mc($('done-msg'));const s=getS();if(!s)return;
+  try{
+    $('refresh-done-btn').disabled=true;
+    const r=await api(CONFIG.N8N_VISITS,{engineer_id:s.id||null,phone:s.phone||''});
+    const all=r.visits||r.data||[];
+    const done=all.filter(i=>['completed','cancelled'].includes(i.status));
+    renderDone(done);
+  }catch(e){M($('done-msg'),'error',e.message||'تعذر تحميل التقارير.');renderDone([])}
+  finally{$('refresh-done-btn').disabled=false}
+}
+
+function renderDone(items){
+  const list=$('done-list');
+  if(!items.length){list.innerHTML='<div class="card"><div class="empty">لا توجد تقارير منجزة حالياً.</div></div>';return}
+  list.innerHTML=items.map(it=>{
+    const d=it.preferred_date||'—';
+    const txt=it.report_text?it.report_text.slice(0,200)+(it.report_text.length>200?'...':''):'لا يوجد نص تقرير';
+    const hasPdf=!!it.pdf_url||!!it.report_file_url;
+    const pdfUrl=it.pdf_url||it.report_file_url||'';
+    const dataStr=encodeURIComponent(JSON.stringify(it));
+    return `<div class="rcard">
+      <div class="rcard-top">
+        <div class="rnum">${esc(it.visit_number||'—')}</div>
+        <div class="rdate">${esc(d)}</div>
+      </div>
+      <div class="client-info">
+        <div class="row"><span class="lbl">العميل</span><span class="val">${esc(it.client_name||'—')}</span></div>
+        <div class="row"><span class="lbl">الجوال</span><span class="val">${esc(it.client_phone||'—')}</span></div>
+        <div class="row"><span class="lbl">الحي</span><span class="val">${esc(it.district||'—')}</span></div>
+        <div class="row"><span class="lbl">العقار</span><span class="val">${esc(it.property_type||'—')} — ${esc(it.city||'—')}</span></div>
+        ${it.contractor_name?`<div class="row"><span class="lbl">المقاول</span><span class="val">${esc(it.contractor_name)}${it.contractor_phone?' — '+esc(it.contractor_phone):''}</span></div>`:''}
+      </div>
+      <div class="report-preview">
+        <div style="font-size:10px;color:var(--text3);font-weight:700;margin-bottom:6px">📋 ملخص التقرير</div>
+        <div class="rt">${esc(txt)}</div>
+        ${it.ai_summary?`<div style="font-size:11px;color:#c4b5fd;margin-top:8px;font-weight:700">🤖 ${esc(it.ai_summary)}</div>`:''}
+      </div>
+      ${hasPdf?`<a href="${esc(pdfUrl)}" target="_blank" class="pdf-btn">📄 تحميل التقرير PDF</a>`:''}
+      <button class="print-btn" onclick='printReport(${dataStr})'>🖨️ طباعة / حفظ كـ PDF</button>
+    </div>`;
+  }).join('');
+}
+
+window.printReport = it => {
+  const sevAr={low:'منخفض',medium:'متوسط',high:'مرتفع'};
+  const w=window.open('','_blank','width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">
+  <title>تقرير ${esc(it.visit_number||'')}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#fff;color:#111;padding:30px;direction:rtl}
+    .header{text-align:center;border-bottom:3px solid #D4A843;padding-bottom:16px;margin-bottom:20px}
+    .header h1{font-size:22px;color:#D4A843;margin-bottom:4px}
+    .header p{font-size:12px;color:#666}
+    .section{margin-bottom:18px}
+    .section h2{font-size:15px;background:#f5f5f5;padding:8px 12px;border-right:4px solid #D4A843;margin-bottom:10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:10px}
+    .field .k{font-size:10px;color:#888;margin-bottom:4px}
+    .field .v{font-size:13px;font-weight:700;color:#111}
+    .report-text{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:12px;font-size:13px;line-height:1.8;white-space:pre-wrap}
+    .ai-box{background:#f0ebff;border:1px solid #c4b5fd;border-radius:6px;padding:12px;margin-top:10px}
+    .ai-box h3{font-size:13px;color:#7C3AED;margin-bottom:8px}
+    .ai-box p{font-size:12px;line-height:1.7;color:#333}
+    .footer{margin-top:30px;text-align:center;font-size:11px;color:#888;border-top:1px solid #eee;padding-top:12px}
+    @media print{body{padding:15px}.no-print{display:none}}
+  </style></head><body>
+  <div class="header">
+    <h1>المطري كونسلت للاستشارات الهندسية</h1>
+    <p>تقرير زيارة إشرافية — رقم ${esc(it.visit_number||'—')}</p>
+    <p>التاريخ: ${esc(it.preferred_date||'—')}</p>
+  </div>
+
+  <div class="section">
+    <h2>بيانات العميل</h2>
+    <div class="grid">
+      <div class="field"><div class="k">اسم العميل</div><div class="v">${esc(it.client_name||'—')}</div></div>
+      <div class="field"><div class="k">رقم الجوال</div><div class="v">${esc(it.client_phone||'—')}</div></div>
+      <div class="field"><div class="k">الحي</div><div class="v">${esc(it.district||'—')}</div></div>
+      <div class="field"><div class="k">المدينة</div><div class="v">${esc(it.city||'—')}</div></div>
+      <div class="field"><div class="k">نوع العقار</div><div class="v">${esc(it.property_type||'—')}</div></div>
+      <div class="field"><div class="k">الفترة</div><div class="v">${esc(it.preferred_time||'—')}</div></div>
+    </div>
+  </div>
+
+  ${it.contractor_name?`<div class="section"><h2>بيانات المقاول</h2><div class="grid">
+    <div class="field"><div class="k">اسم المقاول</div><div class="v">${esc(it.contractor_name)}</div></div>
+    ${it.contractor_phone?`<div class="field"><div class="k">جوال المقاول</div><div class="v">${esc(it.contractor_phone)}</div></div>`:''}
+  </div></div>`:''}
+
+  <div class="section">
+    <h2>بيانات المهندس</h2>
+    <div class="grid">
+      <div class="field"><div class="k">المهندس</div><div class="v">${esc(it.engineer_name||'—')}</div></div>
+      <div class="field"><div class="k">حالة الزيارة</div><div class="v">${esc(it.status||'—')}</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>نص التقرير</h2>
+    <div class="report-text">${esc(it.report_text||'لا يوجد نص تقرير')}</div>
+  </div>
+
+  ${it.ai_summary?`<div class="section"><h2>تحليل الذكاء الاصطناعي</h2>
+  <div class="ai-box">
+    <h3>الملخص</h3><p>${esc(it.ai_summary)}</p>
+    ${it.ai_severity?`<p style="margin-top:8px"><strong>درجة الخطورة:</strong> ${sevAr[it.ai_severity]||it.ai_severity}</p>`:''}
+    ${it.ai_client_message?`<p style="margin-top:8px;font-style:italic">"${esc(it.ai_client_message)}"</p>`:''}
+  </div></div>`:''}
+
+  <div class="footer">
+    المطري كونسلت للاستشارات الهندسية — هذا التقرير صادر إلكترونياً ومعتمد
+  </div>
+  <br/>
+  <button class="no-print" onclick="window.print()" style="padding:10px 20px;background:#D4A843;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit">🖨️ طباعة / حفظ PDF</button>
+  </body></html>`);
+  w.document.close();
+};
 
 (()=>{
   const s=getS();
