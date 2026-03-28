@@ -193,6 +193,7 @@
       <div class="card">
         <div class="stitle">🤖 تحليل الذكاء الاصطناعي</div>
         <button id="analyze-btn" class="btn btn-purple" disabled>🤖 تحليل الصور بـ Claude AI</button>
+        <button id="manual-btn" class="btn btn-outline" style="margin-top:8px" onclick="openManual()">✍️ تعبئة يدوية بدون AI</button>
         <div id="ai-loading" style="display:none;text-align:center;padding:20px;color:#c4b5fd;font-weight:700;font-size:14px" class="sp">جاري التحليل</div>
 
         <!-- جدول نتائج AI قابل للتعديل -->
@@ -340,10 +341,14 @@ function fillAITable(p){
   $('ai-edit-summary').value = p.summary||'';
   setSev(p.severity||'medium');
   $('defects-list').innerHTML='';(p.defects||[]).forEach(d=>addDefect(d));
+  if(!p.defects?.length) addDefect('');
   $('recs-list').innerHTML='';(p.recommendations||[]).forEach(r=>addRec(r));
+  if(!p.recommendations?.length) addRec('');
   $('ai-edit-client-msg').value = p.client_message||'';
   $('ai-table').style.display='block';
   $('next-card').style.display='block';
+  // Scroll to AI table
+  setTimeout(()=>$('ai-table').scrollIntoView({behavior:'smooth',block:'start'}),200);
 }
 
 // ---- Images ----
@@ -559,7 +564,10 @@ window.acceptV=async id=>{
   }catch(e){M($('visits-msg'),'error',e.message)}
 };
 
-window.startInspect=it=>{
+window.openManual = () => {
+  fillAITable({summary:'',severity:'medium',defects:[''],recommendations:[''],client_message:''});
+  M($('inspect-msg'),'info','يمكنك تعبئة النتائج يدوياً الآن.');
+};
   imgs=[];aiData=null;locData=null;
   $('imgs-preview').innerHTML='';$('imgs-msg').style.display='none';
   $('ai-table').style.display='none';$('next-card').style.display='none';
