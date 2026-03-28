@@ -651,12 +651,12 @@
 
               <div class="field">
                 <label class="label">رقم الهوية <span class="req">*</span></label>
-                <input id="reg-national-id" type="text" inputmode="numeric" placeholder="مثال: 1234567890" required />
+                <input id="reg-national-id" type="text" inputmode="numeric" placeholder="مثال: 1234567890" maxlength="10" required />
               </div>
 
               <div class="field">
                 <label class="label">رقم الجوال <span class="req">*</span></label>
-                <input id="reg-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" required />
+                <input id="reg-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" maxlength="10" required />
               </div>
 
               <div class="grid2">
@@ -925,7 +925,7 @@
     }
 
     function validNationalId(id){
-      return String(id || '').replace(/\D/g, '').length >= 10;
+      return /^\d{10}$/.test(String(id || '').replace(/\D/g, ''));
     }
 
     function setAuthMode(mode){
