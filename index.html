@@ -1230,7 +1230,18 @@
         const result = await postJson(CONFIG.N8N_CLIENT_LOGIN_WEBHOOK, payload);
 
         if (result.success && (result.client || result.user)) {
-          const user = result.client || result.user;
+          const clientData = result.client || result.user;
+          const user = {
+            id:          clientData.user_id     || clientData.id          || null,
+            client_id:   clientData.client_id   || clientData.id          || null,
+            user_id:     clientData.user_id      || null,
+            name:        clientData.name         || clientData.full_name   || '',
+            full_name:   clientData.full_name    || clientData.name        || '',
+            national_id: clientData.national_id  || '',
+            phone:       clientData.phone        || '',
+            city:        clientData.city         || '',
+            village:     clientData.village      || ''
+          };
           saveSession(user);
           bootAuthenticatedUI();
           setPage('home-page');
