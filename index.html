@@ -1191,14 +1191,18 @@
         const result = await postJson(CONFIG.N8N_CLIENT_REGISTER_WEBHOOK, payload);
 
         if (result.success) {
-          const user = result.client || result.user || {
-            id: result.id || null,
-            name: payload.full_name,
-            full_name: payload.full_name,
-            national_id: payload.national_id,
-            phone: payload.phone,
-            city: payload.city,
-            village: payload.village
+          // بناء بيانات الجلسة من رد السيرفر أو من النموذج كاحتياط
+          const clientData = result.client || result.user || {};
+          const user = {
+            id:          clientData.id          || clientData.client_id || null,
+            client_id:   clientData.client_id   || clientData.id        || null,
+            user_id:     clientData.user_id      || null,
+            name:        clientData.name         || clientData.full_name || payload.full_name,
+            full_name:   clientData.full_name    || clientData.name      || payload.full_name,
+            national_id: clientData.national_id  || payload.national_id,
+            phone:       clientData.phone        || payload.phone,
+            city:        clientData.city         || payload.city,
+            village:     clientData.village      || payload.village
           };
 
           saveSession(user);
