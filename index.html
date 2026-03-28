@@ -1102,7 +1102,11 @@
               ${item.ai_severity ? `<div style="font-size:11px;margin-bottom:6px">درجة الخطورة: <strong style="color:${sevColors[item.ai_severity]||'#fcd34d'}">${sevLabels[item.ai_severity]||item.ai_severity}</strong></div>` : ''}
               ${item.report_text ? `<div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:6px">${escapeHtml(String(item.report_text).slice(0,200))}${item.report_text.length>200?'...':''}</div>` : ''}
               ${item.ai_client_message ? `<div style="font-size:12px;color:#9dc7ff;font-style:italic;margin-bottom:6px">"${escapeHtml(item.ai_client_message)}"</div>` : ''}
-              ${item.pdf_url ? `<a href="${escapeHtml(item.pdf_url)}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#60a5fa;font-weight:700;margin-top:4px">📄 تحميل التقرير PDF</a>` : ''}
+              ${(item.pdf_url||item.report_file_url) ? `
+                <a href="${escapeHtml(item.pdf_url||item.report_file_url)}" target="_blank"
+                   style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px 16px;background:linear-gradient(135deg,#22B868,#148049);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none">
+                  📄 عرض التقرير وتحميله PDF
+                </a>` : ''}
             </div>`;
         }
 
