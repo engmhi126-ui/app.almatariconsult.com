@@ -490,36 +490,112 @@ window.previewReport = () => {
   if(!visitId) return alert('يجب فتح الطلب أولاً من صفحة الفحص.');
   const s=getS();
   const finalAI={
-    summary:$('ai-edit-summary').value.trim()||aiData?.summary||null,
-    severity:$('ai-edit-severity').value||aiData?.severity||null,
+    summary:$('ai-edit-summary').value.trim()||aiData?.summary||'',
+    severity:$('ai-edit-severity').value||'medium',
     defects:getDefects(),
     recommendations:getRecs(),
-    client_message:$('ai-edit-client-msg').value.trim()||aiData?.client_message||null
+    client_message:$('ai-edit-client-msg').value.trim()||''
   };
-  const previewData={
-    visit_number:visitId,
-    client_name:$('i-client').textContent,
-    client_phone:$('i-phone').textContent,
-    city:$('i-city').textContent,
-    district:$('i-dist').textContent,
-    property_type:$('i-prop').textContent,
-    preferred_date:new Date().toISOString().split('T')[0],
-    preferred_time:'',
-    engineer_name:s?.name||s?.engineer_name||'—',
-    contractor_name:$('r-cname').value.trim()||null,
-    contractor_phone:$('r-cphone').value.trim()||null,
-    report_text:$('r-text').value.trim(),
-    visit_status:$('r-vstatus').value,
-    ai_summary:finalAI.summary,
-    ai_severity:finalAI.severity,
-    ai_defects:finalAI.defects,
-    ai_recommendations:finalAI.recommendations,
-    ai_client_message:finalAI.client_message
-  };
-  // Encode data in URL
-  const encoded=btoa(encodeURIComponent(JSON.stringify(previewData)));
-  const url=`https://engmhi126-ui.github.io/app.almatariconsult.com/report-view.html?data=${encoded}`;
-  window.open(url,'_blank');
+  const e=t=>String(t||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+  const sevAr={low:'منخفض 🟢',medium:'متوسط 🟡',high:'مرتفع 🔴'};
+  const sevCls={low:'#dcfce7;color:#166534',medium:'#fef9c3;color:#713f12',high:'#fee2e2;color:#991b1b'};
+  const today=new Date().toLocaleDateString('ar-SA');
+  const contractorName=$('r-cname').value.trim();
+  const contractorPhone=$('r-cphone').value.trim();
+  const reportText=$('r-text').value.trim();
+
+  const html=`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>معاينة التقرير</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#f5f5f5;color:#111;direction:rtl;padding:20px}
+    .container{max-width:800px;margin:0 auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 20px rgba(0,0,0,.1)}
+    .header{text-align:center;border-bottom:3px solid #D4A843;padding-bottom:20px;margin-bottom:24px}
+    .logo{font-size:22px;font-weight:900;color:#D4A843}
+    .logo-sub{font-size:13px;color:#666;margin-top:4px}
+    .report-title{font-size:18px;font-weight:700;margin-top:12px}
+    .report-num{font-size:12px;color:#888;margin-top:6px}
+    .section{margin-bottom:22px}
+    .section-title{font-size:14px;font-weight:800;background:#f8f4e8;border-right:4px solid #D4A843;padding:8px 12px;margin-bottom:12px;color:#333}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{background:#fafafa;border:1px solid #e5e5e5;border-radius:8px;padding:10px}
+    .field .k{font-size:10px;color:#888;margin-bottom:3px;font-weight:700}
+    .field .v{font-size:14px;font-weight:700;color:#111}
+    .report-text{background:#fafafa;border:1px solid #e5e5e5;border-radius:8px;padding:14px;font-size:13px;line-height:1.9;white-space:pre-wrap}
+    .ai-box{background:#f5f0ff;border:1px solid #c4b5fd;border-radius:8px;padding:14px;margin-top:14px}
+    .ai-title{font-size:13px;font-weight:800;color:#7C3AED;margin-bottom:8px}
+    .sev{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:8px;background:${sevCls[finalAI.severity]||sevCls.medium}}
+    .ai-list{list-style:none;padding:0}
+    .ai-list li{font-size:12px;color:#444;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+    .ai-list li:before{content:'• ';color:#7C3AED;font-weight:700}
+    .client-msg{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-top:10px;font-size:13px;color:#1e40af;font-style:italic}
+    .footer{margin-top:30px;text-align:center;padding-top:16px;border-top:1px solid #e5e5e5;font-size:11px;color:#888}
+    .stamp{font-size:13px;color:#D4A843;font-weight:700;margin-top:8px}
+    .actions{display:flex;gap:10px;justify-content:center;margin:20px 0}
+    .btn{padding:12px 28px;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+    .btn-print{background:#D4A843;color:#fff}
+    .btn-close{background:#666;color:#fff}
+    @media print{.actions{display:none}body{padding:0}.container{box-shadow:none;border-radius:0}}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  </style></head><body>
+  <div class="actions">
+    <button class="btn btn-print" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+    <button class="btn btn-close" onclick="window.close()">✕ إغلاق</button>
+  </div>
+  <div class="container">
+    <div class="header">
+      <div class="logo">المطري كونسلت</div>
+      <div class="logo-sub">للاستشارات الهندسية</div>
+      <div class="report-title">تقرير زيارة إشرافية — معاينة قبل الإرسال</div>
+      <div class="report-num">التاريخ: ${today}</div>
+    </div>
+    <div class="section">
+      <div class="section-title">👤 بيانات العميل</div>
+      <div class="grid">
+        <div class="field"><div class="k">اسم العميل</div><div class="v">${e($('i-client').textContent)}</div></div>
+        <div class="field"><div class="k">رقم الجوال</div><div class="v">${e($('i-phone').textContent)}</div></div>
+        <div class="field"><div class="k">المدينة</div><div class="v">${e($('i-city').textContent)}</div></div>
+        <div class="field"><div class="k">الحي</div><div class="v">${e($('i-dist').textContent)}</div></div>
+        <div class="field"><div class="k">نوع العقار</div><div class="v">${e($('i-prop').textContent)}</div></div>
+        <div class="field"><div class="k">حالة الزيارة</div><div class="v">${e($('r-vstatus').value)}</div></div>
+      </div>
+    </div>
+    ${contractorName?`<div class="section">
+      <div class="section-title">👷 بيانات المقاول</div>
+      <div class="grid">
+        <div class="field"><div class="k">اسم المقاول</div><div class="v">${e(contractorName)}</div></div>
+        ${contractorPhone?`<div class="field"><div class="k">جوال المقاول</div><div class="v">${e(contractorPhone)}</div></div>`:''}
+      </div></div>`:''}
+    <div class="section">
+      <div class="section-title">👷 المهندس المشرف</div>
+      <div class="field"><div class="k">المهندس</div><div class="v">${e(s?.name||s?.engineer_name||'—')}</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 نص التقرير</div>
+      <div class="report-text">${e(reportText)||'لا يوجد نص تقرير'}</div>
+    </div>
+    ${finalAI.summary?`<div class="section">
+      <div class="section-title">🤖 تحليل الذكاء الاصطناعي</div>
+      <div class="ai-box">
+        <div class="ai-title">🤖 نتائج تحليل Claude AI</div>
+        <p style="font-size:13px;line-height:1.7;margin-bottom:8px">${e(finalAI.summary)}</p>
+        <span class="sev">درجة الخطورة: ${sevAr[finalAI.severity]||finalAI.severity}</span>
+        ${finalAI.defects?.length?`<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:4px">العيوب:</div><ul class="ai-list">${finalAI.defects.map(d=>`<li>${e(d)}</li>`).join('')}</ul>`:''}
+        ${finalAI.recommendations?.length?`<div style="font-size:12px;font-weight:700;color:#333;margin:8px 0 4px">التوصيات:</div><ul class="ai-list">${finalAI.recommendations.map(r=>`<li>${e(r)}</li>`).join('')}</ul>`:''}
+        ${finalAI.client_message?`<div class="client-msg">"${e(finalAI.client_message)}"</div>`:''}
+      </div></div>`:''}
+    <div class="footer">
+      <p>هذا التقرير صادر من منصة المطري كونسلت للاستشارات الهندسية</p>
+      <p>تاريخ الإصدار: ${today}</p>
+      <div class="stamp">المطري كونسلت ✦ إشراف هندسي معتمد</div>
+    </div>
+  </div>
+  </body></html>`;
+
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else{alert('يرجى السماح بالنوافذ المنبثقة في المتصفح.');}
 };
 
 // ---- Submit Report ----
