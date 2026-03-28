@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#050D18" />
+  <title>المطري كونسلت — بوابة المهندس</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    const CONFIG = {
+      APP_NAME: 'المطري كونسلت',
+
+      N8N_ENGINEER_LOGIN_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-login',
+      N8N_ENGINEER_GET_VISITS_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-get-visits',
+      N8N_ENGINEER_ACCEPT_VISIT_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-accept-visit',
+      N8N_ENGINEER_SUBMIT_REPORT_WEBHOOK: 'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-submit-report'
+    };
+  </script>
+
+  <style>
+    :root{
+      --bg:#050D18;
+      --bg2:#08111F;
+      --surface:#0C1929;
+      --surface2:#102238;
+      --border:rgba(255,255,255,0.08);
+      --border2:rgba(255,255,255,0.14);
+      --gold:#D4A843;
+      --gold2:#F0C060;
+      --blue:#2E7FE8;
+      --green:#2DBE73;
+      --green2:#178A52;
+      --red:#E45A5A;
+      --text:#EEF2F8;
+      --text2:#90A8C7;
+      --text3:#5E7797;
+      --shadow:0 8px 30px rgba(0,0,0,0.35);
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html, body{
+      height:100%;
+      overflow:hidden;
+    }
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Cairo',sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    input, button, select, textarea{
+      font-family:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    textarea{
+      resize:none;
+    }
+
+    #app{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      height:100dvh;
+      max-width:460px;
+      margin:0 auto;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top right, rgba(212,168,67,.07), transparent 28%),
+        linear-gradient(180deg, #07111d 0%, #050D18 100%);
+    }
+
+    #app::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(46,127,232,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,127,232,0.03) 1px, transparent 1px);
+      background-size:40px 40px;
+    }
+
+    #header{
+      background:rgba(8,15,28,0.95);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:0 16px;
+      height:58px;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:relative;
+      z-index:50;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo-mark{
+      width:36px;
+      height:36px;
+      border-radius:10px;
+      background:linear-gradient(135deg, var(--gold) 0%, #7A5010 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      box-shadow:0 2px 12px rgba(212,168,67,.35);
+      flex-shrink:0;
+    }
+
+    .logo-text .name{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      line-height:1.2;
+    }
+
+    .logo-text .tag{
+      font-size:10px;
+      color:var(--gold);
+      font-weight:600;
+    }
+
+    .header-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    #engineer-pill{
+      display:none;
+      align-items:center;
+      gap:6px;
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:20px;
+      padding:5px 12px;
+      font-size:12px;
+      color:var(--blue);
+      font-weight:700;
+      max-width:160px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    #logout-btn{
+      background:var(--surface);
+      border:1px solid var(--border);
+      color:var(--text3);
+      font-size:13px;
+      cursor:pointer;
+      padding:6px 10px;
+      border-radius:8px;
+      display:none;
+    }
+
+    #pages{
+      flex:1;
+      overflow:hidden;
+      position:relative;
+      z-index:1;
+    }
+
+    .page{
+      position:absolute;
+      inset:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:20px 16px 92px;
+      opacity:0;
+      pointer-events:none;
+      transform:translateY(12px);
+      transition:opacity .22s ease, transform .22s ease;
+    }
+
+    .page.active{
+      opacity:1;
+      pointer-events:all;
+      transform:translateY(0);
+    }
+
+    #bottom-nav{
+      flex-shrink:0;
+      background:rgba(8,15,28,0.97);
+      backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);
+      display:flex;
+      padding-bottom:env(safe-area-inset-bottom, 0px);
+      position:relative;
+      z-index:50;
+      min-height:64px;
+    }
+
+    .nav-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      cursor:pointer;
+      border:none;
+      background:none;
+      color:var(--text3);
+      font-size:10px;
+      font-weight:700;
+      transition:all .2s;
+      padding:8px 4px;
+    }
+
+    .nav-item .nav-icon{
+      font-size:22px;
+      line-height:1;
+    }
+
+    .nav-item.active{
+      color:var(--gold);
+    }
+
+    .page-tag{
+      font-size:10px;
+      color:var(--gold);
+      font-weight:700;
+      letter-spacing:2.5px;
+      margin-bottom:6px;
+      text-align:center;
+    }
+
+    .page-title{
+      font-size:24px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .page-sub{
+      font-size:13px;
+      color:var(--text2);
+      text-align:center;
+      margin-top:6px;
+      line-height:1.7;
+    }
+
+    .page-head{
+      margin-bottom:24px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(16,34,56,.97), rgba(12,25,41,.97));
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:15px;
+      box-shadow:var(--shadow);
+      margin-bottom:14px;
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    .label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--text2);
+      margin-bottom:7px;
+    }
+
+    .req{
+      color:var(--red);
+    }
+
+    input[type=text],
+    input[type=tel],
+    input[type=password],
+    input[type=date],
+    textarea,
+    select{
+      width:100%;
+      background:var(--surface2);
+      border:1.5px solid var(--border);
+      border-radius:12px;
+      padding:13px 14px;
+      color:var(--text);
+      font-size:15px;
+      font-weight:600;
+      appearance:none;
+    }
+
+    input:focus, textarea:focus, select:focus{
+      outline:none;
+      border-color:var(--blue) !important;
+      box-shadow:0 0 0 3px rgba(46,127,232,0.12);
+    }
+
+    textarea{
+      line-height:1.7;
+      min-height:110px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .btn{
+      width:100%;
+      padding:14px 20px;
+      border-radius:13px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      border:none;
+      transition:all .18s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn-gold{
+      background:linear-gradient(135deg, var(--gold), #9A6B12);
+      color:#fff;
+      box-shadow:0 4px 20px rgba(212,168,67,.3);
+    }
+
+    .btn-outline{
+      background:transparent;
+      color:var(--text2);
+      border:1.5px solid var(--border2);
+    }
+
+    .btn-green{
+      background:linear-gradient(135deg, #22B868, #148049);
+      color:#fff;
+    }
+
+    .btn-red{
+      background:linear-gradient(135deg, #E45A5A, #B63E3E);
+      color:#fff;
+    }
+
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .msg{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 13px;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.7;
+      font-weight:700;
+    }
+
+    .msg.show{ display:block; }
+    .msg.success{
+      background:rgba(45,190,115,.12);
+      border:1px solid rgba(45,190,115,.30);
+      color:#81e7af;
+    }
+    .msg.error{
+      background:rgba(228,90,90,.10);
+      border:1px solid rgba(228,90,90,.28);
+      color:#ffb0b0;
+    }
+    .msg.info{
+      background:rgba(46,127,232,.10);
+      border:1px solid rgba(46,127,232,.28);
+      color:#9dc7ff;
+    }
+
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--text3);
+      line-height:1.7;
+    }
+
+    .visit-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+
+    .visit-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .visit-number{
+      font-size:13px;
+      font-weight:900;
+      color:var(--gold2);
+    }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:88px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .status-pending{
+      background:rgba(212,168,67,.14);
+      color:var(--gold2);
+      border:1px solid rgba(212,168,67,.28);
+    }
+
+    .status-progress{
+      background:rgba(46,127,232,.12);
+      color:#8fc2ff;
+      border:1px solid rgba(46,127,232,.28);
+    }
+
+    .status-done{
+      background:rgba(45,190,115,.12);
+      color:#84ebb0;
+      border:1px solid rgba(45,190,115,.28);
+    }
+
+    .visit-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .visit-item{
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:10px;
+      padding:9px;
+    }
+
+    .visit-item .k{
+      font-size:10px;
+      color:var(--text3);
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .visit-item .v{
+      font-size:12px;
+      color:var(--text);
+      font-weight:700;
+      line-height:1.6;
+      word-break:break-word;
+    }
+
+    .visit-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .empty-state{
+      text-align:center;
+      color:var(--text2);
+      font-size:13px;
+      line-height:1.8;
+      padding:18px 10px;
+    }
+
+    .section-title{
+      font-size:15px;
+      font-weight:900;
+      margin-bottom:12px;
+      color:var(--text);
+    }
+
+    .mini-stat{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      text-align:center;
+    }
+
+    .mini-stat .num{
+      font-size:20px;
+      font-weight:900;
+      color:var(--gold2);
+      margin-bottom:4px;
+    }
+
+    .mini-stat .txt{
+      font-size:11px;
+      color:var(--text2);
+      font-weight:700;
+    }
+
+    @media (max-width:360px){
+      .grid2, .visit-grid, .visit-actions{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header id="header">
+      <div class="logo">
+        <div class="logo-mark">م</div>
+        <div class="logo-text">
+          <div class="name">المطري كونسلت</div>
+          <div class="tag">بوابة المهندس</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div id="engineer-pill"></div>
+        <button id="logout-btn" type="button">خروج</button>
+      </div>
+    </header>
+
+    <main id="pages">
+      <section id="auth-page" class="page active">
+        <div class="page-head">
+          <div class="page-tag">ENGINEER PORTAL</div>
+          <div class="page-title">دخول المهندس</div>
+          <div class="page-sub">سجل الدخول للوصول إلى الطلبات وقبولها ورفع التقارير.</div>
+        </div>
+
+        <div id="auth-msg" class="msg"></div>
+
+        <div class="card">
+          <form id="login-form">
+            <div class="field">
+              <label class="label">رقم الجوال <span class="req">*</span></label>
+              <input id="login-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" required />
+            </div>
+
+            <div class="field">
+              <label class="label">كلمة المرور <span class="req">*</span></label>
+              <input id="login-password" type="password" placeholder="أدخل كلمة المرور" required />
+            </div>
+
+            <button id="login-submit-btn" class="btn btn-gold" type="submit">دخول</button>
+            <div class="hint">التحقق يتم من خلال الخادم مباشرة وليس من الواجهة.</div>
+          </form>
+        </div>
+      </section>
+
+      <section id="dashboard-page" class="page">
+        <div class="page-head">
+          <div class="page-tag">ENGINEER DASHBOARD</div>
+          <div class="page-title">لوحة المهندس</div>
+          <div class="page-sub">راجع الطلبات الجديدة والطلبات المقبولة وابدأ إعداد التقارير.</div>
+        </div>
+
+        <div class="grid2">
+          <div class="mini-stat">
+            <div class="num" id="stat-all">0</div>
+            <div class="txt">إجمالي الطلبات</div>
+          </div>
+          <div class="mini-stat">
+            <div class="num" id="stat-pending">0</div>
+            <div class="txt">طلبات جديدة</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <button id="refresh-visits-btn" class="btn btn-outline" type="button">تحديث الطلبات</button>
+        </div>
+
+        <div id="visits-msg" class="msg"></div>
+        <div id="visits-list"></div>
+      </section>
+
+      <section id="report-page" class="page">
+        <div class="page-head">
+          <div class="page-tag">REPORT FORM</div>
+          <div class="page-title">إعداد التقرير</div>
+          <div class="page-sub">اكتب ملاحظاتك الفنية واعتمد حالة الزيارة.</div>
+        </div>
+
+        <div id="report-msg" class="msg"></div>
+
+        <div class="card">
+          <div class="section-title">بيانات الطلب</div>
+
+          <div class="grid2">
+            <div class="field">
+              <label class="label">رقم الطلب</label>
+              <input id="report-visitnumber" type="text" readonly />
+            </div>
+            <div class="field">
+              <label class="label">اسم العميل</label>
+              <input id="report-full-name" type="text" readonly />
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label class="label">نوع العقار</label>
+              <input id="report-property-type" type="text" readonly />
+            </div>
+            <div class="field">
+              <label class="label">الحي</label>
+              <input id="report-district" type="text" readonly />
+            </div>
+          </div>
+
+          <form id="report-form">
+            <input id="report-visit-id" type="hidden" />
+
+            <div class="field">
+              <label class="label">حالة التقرير <span class="req">*</span></label>
+              <select id="report-status" required>
+                <option value="">اختر الحالة</option>
+                <option value="review">يحتاج مراجعة</option>
+                <option value="completed">مكتمل</option>
+                <option value="cancelled">ملغي</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">حالة الزيارة <span class="req">*</span></label>
+              <select id="visit-status" required>
+                <option value="">اختر الحالة</option>
+                <option value="accepted">مقبول</option>
+                <option value="in_progress">قيد المعالجة</option>
+                <option value="completed">منجز</option>
+                <option value="cancelled">ملغي</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">ملاحظات التقرير <span class="req">*</span></label>
+              <textarea id="report-text" placeholder="اكتب الملاحظات الفنية، العيوب، البنود، التوصيات..." required></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label">رابط ملف التقرير PDF</label>
+              <input id="report-file-url" type="text" placeholder="ضع رابط التقرير عند توفره" />
+            </div>
+
+            <div class="field">
+              <label class="label">ملاحظات إضافية للإدارة</label>
+              <textarea id="admin-notes" placeholder="أي ملاحظات داخلية إضافية"></textarea>
+            </div>
+
+            <button id="submit-report-btn" class="btn btn-green" type="submit">حفظ التقرير</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <nav id="bottom-nav">
+      <button class="nav-item active" data-page="dashboard-page" type="button">
+        <span class="nav-icon">📋</span>
+        <span>الطلبات</span>
+      </button>
+
+      <button class="nav-item" data-page="report-page" type="button">
+        <span class="nav-icon">📝</span>
+        <span>التقرير</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const SESSION_KEY = 'almatari_engineer_session_v1';
+
+    const authPage = $('auth-page');
+    const dashboardPage = $('dashboard-page');
+    const reportPage = $('report-page');
+
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const bottomNav = $('bottom-nav');
+
+    const engineerPill = $('engineer-pill');
+    const logoutBtn = $('logout-btn');
+
+    const authMsg = $('auth-msg');
+    const visitsMsg = $('visits-msg');
+    const reportMsg = $('report-msg');
+
+    const loginForm = $('login-form');
+    const reportForm = $('report-form');
+
+    const loginSubmitBtn = $('login-submit-btn');
+    const submitReportBtn = $('submit-report-btn');
+    const refreshVisitsBtn = $('refresh-visits-btn');
+
+    const visitsList = $('visits-list');
+
+    function setLoading(button, isLoading, normalText, loadingText){
+      if (!button) return;
+      button.disabled = isLoading;
+      button.textContent = isLoading ? loadingText : normalText;
+    }
+
+    function showMessage(target, type, text){
+      if (!target) return;
+      target.className = 'msg show ' + type;
+      target.textContent = text;
+    }
+
+    function hideMessage(target){
+      if (!target) return;
+      target.className = 'msg';
+      target.textContent = '';
+    }
+
+    function normalizePhone(phone){
+      return String(phone || '').replace(/\s+/g, '').trim();
+    }
+
+    async function postJson(url, payload){
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await res.text();
+      let data = {};
+      try{
+        data = text ? JSON.parse(text) : {};
+      } catch(e){
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || 'تعذر تنفيذ الطلب.');
+      }
+
+      return data;
+    }
+
+    function saveSession(data){
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    }
+
+    function getSession(){
+      try{
+        return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      } catch(e){
+        return null;
+      }
+    }
+
+    function clearSession(){
+      localStorage.removeItem(SESSION_KEY);
+    }
+
+    function isAuthenticated(){
+      return !!getSession();
+    }
+
+    function showAuthState(isLoggedIn){
+      if (isLoggedIn) {
+        engineerPill.style.display = 'inline-flex';
+        logoutBtn.style.display = 'inline-flex';
+        bottomNav.style.display = 'flex';
+      } else {
+        engineerPill.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        bottomNav.style.display = 'none';
+      }
+    }
+
+    function setPage(pageId){
+      [authPage, dashboardPage, reportPage].forEach(p => p.classList.remove('active'));
+
+      const pageMap = {
+        'auth-page': authPage,
+        'dashboard-page': dashboardPage,
+        'report-page': reportPage
+      };
+
+      if (pageMap[pageId]) {
+        pageMap[pageId].classList.add('active');
+      }
+
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.page === pageId);
+      });
+    }
+
+    function fillHeaderEngineer(session){
+      engineerPill.textContent = session?.name || session?.engineer_name || 'المهندس';
+    }
+
+    function bootAuthenticatedUI(){
+      const session = getSession();
+      if (!session) return;
+      showAuthState(true);
+      fillHeaderEngineer(session);
+      setPage('dashboard-page');
+      loadVisits();
+    }
+
+    function bootGuestUI(){
+      showAuthState(false);
+      setPage('auth-page');
+    }
+
+    function mapStatusLabel(status){
+      const s = String(status || '').toLowerCase();
+
+      if (['completed', 'done'].includes(s)) {
+        return { cls: 'status-done', text: 'مكتمل' };
+      }
+      if (['accepted', 'in_progress', 'review'].includes(s)) {
+        return { cls: 'status-progress', text: 'قيد المعالجة' };
+      }
+      return { cls: 'status-pending', text: 'جديد' };
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function fillStats(items){
+      const total = Array.isArray(items) ? items.length : 0;
+      const pending = Array.isArray(items)
+        ? items.filter(i => ['pending', '', null, undefined].includes(i.status)).length
+        : 0;
+
+      $('stat-all').textContent = total;
+      $('stat-pending').textContent = pending;
+    }
+
+    function openReportForm(item){
+      $('report-visit-id').value = item.id || '';
+      $('report-visitnumber').value = item.visitnumber || '';
+      $('report-full-name').value = item.full_name || '';
+      $('report-property-type').value = item.property_type || '';
+      $('report-district').value = item.district || '';
+      $('report-status').value = item.report_status || '';
+      $('visit-status').value = item.status || '';
+      $('report-text').value = item.report_text || '';
+      $('report-file-url').value = item.report_file_url || '';
+      $('admin-notes').value = item.admin_notes || '';
+      hideMessage(reportMsg);
+      setPage('report-page');
+    }
+
+    function renderVisits(items){
+      fillStats(items);
+
+      if (!Array.isArray(items) || !items.length) {
+        visitsList.innerHTML = `
+          <div class="card">
+            <div class="empty-state">لا توجد طلبات حالياً.</div>
+          </div>
+        `;
+        return;
+      }
+
+      visitsList.innerHTML = items.map(item => {
+        const statusObj = mapStatusLabel(item.status);
+        return `
+          <div class="visit-card">
+            <div class="visit-top">
+              <div class="visit-number">رقم الطلب: ${escapeHtml(item.visitnumber || '—')}</div>
+              <div class="status-badge ${statusObj.cls}">${statusObj.text}</div>
+            </div>
+
+            <div class="visit-grid">
+              <div class="visit-item">
+                <div class="k">اسم العميل</div>
+                <div class="v">${escapeHtml(item.full_name || '—')}</div>
+              </div>
+              <div class="visit-item">
+                <div class="k">الجوال</div>
+                <div class="v">${escapeHtml(item.phone || '—')}</div>
+              </div>
+              <div class="visit-item">
+                <div class="k">المدينة</div>
+                <div class="v">${escapeHtml(item.city || '—')}</div>
+              </div>
+              <div class="visit-item">
+                <div class="k">نوع العقار</div>
+                <div class="v">${escapeHtml(item.property_type || '—')}</div>
+              </div>
+              <div class="visit-item">
+                <div class="k">الحي</div>
+                <div class="v">${escapeHtml(item.district || '—')}</div>
+              </div>
+              <div class="visit-item">
+                <div class="k">التاريخ</div>
+                <div class="v">${escapeHtml(item.preferred_date || '—')}</div>
+              </div>
+              <div class="visit-item" style="grid-column:1/-1;">
+                <div class="k">الوصف</div>
+                <div class="v">${escapeHtml(item.description || '—')}</div>
+              </div>
+            </div>
+
+            <div class="visit-actions">
+              <button class="btn btn-gold" onclick="acceptVisit('${String(item.id || '')}', '${String(item.visitnumber || '')}')">قبول الطلب</button>
+              <button class="btn btn-outline" onclick='openVisitReport(${JSON.stringify(item).replace(/'/g,"&#39;")})'>فتح التقرير</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadVisits(){
+      hideMessage(visitsMsg);
+      const session = getSession();
+      if (!session) return;
+
+      try{
+        refreshVisitsBtn.disabled = true;
+
+        const result = await postJson(CONFIG.N8N_ENGINEER_GET_VISITS_WEBHOOK, {
+          engineer_id: session.id || null,
+          phone: session.phone || ''
+        });
+
+        const items = result.visits || result.data || [];
+        renderVisits(items);
+      } catch(err){
+        showMessage(visitsMsg, 'error', err.message || 'تعذر تحميل الطلبات.');
+        renderVisits([]);
+      } finally {
+        refreshVisitsBtn.disabled = false;
+      }
+    }
+
+    async function acceptVisit(id, visitnumber){
+      const session = getSession();
+      if (!session || !id) return;
+
+      try{
+        const result = await postJson(CONFIG.N8N_ENGINEER_ACCEPT_VISIT_WEBHOOK, {
+          visit_id: id,
+          engineer_id: session.id || null,
+          engineer_name: session.name || session.engineer_name || '',
+          engineer_phone: session.phone || ''
+        });
+
+        if (result.success) {
+          showMessage(visitsMsg, 'success', 'تم قبول الطلب: ' + (visitnumber || id));
+          loadVisits();
+        } else {
+          showMessage(visitsMsg, 'error', result.message || 'تعذر قبول الطلب.');
+        }
+      } catch(err){
+        showMessage(visitsMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      }
+    }
+
+    function openVisitReport(item){
+      openReportForm(item);
+    }
+
+    window.acceptVisit = acceptVisit;
+    window.openVisitReport = openVisitReport;
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessage(authMsg);
+
+      const payload = {
+        phone: normalizePhone($('login-phone').value),
+        password: $('login-password').value
+      };
+
+      if (!payload.phone) return showMessage(authMsg, 'error', 'يرجى إدخال رقم الجوال.');
+      if (!payload.password) return showMessage(authMsg, 'error', 'يرجى إدخال كلمة المرور.');
+
+      setLoading(loginSubmitBtn, true, 'دخول', 'جاري التحقق...');
+
+      try{
+        const result = await postJson(CONFIG.N8N_ENGINEER_LOGIN_WEBHOOK, payload);
+
+        if (result.success && result.engineer) {
+          saveSession(result.engineer);
+          bootAuthenticatedUI();
+        } else {
+          showMessage(authMsg, 'error', result.message || 'بيانات الدخول غير صحيحة.');
+        }
+      } catch(err){
+        showMessage(authMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      } finally {
+        setLoading(loginSubmitBtn, false, 'دخول', 'جاري التحقق...');
+      }
+    });
+
+    reportForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessage(reportMsg);
+
+      const session = getSession();
+      if (!session) return showMessage(reportMsg, 'error', 'يجب تسجيل الدخول أولاً.');
+
+      const payload = {
+        visit_id: $('report-visit-id').value,
+        report_status: $('report-status').value,
+        visit_status: $('visit-status').value,
+        report_text: $('report-text').value.trim(),
+        report_file_url: $('report-file-url').value.trim(),
+        admin_notes: $('admin-notes').value.trim(),
+        engineer_id: session.id || null,
+        engineer_name: session.name || session.engineer_name || '',
+        engineer_phone: session.phone || ''
+      };
+
+      if (!payload.visit_id) return showMessage(reportMsg, 'error', 'لا يوجد طلب محدد.');
+      if (!payload.report_status) return showMessage(reportMsg, 'error', 'اختر حالة التقرير.');
+      if (!payload.visit_status) return showMessage(reportMsg, 'error', 'اختر حالة الزيارة.');
+      if (!payload.report_text) return showMessage(reportMsg, 'error', 'اكتب ملاحظات التقرير.');
+
+      setLoading(submitReportBtn, true, 'حفظ التقرير', 'جاري الحفظ...');
+
+      try{
+        const result = await postJson(CONFIG.N8N_ENGINEER_SUBMIT_REPORT_WEBHOOK, payload);
+
+        if (result.success) {
+          showMessage(reportMsg, 'success', 'تم حفظ التقرير بنجاح.');
+          loadVisits();
+        } else {
+          showMessage(reportMsg, 'error', result.message || 'تعذر حفظ التقرير.');
+        }
+      } catch(err){
+        showMessage(reportMsg, 'error', err.message || 'فشل الاتصال بالخادم.');
+      } finally {
+        setLoading(submitReportBtn, false, 'حفظ التقرير', 'جاري الحفظ...');
+      }
+    });
+
+    refreshVisitsBtn.addEventListener('click', loadVisits);
+
+    logoutBtn.addEventListener('click', () => {
+      clearSession();
+      loginForm.reset();
+      reportForm.reset();
+      hideMessage(authMsg);
+      hideMessage(visitsMsg);
+      hideMessage(reportMsg);
+      visitsList.innerHTML = '';
+      bootGuestUI();
+    });
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (!isAuthenticated()) return;
+        setPage(item.dataset.page);
+      });
+    });
+
+    (function init(){
+      const session = getSession();
+      if (session) {
+        bootAuthenticatedUI();
+      } else {
+        bootGuestUI();
+      }
+    })();
+  </script>
+</body>
+</html>
