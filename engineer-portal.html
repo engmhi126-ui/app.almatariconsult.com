@@ -215,8 +215,8 @@
         <!-- جدول نتائج AI قابل للتعديل -->
         <div id="ai-table" class="ai-table-wrap" style="display:none">
           <div class="ai-table-hdr">
-            <span class="ai-badge">Claude AI</span>
-            <span class="ai-ttl">نتائج التحليل — قابلة للتعديل</span>
+            <span class="ai-badge">📋</span>
+            <span class="ai-ttl">ملاحظات الفحص الهندسي — قابلة للتعديل</span>
           </div>
 
           <div class="ai-field">
@@ -654,12 +654,15 @@ $('report-form').addEventListener('submit',async e=>{
     });
 
     if(r.success!==false){
-      M($('report-msg'),'success',`✅ تم اعتماد التقرير وإرساله للعميل. رُفعت ${urls.length} صورة.`);
+      M($('report-msg'),'success',`✅ تم اعتماد التقرير وإرساله للعميل.`);
       imgs=[];aiData=null;locData=null;
       $('imgs-preview').innerHTML='';$('ai-table').style.display='none';$('next-card').style.display='none';
       $('loc-box').style.display='none';$('loc-lat').value='';$('loc-lng').value='';
       $('analyze-btn').disabled=true;$('report-form').reset();
-      loadVisits();setTimeout(()=>setPage('pg-visits'),1500);
+      // Reload visits and go to done page
+      await loadVisits();
+      await loadDone();
+      setTimeout(()=>setPage('pg-done'),1000);
     }else M($('report-msg'),'error',r.message||'تعذر حفظ التقرير.');
   }catch(e){M($('report-msg'),'error',e.message||'فشل الاتصال.')}
   finally{load(btn,false,'✅ اعتماد التقرير وإرساله للعميل','')}
