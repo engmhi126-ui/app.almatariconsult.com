@@ -411,44 +411,35 @@ $('loc-btn').addEventListener('click',()=>{
 
 // ---- Claude AI ----
 $('analyze-btn').addEventListener('click',async()=>{
-  if(!imgs.length)return M($('inspect-msg'),'error','يرجى رفع صورة أولاً.');
-  load($('analyze-btn'),true,'🤖 جاري التحليل...','🤖 جاري التحليل...');
+  if(!imgs.length) return M($('inspect-msg'),'error','⚠️ يرجى رفع صورة واحدة على الأقل من الموقع.');
+
+  // إظهار حالة الانتظار بوضوح
+  const btn=$('analyze-btn');
+  btn.disabled=true;
+  btn.textContent='⏳ جاري التحليل الهندسي...';
+  btn.style.background='linear-gradient(135deg,#4B5563,#374151)';
+
   $('ai-loading').style.display='block';
+  $('ai-loading').textContent='🔍 جاري تحليل بيانات الموقع بواسطة الذكاء الاصطناعي...';
   $('ai-table').style.display='none';
   $('next-card').style.display='none';
-  Mc($('inspect-msg'));
+  M($('inspect-msg'),'info','⏳ جاري التحليل الهندسي... قد يستغرق حتى 30 ثانية.');
 
   try{
-    // ضغط الصور قبل الإرسال لتقليل الحجم
-    async function compressImage(imgObj, maxWidth=800, quality=0.7){
-      return new Promise(resolve=>{
-        const canvas=document.createElement('canvas');
-        const image=new Image();
-        image.onload=()=>{
-          let w=image.width, h=image.height;
-          if(w>maxWidth){h=h*(maxWidth/w);w=maxWidth;}
-          canvas.width=w;canvas.height=h;
-          canvas.getContext('2d').drawImage(image,0,0,w,h);
-          const compressed=canvas.toDataURL('image/jpeg',quality);
-          resolve({data:compressed.split(',')[1],media_type:'image/jpeg'});
-        };
-        image.src=imgObj.url;
-      });
-    }
-
-    M($('inspect-msg'),'info','⏳ جاري ضغط الصور وإرسالها للتحليل...');
-    const imagePayload=await Promise.all(imgs.slice(0,4).map(im=>compressImage(im)));
-
     const payload={
-      images:imagePayload,
       info:{
-        property_type:$('i-prop').textContent,
-        district:$('i-dist').textContent,
-        client_name:$('i-client').textContent,
-        lat:$('loc-lat').value||null,
-        lng:$('loc-lng').value||null
+        property_type: $('i-prop').textContent.trim()||'غير محدد',
+        district:      $('i-dist').textContent.trim()||'غير محدد',
+        city:          $('i-city').textContent.trim()||'غير محدد',
+        client_name:   $('i-client').textContent.trim()||'غير محدد',
+        description:   $('i-desc').textContent.trim()||'غير محدد',
+        images_count:  imgs.length,
+        lat:           $('loc-lat').value||null,
+        lng:           $('loc-lng').value||null
       }
     };
+
+    $('ai-loading').textContent='📡 جاري الاتصال بالذكاء الاصطناعي...';
 
     const res=await fetch(CONFIG.N8N_ANALYZE,{
       method:'POST',
@@ -456,26 +447,50 @@ $('analyze-btn').addEventListener('click',async()=>{
       body:JSON.stringify(payload)
     });
 
-    const data=await res.json();
-    if(!res.ok||data.success===false) throw new Error(data.message||'فشل التحليل');
-    const p=data.result;
-    if(!p) throw new Error('لم يرجع ناتج من التحليل');
-    if(data.usage) console.log(`✅ Tokens: ${data.usage.total_tokens} | Model: ${data.model}`);
+    $('ai-loading').textContent='📊 جاري معالجة النتائج...';
 
+    let data;
+    try{ data=await res.json(); }
+    catch{ throw new Error('الاستجابة من السيرفر غير صحيحة — تحقق من تفعيل الـ Workflow في n8n'); }
+
+    if(!res.ok){
+      if(res.status===402||data?.message?.includes('credit')||data?.message?.includes('balance')){
+        throw new Error('⚠️ رصيد API منتهٍ — يرجى شحن الرصيد من console.anthropic.com');
+      }
+      throw new Error(data?.message||`خطأ من السيرفر: ${res.status}`);
+    }
+    if(data.success===false) throw new Error(data.message||'فشل التحليل');
+    if(!data.result) throw new Error('لم يرجع تقرير من الذكاء الاصطناعي');
+
+    const p=data.result;
     aiData=p;
 
-    // Fill report text automatically
-    let rt=`الملخص: ${p.summary||''}\n\n`;
-    if(p.defects?.length)rt+=`العيوب المرصودة:\n${p.defects.map(d=>`• ${d}`).join('\n')}\n\n`;
-    if(p.recommendations?.length)rt+=`التوصيات:\n${p.recommendations.map(r=>`• ${r}`).join('\n')}`;
-    if(!$('r-text').value)$('r-text').value=rt;
+    // ملء نص التقرير تلقائياً بأسلوب مهندس مدني
+    let rt=`تقرير الزيارة الإشرافية\n${'═'.repeat(40)}\n\n`;
+    rt+=`الموقع: ${$('i-city').textContent} — حي ${$('i-dist').textContent}\n`;
+    rt+=`نوع العقار: ${$('i-prop').textContent}\n\n`;
+    if(p.summary) rt+=`الملاحظات العامة:\n${p.summary}\n\n`;
+    if(p.defects?.length) rt+=`العيوب والملاحظات الفنية:\n${p.defects.map((d,i)=>`${i+1}. ${d}`).join('\n')}\n\n`;
+    if(p.recommendations?.length) rt+=`التوصيات الفنية:\n${p.recommendations.map((r,i)=>`${i+1}. ${r}`).join('\n')}\n\n`;
+    if(p.client_message) rt+=`ملاحظة للمالك:\n${p.client_message}`;
+    if(!$('r-text').value.trim()) $('r-text').value=rt;
 
     fillAITable(p);
-    M($('inspect-msg'),'success','✅ اكتمل التحليل! راجع النتائج وعدّلها حسب رأيك ثم انتقل للتقرير.');
+    M($('inspect-msg'),'success','✅ اكتمل التحليل الهندسي! راجع الملاحظات وعدّلها ثم انتقل للتقرير.');
+
   }catch(e){
-    M($('inspect-msg'),'error','فشل التحليل: '+(e.message||'خطأ غير معروف'));
+    const errMsg=e.message||'خطأ غير معروف';
+    if(errMsg.includes('رصيد')||errMsg.includes('credit')){
+      M($('inspect-msg'),'error','💳 '+errMsg);
+    } else if(errMsg.includes('fetch')||errMsg.includes('network')||errMsg.includes('Failed')){
+      M($('inspect-msg'),'error','🌐 تعذر الاتصال بالخادم — تحقق من الإنترنت وتفعيل الـ Workflow في n8n.');
+    } else {
+      M($('inspect-msg'),'error','❌ '+errMsg);
+    }
   }finally{
-    load($('analyze-btn'),false,'🤖 تحليل الصور بـ Claude AI','');
+    btn.disabled=false;
+    btn.textContent='🤖 تحليل بواسطة الذكاء الاصطناعي';
+    btn.style.background='';
     $('ai-loading').style.display='none';
   }
 });
