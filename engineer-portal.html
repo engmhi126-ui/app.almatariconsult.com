@@ -813,10 +813,15 @@ async function loadDone(){
   Mc($('done-msg'));const s=getS();if(!s)return;
   try{
     $('refresh-done-btn').disabled=true;
-    const r=await api(CONFIG.N8N_VISITS,{engineer_id:s.id||null,phone:s.phone||''});
-    const all=r.visits||r.data||[];
-    const done=all.filter(i=>['completed','cancelled'].includes(i.status));
-    renderDone(done);
+    // جلب التقارير مباشرة من Supabase بدل n8n
+    const engId=s.id||null;
+    if(!engId){renderDone([]);return;}
+    const res=await fetch(
+      `${CONFIG.SUPABASE_URL}/rest/v1/v_visit_reports_full?engineer_id=eq.${engId}&select=*&order=created_at.desc`,
+      {headers:{apikey:CONFIG.SUPABASE_KEY,Authorization:`Bearer ${CONFIG.SUPABASE_KEY}`}}
+    );
+    const data=await res.json();
+    renderDone(Array.isArray(data)?data:[]);
   }catch(e){M($('done-msg'),'error',e.message||'تعذر تحميل التقارير.');renderDone([])}
   finally{$('refresh-done-btn').disabled=false}
 }
