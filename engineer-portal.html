@@ -419,11 +419,25 @@ $('analyze-btn').addEventListener('click',async()=>{
   Mc($('inspect-msg'));
 
   try{
-    // إرسال الصور لـ n8n الذي يستدعي Claude API
-    const imagePayload=imgs.slice(0,4).map(im=>({
-      data:im.url.split(',')[1],
-      media_type:im.file.type||'image/jpeg'
-    }));
+    // ضغط الصور قبل الإرسال لتقليل الحجم
+    async function compressImage(imgObj, maxWidth=800, quality=0.7){
+      return new Promise(resolve=>{
+        const canvas=document.createElement('canvas');
+        const image=new Image();
+        image.onload=()=>{
+          let w=image.width, h=image.height;
+          if(w>maxWidth){h=h*(maxWidth/w);w=maxWidth;}
+          canvas.width=w;canvas.height=h;
+          canvas.getContext('2d').drawImage(image,0,0,w,h);
+          const compressed=canvas.toDataURL('image/jpeg',quality);
+          resolve({data:compressed.split(',')[1],media_type:'image/jpeg'});
+        };
+        image.src=imgObj.url;
+      });
+    }
+
+    M($('inspect-msg'),'info','⏳ جاري ضغط الصور وإرسالها للتحليل...');
+    const imagePayload=await Promise.all(imgs.slice(0,4).map(im=>compressImage(im)));
 
     const payload={
       images:imagePayload,
