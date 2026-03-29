@@ -15,7 +15,8 @@
       N8N_LOGIN:    'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-login',
       N8N_VISITS:   'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-get-visits',
       N8N_ACCEPT:   'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-accept-visit',
-      N8N_REPORT:   'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-submit-report'
+      N8N_REPORT:   'https://n8n.srv1243842.hstgr.cloud/webhook/engineer-submit-report',
+      N8N_ANALYZE:  'https://n8n.srv1243842.hstgr.cloud/webhook/analyze-site'
     };
   </script>
   <style>
@@ -418,27 +419,34 @@ $('analyze-btn').addEventListener('click',async()=>{
   Mc($('inspect-msg'));
 
   try{
-    const content=[];
-    imgs.slice(0,4).forEach(im=>{
-      content.push({type:'image',source:{type:'base64',media_type:im.file.type||'image/jpeg',data:im.url.split(',')[1]}});
-    });
-    content.push({type:'text',text:`أنت مهندس استشاري خبير في الإشراف الهندسي. حلّل صور موقع البناء المرفقة.\n\nمعلومات:\n- نوع العقار: ${$('i-prop').textContent}\n- الحي: ${$('i-dist').textContent}\n- الموقع: ${locData?locData.lat+','+locData.lng:'غير محدد'}\n\nأجب بـ JSON فقط بدون أي نص إضافي:\n{"summary":"ملخص هندسي شامل","severity":"low أو medium أو high","defects":["عيب 1","عيب 2"],"recommendations":["توصية 1","توصية 2"],"client_message":"رسالة احترافية للعميل"}`});
+    // إرسال الصور لـ n8n الذي يستدعي Claude API
+    const imagePayload=imgs.slice(0,4).map(im=>({
+      data:im.url.split(',')[1],
+      media_type:im.file.type||'image/jpeg'
+    }));
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const payload={
+      images:imagePayload,
+      info:{
+        property_type:$('i-prop').textContent,
+        district:$('i-dist').textContent,
+        client_name:$('i-client').textContent,
+        lat:$('loc-lat').value||null,
+        lng:$('loc-lng').value||null
+      }
+    };
+
+    const res=await fetch(CONFIG.N8N_ANALYZE,{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':CONFIG.CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1500,messages:[{role:'user',content}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
     });
-    const data=await res.json();
-    if(!res.ok){
-      const errMsg=data.error?.message||JSON.stringify(data);
-      throw new Error('Claude API: '+errMsg);
-    }
 
-    const raw=data.content?.[0]?.text||'{}';
-    let p;
-    try{p=JSON.parse(raw.replace(/```json|```/g,'').trim())}
-    catch{p={summary:raw,severity:'medium',defects:[],recommendations:[],client_message:''}}
+    const data=await res.json();
+    if(!res.ok||data.success===false) throw new Error(data.message||'فشل التحليل');
+    const p=data.result;
+    if(!p) throw new Error('لم يرجع ناتج من التحليل');
+    if(data.usage) console.log(`✅ Tokens: ${data.usage.total_tokens} | Model: ${data.model}`);
 
     aiData=p;
 
