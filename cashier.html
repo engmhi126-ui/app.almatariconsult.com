@@ -636,45 +636,82 @@ function onProofFile(input){
 }
 
 function saveVoucher(){
-  var client=document.getElementById("v-client").value.trim();
-  var paid  =parseFloat(document.getElementById("v-paid").value)||0;
-  var total =parseFloat(document.getElementById("v-total").value)||0;
-  var engId =document.getElementById("v-eng").value;
-  var idnum =document.getElementById("v-idnum").value;
-  var phone =document.getElementById("v-phone").value;
-  var chip  =document.querySelector("#v-pay-chips .chip.on");
-  if(!client)        {showToast("يرجى إدخال اسم العميل");return;}
-  if(!paid)          {showToast("يرجى إدخال المبلغ المدفوع");return;}
-  if(!engId)         {showToast("يرجى اختيار عضو الفريق");return;}
-  if(idnum&&idnum.length<10){showToast("رقم الهوية يجب أن يكون 10 أرقام");return;}
-  if(phone&&phone.length<10){showToast("رقم الجوال يجب أن يكون 10 أرقام");return;}
-  var btn=document.getElementById("save-btn");
-  btn.innerHTML="<div class='spinner'></div> جارٍ الحفظ..."; btn.disabled=true;
-  var savedVoucherRef = null;
-  sbGet("vouchers","select=voucher_num&order=created_at.desc&limit=1").then(function(ex){
-    var n=1;
-    if(ex&&ex.length&&ex[0].voucher_num){var m=ex[0].voucher_num.replace("#","").match(/(\d+)$/);if(m)n=parseInt(m[1])+1;}
-    var vNum="#"+new Date().getFullYear()+"-"+String(n).padStart(3,"0");
-    return sbPost("vouchers",{
+  var client = document.getElementById("v-client").value.trim();
+  var paid   = parseFloat(document.getElementById("v-paid").value)||0;
+  var total  = parseFloat(document.getElementById("v-total").value)||0;
+  var engId  = document.getElementById("v-eng").value;
+  var idnum  = document.getElementById("v-idnum").value;
+  var phone  = document.getElementById("v-phone").value;
+  var chip   = document.querySelector("#v-pay-chips .chip.on");
+  var district = document.getElementById("v-district").value||null;
+  var purpose  = document.getElementById("v-purpose").value||null;
+  var svcType  = (document.querySelector("#v-type-chips .chip.on")||{}).textContent||"خدمة هندسية";
+
+  if(!client){ showToast("يرجى إدخال اسم العميل"); return; }
+  if(!paid)  { showToast("يرجى إدخال المبلغ المدفوع"); return; }
+  if(!engId) { showToast("يرجى اختيار عضو الفريق"); return; }
+  if(idnum && idnum.length < 10){ showToast("رقم الهوية يجب أن يكون 10 أرقام"); return; }
+  if(phone && phone.length < 10){ showToast("رقم الجوال يجب أن يكون 10 أرقام"); return; }
+
+  var btn = document.getElementById("save-btn");
+  btn.innerHTML = "<div class=\"spinner\"></div> جارٍ الحفظ...";
+  btn.disabled  = true;
+
+  // الخطوة 1: جلب آخر رقم سند
+  sbGet("vouchers","select=voucher_num&order=created_at.desc&limit=1")
+  .then(function(ex){
+    var n = 1;
+    if(ex && ex.length && ex[0].voucher_num){
+      var m = ex[0].voucher_num.replace("#","").match(/(\d+)$/);
+      if(m) n = parseInt(m[1]) + 1;
+    }
+    var vNum = "#" + new Date().getFullYear() + "-" + String(n).padStart(3,"0");
+
+    // الخطوة 2: حفظ السند
+    return sbPost("vouchers", {
       voucher_num:     vNum,
       client_name:     client,
       client_id_num:   idnum||null,
       client_phone:    phone||null,
-      client_district: document.getElementById("v-district").value||null,
-      service_type:    (document.querySelector("#v-type-chips .chip.on")||{}).textContent||"خدمة هندسية",
+      client_district: district,
+      service_type:    svcType,
       total_amount:    total||paid,
       paid_amount:     paid,
-      payment_method:  chip?chip.textContent:null,
-      purpose:         document.getElementById("v-purpose").value||null,
+      payment_method:  chip ? chip.textContent : null,
+      purpose:         purpose,
       eng_user_id:     engId,
       status:          "partial"
     });
-  }).then(function(saved){
-    var sv=(saved||[])[0];
-    savedVoucherRef = sv || null;
+  })
+  .then(function(saved){
+    var sv = saved && saved[0] ? saved[0] : null;
+
+    // حفظ السند للطباعة فوراً
+    lastSavedVoucher = sv;
+
+    // إظهار زر الطباعة
+    var pb = document.getElementById("print-btn");
+    if(pb) pb.hidden = false;
+
+    // تحديث رقم السند في المعاينة
+    if(sv && sv.voucher_num){
+      document.getElementById("vp-num").textContent = sv.voucher_num;
+    }
+
+    showToast("✓ تم حفظ السند " + (sv ? sv.voucher_num : "") + " — اضغط 🖨 للطباعة");
+
+    // الخطوة 3: إشعار واتساب
+    var em = teamMembers.filter(function(m){ return m.id === engId; })[0];
+    sendWA("🧾 سند قبض جديد\nالعميل: " + client +
+           "\nالمدفوع: " + fmt(paid) + " ريال" +
+           "\nالمهندس: " + (em ? em.name : "—") +
+           "\n💼 استلمه: " + currentCashierName +
+           "\n" + new Date().toLocaleString("ar-SA"));
+
+    // الخطوة 4: إنشاء مهمة — بدون ربط بالسداد
     if(sv){
-      return sbPost("tasks",{
-        title:        "إنجاز "+(sv.service_type||"عمل")+" — "+client,
+      sbPost("tasks", {
+        title:        "إنجاز " + svcType + " — " + client,
         task_client:  client,
         task_type:    "field",
         status:       "waiting",
@@ -683,28 +720,19 @@ function saveVoucher(){
         eng_user_id:  engId
       });
     }
-  }).then(function(){
-    var em=teamMembers.filter(function(m){return m.id===engId;})[0];
-    var sv = savedVoucherRef;
-    // حفظ بيانات السند للطباعة
-    lastSavedVoucher = sv || null;
-    showToast("✓ تم حفظ السند — يمكنك الطباعة الآن");
-    // إظهار زر الطباعة
-    var pb = document.getElementById("print-btn");
-    if(pb) { pb.hidden = false; }
-    // تحديث رقم السند في المعاينة
-    if(sv && sv.voucher_num) {
-      document.getElementById("vp-num").textContent = sv.voucher_num;
-      document.getElementById("vp-date").textContent = new Date().toLocaleDateString("ar-SA");
-    }
-    sendWA("🧾 سند قبض جديد\nالعميل: "+client+"\nالمدفوع: "+fmt(paid)+" ريال\nالمهندس: "+(em?em.name:"—")+"\n💼 استلمه: "+currentCashierName+"\n"+new Date().toLocaleString("ar-SA"));
+
+    // الخطوة 5: تفريغ النموذج
     resetForm();
     loadPartialVouchers();
     loadTasks();
-  }).catch(function(e){
-    showToast("خطأ: "+e.message);
-  }).finally(function(){
-    btn.innerHTML="💾 حفظ السند"; btn.disabled=false;
+  })
+  .catch(function(e){
+    showToast("خطأ في الحفظ: " + e.message);
+    console.error("saveVoucher error:", e);
+  })
+  .finally(function(){
+    btn.innerHTML = "💾 حفظ السند";
+    btn.disabled  = false;
   });
 }
 
@@ -721,10 +749,8 @@ function resetForm(){
   document.getElementById("proof-zone").classList.remove("has-file");
   document.getElementById("id-hint").textContent="";
   document.getElementById("phone-hint").textContent="";
-  // إخفاء زر الطباعة عند بدء سند جديد
-  var pb = document.getElementById("print-btn");
-  if(pb) { pb.hidden = true; }
   lastSavedVoucher = null;
+  // لا نخفي زر الطباعة هنا — يبقى حتى يضغط المستخدم عليه
 }
 
 function printVoucher(){
