@@ -305,12 +305,31 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       <!-- معاينة السند -->
-      <div class="vp" id="vp-wrap">
+      <div class="vp" id="vp-wrap" style="position:relative;">
         <div class="vp-hdr">
           <span>معاينة السند</span>
           <span id="vp-num" style="color:var(--blue);">#—</span>
         </div>
-        <div class="vp-paper" id="printable-voucher">
+        <div class="vp-paper" id="printable-voucher" style="position:relative;">
+          <!-- ختم مسودة — يختفي بعد الحفظ -->
+          <div id="draft-stamp" style="
+            position:absolute;inset:0;
+            display:flex;align-items:center;justify-content:center;
+            pointer-events:none;z-index:10;
+            ">
+            <div style="
+              transform:rotate(-35deg);
+              font-size:52px;font-weight:900;
+              color:rgba(255,71,87,.18);
+              font-family:Arial,sans-serif;
+              letter-spacing:4px;
+              border:6px solid rgba(255,71,87,.15);
+              padding:4px 14px;
+              border-radius:8px;
+              white-space:nowrap;
+              user-select:none;
+              ">مسودة</div>
+          </div>
           <div class="vp-co">
             <div>
               <div style="font-size:9px;font-weight:700;line-height:1.6;">عبدالعزيز حسن المطري للاستشارات الهندسية</div>
@@ -547,6 +566,8 @@ function doLogout(){
   document.getElementById("login-member").value = "";
   document.getElementById("print-btn").hidden = true;
   document.getElementById("print-partial-wrap").style.display = "none";
+  var stamp = document.getElementById("draft-stamp");
+  if(stamp) stamp.style.display = "flex";
 }
 
 /* LOAD */
@@ -693,9 +714,11 @@ function saveVoucher(){
   btn.innerHTML = "<div class=\"spinner\"></div> جارٍ الحفظ...";
   btn.disabled = true;
 
-  /* إخفاء زر الطباعة حتى يكتمل الحفظ */
+  /* إخفاء زر الطباعة حتى يكتمل الحفظ — إعادة ختم المسودة */
   document.getElementById("print-btn").hidden = true;
   lastSavedVoucher = null;
+  var stamp = document.getElementById("draft-stamp");
+  if(stamp) stamp.style.display = "flex";
 
   var savedRef = null;
 
@@ -742,8 +765,10 @@ function saveVoucher(){
       document.getElementById("vp-num").textContent = savedRef.voucher_num;
     }
 
-    /* إظهار زر الطباعة */
+    /* إظهار زر الطباعة وإخفاء ختم المسودة */
     document.getElementById("print-btn").hidden = false;
+    var stamp = document.getElementById("draft-stamp");
+    if(stamp) stamp.style.display = "none";
 
     var em = teamMembers.filter(function(m){return m.id===engId;})[0];
     showToast("✓ تم حفظ السند — اضغط 🖨 للطباعة");
@@ -758,6 +783,8 @@ function saveVoucher(){
   }).catch(function(e){
     showToast("خطأ في الحفظ: "+e.message);
     document.getElementById("print-btn").hidden = true;
+    var stamp = document.getElementById("draft-stamp");
+    if(stamp) stamp.style.display = "flex";
   }).finally(function(){
     btn.innerHTML = "💾 حفظ السند";
     btn.disabled = false;
