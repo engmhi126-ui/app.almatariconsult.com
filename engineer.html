@@ -8,564 +8,139 @@
 <meta name="theme-color" content="#0f2d52">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-
-:root {
-  --bg: #f0ede6;
-  --card: #ffffff;
-  --border: #ddd8ce;
-  --border2: #c8c2b6;
-  --text: #18181a;
-  --t2: #58575a;
-  --t3: #a09fa2;
-  --blue: #1a4880;
-  --blue-d: #0f2d52;
-  --blue-l: #e6eef8;
-  --green: #1a5c35;
-  --green-l: #e6f4ec;
-  --amber: #7a4e00;
-  --amber-l: #fef3dc;
-  --red: #7a1f1f;
-  --red-l: #faeaea;
-  --font: "IBM Plex Sans Arabic", sans-serif;
-  --mono: "JetBrains Mono", monospace;
-  --r: 12px;
-  --r2: 16px;
-  --shadow: 0 1px 4px rgba(0,0,0,.07), 0 6px 16px rgba(0,0,0,.05);
+:root{
+  --bg:#f0ede6;--card:#fff;--border:#ddd8ce;--border2:#c8c2b6;
+  --text:#18181a;--t2:#58575a;--t3:#a09fa2;
+  --blue:#1a4880;--blue-d:#0f2d52;--blue-l:#e6eef8;
+  --green:#1a5c35;--green-l:#e6f4ec;
+  --amber:#7a4e00;--amber-l:#fef3dc;
+  --red:#7a1f1f;--red-l:#faeaea;
+  --font:"IBM Plex Sans Arabic",sans-serif;
+  --mono:"JetBrains Mono",monospace;
+  --r:12px;--r2:16px;
+  --shadow:0 2px 8px rgba(0,0,0,.07);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; -webkit-text-size-adjust: 100%; }
-body {
-  background: var(--bg);
-  font-family: var(--font);
-  color: var(--text);
-  min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-/* ── SCREENS ── */
-.screen { display: none; min-height: 100vh; flex-direction: column; }
-.screen.active { display: flex; }
-
-/* ── LOGIN ── */
-.login-bg {
-  background: var(--blue-d);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
-  position: relative;
-  overflow: hidden;
-}
-.login-bg::before {
-  content: '';
-  position: absolute;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.04);
-  top: -80px; left: -80px;
-}
-.login-bg::after {
-  content: '';
-  position: absolute;
-  width: 200px; height: 200px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.03);
-  bottom: -40px; right: -40px;
-}
-.login-logo {
-  width: 64px; height: 64px;
-  background: rgba(255,255,255,.12);
-  border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px;
-  border: 1px solid rgba(255,255,255,.15);
-}
-.login-logo svg { width: 28px; height: 28px; fill: white; }
-.login-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-.login-sub { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 36px; }
-.login-card {
-  background: #fff;
-  border-radius: var(--r2);
-  padding: 24px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,.25);
-}
-.login-card-title { font-size: 15px; font-weight: 600; margin-bottom: 18px; color: var(--text); }
-.fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-.fl { font-size: 11px; font-weight: 600; color: var(--t2); }
-.fi {
-  padding: 11px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 9px;
-  font-family: var(--font);
-  font-size: 14px;
-  color: var(--text);
-  direction: rtl;
-  transition: border-color .15s;
-  background: #fff;
-  width: 100%;
-}
-.fi:focus { outline: none; border-color: var(--blue); background: var(--blue-l); }
-.fs {
-  padding: 11px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 9px;
-  font-family: var(--font);
-  font-size: 14px;
-  cursor: pointer;
-  direction: rtl;
-  background: #fff;
-  width: 100%;
-  color: var(--text);
-}
-.fs:focus { outline: none; border-color: var(--blue); }
-.login-btn {
-  width: 100%;
-  padding: 13px;
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 4px;
-  transition: background .15s;
-}
-.login-btn:hover { background: var(--blue-d); }
-.login-err {
-  background: var(--red-l);
-  border: 1px solid rgba(122,31,31,.2);
-  border-radius: 8px;
-  padding: 9px 13px;
-  font-size: 12px;
-  color: var(--red);
-  margin-top: 10px;
-  display: none;
-}
-.login-err.show { display: block; }
-
-/* ── APP HEADER ── */
-.app-header {
-  background: var(--blue-d);
-  padding: 0 16px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-.ah-eng { display: flex; align-items: center; gap: 10px; }
-.ah-av {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.18);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff;
-  flex-shrink: 0;
-}
-.ah-name { font-size: 13px; font-weight: 600; color: #fff; }
-.ah-role { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 1px; }
-.ah-right { display: flex; gap: 8px; }
-.ah-btn {
-  padding: 6px 12px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 8px;
-  background: transparent;
-  color: rgba(255,255,255,.7);
-  font-size: 11px;
-  font-family: var(--font);
-  cursor: pointer;
-  transition: all .15s;
-}
-.ah-btn:hover { color: #fff; border-color: rgba(255,255,255,.4); }
-.ah-btn.active-tab { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.3); }
-
-/* ── TABS ── */
-.tabs-bar {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  position: sticky;
-  top: 54px;
-  z-index: 40;
-}
-.tab {
-  flex: 1;
-  padding: 11px 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--t3);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition: all .15s;
-}
-.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
-.tab-n {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
-  background: var(--border);
-  color: var(--t2);
-}
-.tab.active .tab-n { background: var(--blue-l); color: var(--blue); }
-
-/* ── VIEWS ── */
-.view { display: none; padding: 14px; animation: fadeIn .2s ease; }
-.view.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-/* ── FILE CARD ── */
-.fc {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  margin-bottom: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.fc-top {
-  padding: 14px 16px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-.fc-badge {
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.badge-field { background: var(--amber-l); color: var(--amber); }
-.badge-office { background: var(--blue-l); color: var(--blue); }
-.fc-client { font-size: 14px; font-weight: 600; line-height: 1.3; }
-.fc-service { font-size: 11px; color: var(--t3); margin-top: 2px; }
-.fc-loc { font-size: 11px; color: var(--t2); margin-top: 5px; }
-.fc-ref { font-size: 10px; font-family: var(--mono); color: var(--t3); margin-top: 3px; }
-
-/* ── PAY STATUS ── */
-.fc-pay {
-  padding: 11px 16px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.pay-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 13px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.pay-full { background: var(--green-l); color: var(--green); }
-.pay-partial { background: var(--amber-l); color: var(--amber); }
-.pay-icon { font-size: 18px; }
-.pay-amount {
-  font-size: 20px;
-  font-weight: 700;
-  font-family: var(--mono);
-  display: block;
-  margin-top: 3px;
-}
-.pay-sub { font-size: 10px; font-weight: 400; opacity: .75; }
-
-/* ── NOTICE ── */
-.fc-notice {
-  margin: 0 16px 12px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  font-size: 11px;
-  line-height: 1.6;
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-}
-.n-ok { background: var(--green-l); color: var(--green); border: 1px solid rgba(26,92,53,.15); }
-.n-warn { background: var(--amber-l); color: var(--amber); border: 1px solid rgba(122,78,0,.15); }
-.n-info { background: var(--blue-l); color: var(--blue); border: 1px solid rgba(26,72,128,.15); }
-
-/* ── ACTIONS ── */
-.fc-actions {
-  padding: 11px 16px;
-  display: flex;
-  gap: 8px;
-}
-.abtn {
-  flex: 1;
-  padding: 11px 10px;
-  border-radius: 9px;
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  text-align: center;
-  transition: all .15s;
-  line-height: 1.3;
-}
-.abtn:active { transform: scale(.98); }
-.abtn-deliver { background: var(--green); color: #fff; }
-.abtn-deliver:active { background: #144d2b; }
-.abtn-voucher { background: var(--blue); color: #fff; }
-.abtn-voucher:active { background: var(--blue-d); }
-.abtn-contact { background: var(--blue-l); color: var(--blue); border: 1px solid rgba(26,72,128,.2); }
-.abtn-disabled { background: var(--border); color: var(--t3); cursor: not-allowed; opacity: .6; }
-
-/* ── HISTORY ── */
-.fc-hist {
-  padding: 10px 16px;
-  background: #faf9f7;
-  border-top: 1px solid var(--border);
-}
-.hist-lbl { font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 7px; font-weight: 600; }
-.hist-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--t2); margin-bottom: 5px; }
-.hdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.htime { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-right: auto; }
-
-/* ── DONE STAMP ── */
-.fc-done {
-  padding: 9px 16px;
-  background: var(--green-l);
-  border-top: 1px solid rgba(26,92,53,.15);
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--green);
-}
-
-/* ── CUSTODY VIEW ── */
-.custody-total {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 20px;
-  margin-bottom: 14px;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-.ct-lbl { font-size: 10px; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 8px; }
-.ct-val { font-size: 36px; font-weight: 700; font-family: var(--mono); color: var(--amber); }
-.ct-sub { font-size: 11px; color: var(--t3); margin-top: 6px; }
-.ct-zero { color: var(--green); }
-.custody-row {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 13px 16px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.05);
-}
-.cr-id { font-family: var(--mono); font-size: 11px; color: var(--blue); font-weight: 600; }
-.cr-client { font-size: 12px; font-weight: 600; }
-.cr-date { font-size: 10px; color: var(--t3); margin-top: 2px; }
-.cr-amt { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--amber); }
-.cr-status { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-.cs-eng { background: var(--amber-l); color: var(--amber); }
-.cs-done { background: var(--green-l); color: var(--green); }
-
-/* ── BOTTOM SHEET ── */
-.sheet-bg {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  z-index: 100;
-  display: none;
-  align-items: flex-end;
-}
-.sheet-bg.open { display: flex; }
-.sheet {
-  background: #fff;
-  border-radius: 18px 18px 0 0;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding-bottom: env(safe-area-inset-bottom, 16px);
-}
-.sheet-handle {
-  width: 36px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 12px auto 0;
-}
-.sheet-head {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.sheet-title { font-size: 15px; font-weight: 600; }
-.sheet-close {
-  font-size: 22px; color: var(--t3);
-  background: none; border: none;
-  cursor: pointer; line-height: 1; padding: 0 4px;
-}
-.sheet-body { padding: 18px 20px; }
-
-/* ── VOUCHER FORM ── */
-.v-client-info {
-  background: var(--blue-l);
-  border-radius: 10px;
-  padding: 13px 14px;
-  margin-bottom: 16px;
-}
-.vci-name { font-size: 14px; font-weight: 600; color: var(--blue); }
-.vci-ref { font-size: 11px; color: rgba(26,72,128,.6); margin-top: 2px; }
-.remaining-box {
-  background: var(--amber-l);
-  border-radius: 8px;
-  padding: 10px 13px;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.rb-lbl { font-size: 10px; color: var(--amber); font-weight: 600; }
-.rb-val { font-size: 22px; font-weight: 700; font-family: var(--mono); color: var(--amber); }
-.chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chip {
-  padding: 9px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: var(--font);
-  transition: all .15s;
-}
-.chip.on { border-color: var(--blue); background: var(--blue-l); color: var(--blue); font-weight: 600; }
-.words-box {
-  background: var(--amber-l);
-  border: 1px solid rgba(122,78,0,.2);
-  border-radius: 8px;
-  padding: 10px 13px;
-  font-size: 12px;
-  color: var(--amber);
-  min-height: 36px;
-  margin-bottom: 13px;
-}
-.submit-btn {
-  width: 100%;
-  padding: 14px;
-  background: var(--green);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s;
-}
-.submit-btn:active { background: #144d2b; }
-
-/* ── CONTACT SHEET ── */
-.contact-opt {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all .15s;
-  margin-bottom: 10px;
-}
-.contact-opt:active { background: var(--blue-l); border-color: var(--blue); }
-.co-icon {
-  width: 42px; height: 42px;
-  border-radius: 11px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.co-title { font-size: 13px; font-weight: 600; }
-.co-sub { font-size: 11px; color: var(--t3); margin-top: 2px; }
-
-/* ── DELIVER MODAL ── */
-.modal-wrap {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 200;
-  display: none;
-  align-items: flex-end;
-}
-.modal-wrap.open { display: flex; }
-.modal-box {
-  background: #fff;
-  border-radius: 18px 18px 0 0;
-  width: 100%;
-  padding: 28px 20px;
-  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-}
-.modal-emoji { font-size: 44px; text-align: center; margin-bottom: 12px; }
-.modal-title { font-size: 16px; font-weight: 600; text-align: center; margin-bottom: 6px; }
-.modal-body-text { font-size: 12px; color: var(--t2); text-align: center; margin-bottom: 22px; line-height: 1.7; }
-.modal-btns { display: flex; gap: 10px; }
-.mbtn { flex: 1; padding: 13px; border-radius: 10px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
-.mbtn-cancel { background: var(--bg); color: var(--t2); }
-.mbtn-ok { background: var(--green); color: #fff; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: #fff;
-  padding: 11px 22px;
-  border-radius: 30px;
-  font-size: 13px;
-  z-index: 400;
-  opacity: 0;
-  transition: opacity .3s;
-  pointer-events: none;
-  white-space: nowrap;
-  max-width: 90vw;
-  text-align: center;
-}
-.toast.show { opacity: 1; }
-
-/* ── EMPTY ── */
-.empty {
-  text-align: center;
-  padding: 48px 20px;
-}
-.empty-icon { font-size: 40px; margin-bottom: 10px; }
-.empty-title { font-size: 14px; font-weight: 600; color: var(--t2); }
-.empty-sub { font-size: 11px; color: var(--t3); margin-top: 5px; line-height: 1.6; }
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-text-size-adjust:100%;}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;max-width:520px;margin:0 auto;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+/* LOGIN */
+.login-bg{background:var(--blue-d);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.login-logo{width:64px;height:64px;background:rgba(255,255,255,.12);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:1px solid rgba(255,255,255,.15);}
+.login-logo svg{width:28px;height:28px;fill:white;}
+.login-title{font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;}
+.login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:36px;}
+.login-card{background:#fff;border-radius:var(--r2);padding:24px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.login-card-title{font-size:15px;font-weight:600;margin-bottom:18px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.fl{font-size:11px;font-weight:600;color:var(--t2);}
+.fi{padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;color:var(--text);direction:rtl;width:100%;background:#fff;}
+.fi:focus{outline:none;border-color:var(--blue);}
+.fs{padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;cursor:pointer;direction:rtl;background:#fff;width:100%;}
+.fs:focus{outline:none;border-color:var(--blue);}
+.login-btn{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.login-btn:active{background:var(--blue-d);}
+.login-err{background:var(--red-l);border:1px solid rgba(122,31,31,.2);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--red);margin-top:10px;display:none;}
+.login-err.show{display:block;}
+/* APP */
+.app-header{background:var(--blue-d);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ah-eng{display:flex;align-items:center;gap:10px;}
+.ah-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+.ah-name{font-size:13px;font-weight:600;color:#fff;}
+.ah-role{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;}
+.ah-btn{padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:transparent;color:rgba(255,255,255,.7);font-size:11px;font-family:var(--font);cursor:pointer;}
+/* TABS */
+.tabs-bar{background:#fff;border-bottom:1px solid var(--border);display:flex;}
+.tab{flex:1;padding:11px 8px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-n{font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:8px;background:var(--border);color:var(--t2);}
+.tab.active .tab-n{background:var(--blue-l);color:var(--blue);}
+/* VIEWS */
+.view{display:none;padding:14px;}
+.view.active{display:block;}
+/* FILE CARD */
+.fc{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+.fc-top{padding:14px 16px;display:flex;gap:10px;align-items:flex-start;}
+.fc-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.badge-field{background:var(--amber-l);color:var(--amber);}
+.badge-office{background:var(--blue-l);color:var(--blue);}
+.fc-client{font-size:14px;font-weight:600;line-height:1.3;}
+.fc-service{font-size:11px;color:var(--t3);margin-top:2px;}
+.fc-loc{font-size:11px;color:var(--t2);margin-top:5px;}
+.fc-ref{font-size:10px;font-family:var(--mono);color:var(--t3);margin-top:3px;}
+.fc-pay{padding:11px 16px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.pay-badge{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:10px;font-size:12px;font-weight:600;}
+.pay-full{background:var(--green-l);color:var(--green);}
+.pay-partial{background:var(--amber-l);color:var(--amber);}
+.pay-icon{font-size:18px;}
+.pay-amount{font-size:20px;font-weight:700;font-family:var(--mono);display:block;margin-top:3px;}
+.pay-sub{font-size:10px;font-weight:400;opacity:.75;}
+.fc-notice{margin:0 16px 12px;padding:9px 12px;border-radius:8px;font-size:11px;line-height:1.6;display:flex;align-items:flex-start;gap:7px;}
+.n-ok{background:var(--green-l);color:var(--green);border:1px solid rgba(26,92,53,.15);}
+.n-warn{background:var(--amber-l);color:var(--amber);border:1px solid rgba(122,78,0,.15);}
+.fc-actions{padding:11px 16px;display:flex;gap:8px;}
+.abtn{flex:1;padding:11px 10px;border-radius:9px;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.abtn-deliver{background:var(--green);color:#fff;}
+.abtn-voucher{background:var(--blue);color:#fff;}
+.abtn-contact{background:var(--blue-l);color:var(--blue);border:1px solid rgba(26,72,128,.2);}
+.abtn-disabled{background:var(--border);color:var(--t3);cursor:not-allowed;opacity:.6;}
+.fc-done{padding:9px 16px;background:var(--green-l);border-top:1px solid rgba(26,92,53,.15);display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--green);}
+/* CUSTODY */
+.custody-total{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:14px;text-align:center;box-shadow:var(--shadow);}
+.ct-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+.ct-val{font-size:36px;font-weight:700;font-family:var(--mono);color:var(--amber);}
+.ct-sub{font-size:11px;color:var(--t3);margin-top:6px;}
+.ct-zero{color:var(--green);}
+.custody-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.cr-id{font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:600;}
+.cr-client{font-size:12px;font-weight:600;}
+.cr-date{font-size:10px;color:var(--t3);margin-top:2px;}
+.cr-amt{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--amber);}
+.cr-status{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--amber-l);color:var(--amber);}
+/* SHEET */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;}
+.sheet-bg.open{display:flex;}
+.sheet{background:#fff;border-radius:18px 18px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding-bottom:20px;}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.sheet-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sheet-title{font-size:15px;font-weight:600;}
+.sheet-close{font-size:22px;color:var(--t3);background:none;border:none;cursor:pointer;padding:0 4px;}
+.sheet-body{padding:18px 20px;}
+.v-client-info{background:var(--blue-l);border-radius:10px;padding:13px 14px;margin-bottom:16px;}
+.vci-name{font-size:14px;font-weight:600;color:var(--blue);}
+.vci-ref{font-size:11px;color:rgba(26,72,128,.6);margin-top:2px;}
+.remaining-box{background:var(--amber-l);border-radius:8px;padding:10px 13px;margin-top:10px;display:flex;align-items:center;gap:10px;}
+.rb-lbl{font-size:10px;color:var(--amber);font-weight:600;}
+.rb-val{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--amber);}
+.chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font);}
+.chip.on{border-color:var(--blue);background:var(--blue-l);color:var(--blue);font-weight:600;}
+.words-box{background:var(--amber-l);border:1px solid rgba(122,78,0,.2);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--amber);min-height:36px;margin-bottom:13px;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;}
+/* MODAL */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;}
+.modal-wrap.open{display:flex;}
+.modal-box{background:#fff;border-radius:18px 18px 0 0;width:100%;padding:28px 20px;}
+.modal-emoji{font-size:44px;text-align:center;margin-bottom:12px;}
+.modal-title{font-size:16px;font-weight:600;text-align:center;margin-bottom:6px;}
+.modal-body-text{font-size:12px;color:var(--t2);text-align:center;margin-bottom:22px;line-height:1.7;}
+.modal-btns{display:flex;gap:10px;}
+.mbtn{flex:1;padding:13px;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.mbtn-cancel{background:var(--bg);color:var(--t2);}
+.mbtn-ok{background:var(--green);color:#fff;}
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;}
+.empty{text-align:center;padding:48px 20px;}
+.empty-icon{font-size:40px;margin-bottom:10px;}
+.empty-title{font-size:14px;font-weight:600;color:var(--t2);}
+.empty-sub{font-size:11px;color:var(--t3);margin-top:5px;line-height:1.6;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ═ LOGIN ═ -->
 <div class="screen active" id="screen-login">
   <div class="login-bg">
     <div class="login-logo">
@@ -597,7 +172,7 @@ body {
   </div>
 </div>
 
-<!-- APP -->
+<!-- ═ APP ═ -->
 <div class="screen" id="screen-app">
   <div class="app-header">
     <div class="ah-eng">
@@ -607,23 +182,13 @@ body {
         <div class="ah-role" id="app-role">—</div>
       </div>
     </div>
-    <div class="ah-right">
-      <button class="ah-btn" onclick="doLogout()">خروج</button>
-    </div>
+    <div><button class="ah-btn" onclick="doLogout()">خروج</button></div>
   </div>
-
   <div class="tabs-bar">
-    <div class="tab active" id="tab-files" onclick="switchTab('files',this)">
-      ملفاتي <span class="tab-n" id="cnt-files">0</span>
-    </div>
-    <div class="tab" id="tab-done" onclick="switchTab('done',this)">
-      مكتملة <span class="tab-n" id="cnt-done">0</span>
-    </div>
-    <div class="tab" id="tab-custody" onclick="switchTab('custody',this)">
-      عهدتي <span class="tab-n" id="cnt-custody">0</span>
-    </div>
+    <div class="tab active" id="tab-files" onclick="switchTab('files',this)">ملفاتي <span class="tab-n" id="cnt-files">0</span></div>
+    <div class="tab" id="tab-done" onclick="switchTab('done',this)">مكتملة <span class="tab-n" id="cnt-done">0</span></div>
+    <div class="tab" id="tab-custody" onclick="switchTab('custody',this)">عهدتي <span class="tab-n" id="cnt-custody">0</span></div>
   </div>
-
   <div class="view active" id="view-files"><div id="files-list"></div></div>
   <div class="view" id="view-done"><div id="done-list"></div></div>
   <div class="view" id="view-custody">
@@ -636,7 +201,7 @@ body {
   </div>
 </div>
 
-<!-- VOUCHER SHEET -->
+<!-- ═ VOUCHER SHEET ═ -->
 <div class="sheet-bg" id="voucher-sheet" onclick="closeSheet('voucher-sheet')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -669,15 +234,15 @@ body {
           <div class="chip" onclick="selChip(this,'vs-chips')">تحويل</div>
         </div>
       </div>
-      <div style="background:#e6f4ec;border:1px solid rgba(26,92,53,.15);border-radius:9px;padding:12px 14px;font-size:11px;color:#1a5c35;margin-bottom:14px;line-height:1.7;">
-        ✓ بعد الحفظ: يُسجَّل المبلغ في عهدتك ويظهر زر تسليم الملف
+      <div style="background:#e6f4ec;border:1px solid rgba(26,92,53,.15);border-radius:9px;padding:12px 14px;font-size:11px;color:#1a5c35;margin-bottom:14px;">
+        ✓ بعد الحفظ يُسجَّل المبلغ في عهدتك ويظهر زر التسليم
       </div>
       <button class="submit-btn" onclick="saveVoucher()">استلمت المبلغ — حفظ السند</button>
     </div>
   </div>
 </div>
 
-<!-- CONTACT SHEET -->
+<!-- ═ CONTACT SHEET ═ -->
 <div class="sheet-bg" id="contact-sheet" onclick="closeSheet('contact-sheet')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -686,27 +251,24 @@ body {
       <button class="sheet-close" onclick="closeSheet('contact-sheet')">×</button>
     </div>
     <div class="sheet-body">
-      <div class="contact-opt" onclick="showToast('جارٍ الاتصال...')">
-        <div class="co-icon" style="background:#e6eef8;">📞</div>
-        <div><div class="co-title">اتصال بالإدارة</div><div class="co-sub">م. محمد حمد · +966538986031</div></div>
+      <div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;" onclick="showToast('جارٍ الاتصال بالإدارة...')">
+        <div style="font-size:13px;font-weight:600;">📞 اتصال بالإدارة</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:3px;">م. محمد حمد · +966538986031</div>
       </div>
-      <div class="contact-opt" onclick="showToast('جارٍ فتح واتساب...')">
-        <div class="co-icon" style="background:#e6f4ec;">💬</div>
-        <div><div class="co-title">واتساب الإدارة</div><div class="co-sub">إرسال تفاصيل الملف</div></div>
+      <div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;" onclick="showToast('جارٍ فتح واتساب...')">
+        <div style="font-size:13px;font-weight:600;">💬 واتساب الإدارة</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:3px;">إرسال تفاصيل الملف</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- DELIVER MODAL -->
+<!-- ═ DELIVER MODAL ═ -->
 <div class="modal-wrap" id="deliver-modal">
   <div class="modal-box">
     <div class="modal-emoji">📂</div>
     <div class="modal-title">تأكيد تسليم الملف</div>
-    <div class="modal-body-text">
-      هل تؤكد تسليم ملف <strong id="deliver-client-name">—</strong> للعميل؟<br>
-      بعد التأكيد تُغلق المهمة نهائياً
-    </div>
+    <div class="modal-body-text">هل تؤكد تسليم ملف <strong id="deliver-client-name">—</strong> للعميل؟<br>بعد التأكيد تُغلق المهمة نهائياً</div>
     <div class="modal-btns">
       <button class="mbtn mbtn-cancel" onclick="closeDeliverModal()">إلغاء</button>
       <button class="mbtn mbtn-ok" onclick="confirmDeliver()">✓ نعم، سلّمت الملف</button>
@@ -717,299 +279,193 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══ CONFIG ══ */
-const SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
-const WA_INSTANCE = "165504";
-const WA_TOKEN    = "oghzjhf82g3ghqkq";
-const ADMIN_PHONE = "966538986031";
+var SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
+var WA_INST = "165504";
+var WA_TOK  = "oghzjhf82g3ghqkq";
+var WA_TO   = "966538986031";
 
-/* ══ TEAM ══ */
-const TEAM = {
-  mhd: { name:"م. محمد حمد",        initials:"مح", role:"مهندس مدني — إدارة", pass:"Matari@2026", phone:"0538986031" },
-  mkh: { name:"م. محمد خالد",       initials:"مخ", role:"مهندس معماري",        pass:"Matari@2026", phone:"0570889155" },
-  ism: { name:"م. إسماعيل",         initials:"إس", role:"مهندس مساحة",         pass:"Matari@2026", phone:"0500000003" },
-  abr: { name:"م. عبد الرحمن خان",  initials:"عخ", role:"مهندس مساحة",         pass:"Matari@2026", phone:"0500000004" },
-  say: { name:"الرسام صايم",        initials:"صا", role:"رسام هندسي",           pass:"Matari@2026", phone:"0500000005" },
-  slh: { name:"م. صلاح بدر التمام", initials:"صب", role:"مهندس إنشائي",         pass:"Matari@2026", phone:"0500000006" }
+var TEAM = {
+  mhd:{name:"م. محمد حمد",       init:"مح",role:"مهندس مدني — إدارة",pass:"Matari@2026",phone:"0538986031"},
+  mkh:{name:"م. محمد خالد",      init:"مخ",role:"مهندس معماري",       pass:"Matari@2026",phone:"0570889155"},
+  ism:{name:"م. إسماعيل",        init:"إس",role:"مهندس مساحة",        pass:"Matari@2026",phone:"0500000003"},
+  abr:{name:"م. عبد الرحمن خان", init:"عخ",role:"مهندس مساحة",        pass:"Matari@2026",phone:"0500000004"},
+  say:{name:"الرسام صايم",       init:"صا",role:"رسام هندسي",          pass:"Matari@2026",phone:"0500000005"},
+  slh:{name:"م. صلاح بدر التمام",init:"صب",role:"مهندس إنشائي",       pass:"Matari@2026",phone:"0500000006"}
 };
 
-/* ══ STATE ══ */
 var currentEng = null;
-var currentEngUserId = null;
-var pendingDeliverId = null;
-var pendingVoucherId = null;
-var ALL_FILES = [];
+var currentUID = null;
+var pendingVId  = null;
+var pendingDId  = null;
+var FILES = [];
 
-/* ══ SUPABASE ══ */
-function sbGet(table, params) {
-  params = params || "";
-  return fetch(SB_URL + "/rest/v1/" + table + "?" + params, {
-    headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY }
-  }).then(function(r) {
-    if (!r.ok) return r.text().then(function(t){ throw new Error(t); });
-    return r.json();
+/* SB */
+function sbGet(tbl, q) {
+  return fetch(SB_URL + "/rest/v1/" + tbl + "?" + (q||""), {
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+  }).then(function(r){ return r.json(); });
+}
+function sbPatch(tbl, q, body) {
+  fetch(SB_URL + "/rest/v1/" + tbl + "?" + q, {
+    method:"PATCH",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify(body)
   });
 }
 
-function sbPatch(table, filter, body) {
-  return fetch(SB_URL + "/rest/v1/" + table + "?" + filter, {
-    method: "PATCH",
-    headers: {
-      "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY,
-      "Content-Type": "application/json", "Prefer": "return=minimal"
-    },
-    body: JSON.stringify(body)
-  });
+/* NUMBERS */
+function fmt(n){ return parseFloat(n||0).toLocaleString("ar-SA"); }
+var O=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
+var T=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
+var H=["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+function n2ar(n){
+  n=parseInt(n)||0; if(!n) return "صفر";
+  if(n<20) return O[n];
+  if(n<100){var t=Math.floor(n/10),o=n%10; return o?O[o]+" و"+T[t]:T[t];}
+  if(n<1000){var h=Math.floor(n/100),r=n%100; return r?H[h]+" و"+n2ar(r):H[h];}
+  if(n<1000000){var th=Math.floor(n/1000),r2=n%1000; var tp=th===1?"ألف":th===2?"ألفان":n2ar(th)+(th<=10?" آلاف":" ألف"); return r2?tp+" و"+n2ar(r2):tp;}
+  return n.toString();
 }
 
-/* ══ NUMBERS ══ */
-function fmt(n) { return parseFloat(n||0).toLocaleString("ar-SA"); }
-var _o=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
-var _t=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
-var _h=["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
-function n2ar(n) {
-  n = parseInt(n)||0;
-  if (!n) return "صفر";
-  if (n<20) return _o[n];
-  if (n<100) { var t=Math.floor(n/10),o=n%10; return o?_o[o]+" و"+_t[t]:_t[t]; }
-  if (n<1000) { var h=Math.floor(n/100),r=n%100; return r?_h[h]+" و"+n2ar(r):_h[h]; }
-  if (n<1000000) {
-    var th=Math.floor(n/1000),r2=n%1000;
-    var tp=th===1?"ألف":th===2?"ألفان":th<=10?n2ar(th)+" آلاف":n2ar(th)+" ألف";
-    return r2?tp+" و"+n2ar(r2):tp;
-  }
-  return n.toLocaleString("ar-SA");
-}
-
-/* ══ LOGIN ══ */
+/* LOGIN */
 function doLogin() {
   var id   = document.getElementById("login-name").value;
   var pass = document.getElementById("login-pass").value;
   var err  = document.getElementById("login-err");
   var btn  = document.getElementById("login-btn");
-
-  err.classList.remove("show");
-
-  if (!id) {
-    err.textContent = "يرجى اختيار اسمك";
-    err.classList.add("show");
-    return;
-  }
-
-  var member = TEAM[id];
-  if (!member) {
-    err.textContent = "خطأ في البيانات";
-    err.classList.add("show");
-    return;
-  }
-
-  if (pass !== member.pass) {
+  err.className = "login-err";
+  if (!id) { err.textContent="يرجى اختيار اسمك"; err.className="login-err show"; return; }
+  var m = TEAM[id];
+  if (!m || pass !== m.pass) {
     err.textContent = "كلمة المرور غير صحيحة";
-    err.classList.add("show");
+    err.className = "login-err show";
     document.getElementById("login-pass").value = "";
     return;
   }
-
-  // دخول ناجح
+  currentEng = id;
   btn.textContent = "جارٍ الدخول...";
   btn.disabled = true;
-
-  currentEng = id;
-
-  document.getElementById("app-av").textContent   = member.initials;
-  document.getElementById("app-name").textContent  = member.name;
-  document.getElementById("app-role").textContent  = member.role;
-
+  document.getElementById("app-av").textContent  = m.init;
+  document.getElementById("app-name").textContent = m.name;
+  document.getElementById("app-role").textContent = m.role;
   document.getElementById("screen-login").classList.remove("active");
   document.getElementById("screen-app").classList.add("active");
-
   btn.textContent = "دخول";
   btn.disabled = false;
-
-  // جلب الملفات من Supabase
-  loadFilesFromDB(member.phone);
+  loadFiles(m.phone);
 }
 
 function doLogout() {
-  currentEng = null;
-  currentEngUserId = null;
-  ALL_FILES = [];
+  currentEng = null; currentUID = null; FILES = [];
   document.getElementById("screen-app").classList.remove("active");
   document.getElementById("screen-login").classList.add("active");
   document.getElementById("login-pass").value = "";
   document.getElementById("login-name").value = "";
-  switchTab("files", document.getElementById("tab-files"));
 }
 
-/* ══ LOAD FROM SUPABASE ══ */
-function loadFilesFromDB(phone) {
-  // أولاً: جلب user_id
-  sbGet("users", "phone=eq." + phone + "&select=id").then(function(users) {
-    if (users && users.length > 0) {
-      currentEngUserId = users[0].id;
-      // جلب السندات
-      return sbGet("v_vouchers_full", "eng_user_id=eq." + currentEngUserId + "&order=created_at.desc");
-    }
-    return [];
-  }).then(function(vouchers) {
-    ALL_FILES = [];
-    if (vouchers && vouchers.length > 0) {
-      vouchers.forEach(function(v) {
-        ALL_FILES.push({
-          id:        v.id,
-          voucher:   v.voucher_num || "—",
-          eng:       currentEng,
-          client:    v.client_name,
-          service:   v.service_type || "خدمة هندسية",
-          loc:       (v.client_district || "—") + " · جازان",
-          type:      "field",
-          received:  new Date(v.created_at).toLocaleDateString("ar-SA"),
-          paid:      parseFloat(v.paid_amount) || 0,
-          total:     parseFloat(v.total_amount) || 0,
-          remaining: parseFloat(v.remaining) || 0,
-          status:    v.status === "settled" ? "done" : "active",
-          deliveredAt: v.settled_at ? new Date(v.settled_at).toLocaleDateString("ar-SA") : null,
-          history:   []
+/* LOAD */
+function loadFiles(phone) {
+  sbGet("users","phone=eq."+phone+"&select=id").then(function(us) {
+    if (us && us.length) {
+      currentUID = us[0].id;
+      sbGet("v_vouchers_full","eng_user_id=eq."+currentUID+"&order=created_at.desc").then(function(vs) {
+        FILES = [];
+        if (vs) vs.forEach(function(v) {
+          FILES.push({
+            id:        v.id,
+            voucher:   v.voucher_num || "—",
+            client:    v.client_name || "—",
+            service:   v.service_type || "خدمة هندسية",
+            loc:       (v.client_district||"—")+" · جازان",
+            received:  new Date(v.created_at).toLocaleDateString("ar-SA"),
+            paid:      parseFloat(v.paid_amount)||0,
+            total:     parseFloat(v.total_amount)||0,
+            remaining: parseFloat(v.remaining)||0,
+            status:    v.status==="settled"?"done":"active",
+            doneAt:    v.settled_at?new Date(v.settled_at).toLocaleDateString("ar-SA"):null
+          });
         });
+        renderAll();
       });
-    }
-    renderAll();
-  }).catch(function(e) {
-    console.error("loadFilesFromDB error:", e);
-    showToast("تعذر تحميل الملفات — " + e.message);
-    renderAll();
-  });
+    } else { renderAll(); }
+  }).catch(function(){ renderAll(); });
 }
 
-/* ══ RENDER ══ */
-function myFiles()   { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="active"; }); }
-function myDone()    { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="done"; }); }
-function myCustody() { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="active" && f.remaining>0; }); }
+/* RENDER */
+function active()   { return FILES.filter(function(f){ return f.status==="active"; }); }
+function done()     { return FILES.filter(function(f){ return f.status==="done"; }); }
+function custody()  { return FILES.filter(function(f){ return f.status==="active" && f.remaining>0; }); }
 
-function renderAll() {
-  renderFiles();
-  renderDone();
-  renderCustody();
-  updateCounts();
-}
+function renderAll() { renderFiles(); renderDone(); renderCustody(); updateCounts(); }
 
 function updateCounts() {
-  document.getElementById("cnt-files").textContent   = myFiles().length;
-  document.getElementById("cnt-done").textContent    = myDone().length;
-  var custodyFiles = myCustody();
-  document.getElementById("cnt-custody").textContent = custodyFiles.length;
-  var total = custodyFiles.reduce(function(s,f){ return s+f.remaining; }, 0);
-  var tv = document.getElementById("custody-total-val");
-  tv.textContent = fmt(total);
-  tv.className = "ct-val " + (total>0 ? "" : "ct-zero");
-  document.getElementById("custody-total-sub").textContent =
-    total>0 ? "ريال سعودي — في عهدتك" : "ريال — ذمتك نظيفة ✓";
+  document.getElementById("cnt-files").textContent   = active().length;
+  document.getElementById("cnt-done").textContent    = done().length;
+  document.getElementById("cnt-custody").textContent = custody().length;
+  var tot = custody().reduce(function(s,f){ return s+f.remaining; },0);
+  var el = document.getElementById("custody-total-val");
+  el.textContent = fmt(tot);
+  el.className = "ct-val"+(tot>0?"":" ct-zero");
+  document.getElementById("custody-total-sub").textContent = tot>0?"ريال سعودي — في عهدتك":"ريال — ذمتك نظيفة ✓";
+}
+
+function fc(f) {
+  var full = f.remaining===0;
+  var pay  = full
+    ? "<div class=\"pay-badge pay-full\"><span class=\"pay-icon\">✅</span><div><span>مسدد بالكامل</span><div class=\"pay-sub\">بإمكانك تسليم الملف للعميل</div></div></div>"
+    : "<div class=\"pay-badge pay-partial\"><span class=\"pay-icon\">⏳</span><div><span>متبقي على العميل</span><span class=\"pay-amount\">"+fmt(f.remaining)+"</span><div class=\"pay-sub\">لا يُسلَّم الملف قبل السداد</div></div></div>";
+  var notice = full
+    ? "<div class=\"fc-notice n-ok\"><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف</span></div>"
+    : "<div class=\"fc-notice n-warn\"><span>⚠</span><span>إذا أحضر العميل المبلغ اضغط استلام وسند</span></div>";
+  var deliverBtn = full
+    ? "<button class=\"abtn abtn-deliver\" data-fid=\""+f.id+"\" data-fclient=\""+f.client+"\" onclick=\"clickDeliver(this)\">📂 تسليم الملف</button>"
+    : "<button class=\"abtn abtn-disabled\" disabled>🔒 تسليم الملف</button>";
+  var vBtn = !full
+    ? "<div class=\"fc-actions\" style=\"padding-top:0\"><button class=\"abtn abtn-voucher\" data-fid=\""+f.id+"\" onclick=\"clickVoucher(this)\">📄 استلام "+fmt(f.remaining)+" ريال وتحرير سند</button></div>"
+    : "";
+  return "<div class=\"fc\">"+
+    "<div class=\"fc-top\"><span class=\"fc-badge "+(f.type==="field"?"badge-field":"badge-office")+"\">"+(f.type==="field"?"ميداني":"مكتبي")+"</span>"+
+    "<div><div class=\"fc-client\">"+f.client+"</div>"+
+    "<div class=\"fc-service\">"+f.service+"</div>"+
+    "<div class=\"fc-loc\">📍 "+f.loc+"</div>"+
+    "<div class=\"fc-ref\">"+f.voucher+" · "+f.received+"</div></div></div>"+
+    "<div class=\"fc-pay\">"+pay+"</div>"+
+    notice+
+    "<div class=\"fc-actions\">"+deliverBtn+"<button class=\"abtn abtn-contact\" onclick=\"openSheet('contact-sheet')\">تواصل</button></div>"+
+    vBtn+"</div>";
 }
 
 function renderFiles() {
-  var list  = document.getElementById("files-list");
-  var files = myFiles();
-  if (files.length===0) {
-    list.innerHTML = "<div class='empty'><div class='empty-icon'>📋</div><div class='empty-title'>لا توجد ملفات نشطة</div><div class='empty-sub'>سيظهر هنا كل ملف يُسند إليك</div></div>";
-    return;
-  }
-  var html = "";
-  files.forEach(function(f) {
-    var fullPay   = f.remaining === 0;
-    var typeLabel = f.type==="field" ? "ميداني" : "مكتبي";
-    var typeBadge = f.type==="field" ? "badge-field" : "badge-office";
-
-    var paySection = fullPay
-      ? "<div class=\"pay-badge pay-full\"><span class=\"pay-icon\">✅</span><div><span>مسدد بالكامل</span><div class=\"pay-sub\">بإمكانك تسليم الملف للعميل</div></div></div>"
-      : "<div class=\"pay-badge pay-partial\"><span class=\"pay-icon\">⏳</span><div><span>متبقي على العميل</span><span class=\"pay-amount\">" + fmt(f.remaining) + " <span style=\"font-size:13px;font-weight:400\">ريال</span></span><div class=\"pay-sub\">لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>";
-
-    var notice = fullPay
-      ? "<div class=\"fc-notice n-ok\"><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>"
-      : "<div class=\"fc-notice n-warn\"><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط استلام وسند</span></div>";
-
-    // استخدام data attributes لتجنب مشكلة الـ quotes
-    var deliverBtn = fullPay
-      ? "<button class=\"abtn abtn-deliver\" data-id=\"" + f.id + "\" data-client=\"" + f.client.replace(/"/g,"") + "\" onclick=\"handleDeliver(this)\">📂 تسليم الملف للعميل</button>"
-      : "<button class=\"abtn abtn-disabled\" disabled>🔒 تسليم الملف</button>";
-
-    var contactBtn = "<button class=\"abtn abtn-contact\" onclick=\"openSheet(this.getAttribute('data-sheet'))\" data-sheet=\"contact-sheet\">تواصل</button>";
-
-    var voucherBtn = !fullPay
-      ? "<div class=\"fc-actions\" style=\"padding-top:0;\"><button class=\"abtn abtn-voucher\" data-id=\"" + f.id + "\" onclick=\"handleVoucher(this)\">📄 استلام " + fmt(f.remaining) + " ريال وتحرير سند</button></div>"
-      : "";
-
-    html += "<div class=\"fc\">" +
-      "<div class=\"fc-top\"><span class=\"fc-badge " + typeBadge + "\">" + typeLabel + "</span>" +
-      "<div><div class=\"fc-client\">" + f.client + "</div>" +
-      "<div class=\"fc-service\">" + f.service + "</div>" +
-      "<div class=\"fc-loc\">📍 " + f.loc + "</div>" +
-      "<div class=\"fc-ref\">" + f.voucher + " · استُلم: " + f.received + "</div></div></div>" +
-      "<div class=\"fc-pay\">" + paySection + "</div>" +
-      notice +
-      "<div class=\"fc-actions\">" + deliverBtn + contactBtn + "</div>" +
-      voucherBtn +
-      "</div>";
-  });
-  list.innerHTML = html;
-}
-
-/* ══ EVENT HANDLERS ══ */
-function handleDeliver(btn) {
-  var id     = btn.getAttribute("data-id");
-  var client = btn.getAttribute("data-client");
-  openDeliver(id, client);
-}
-
-function handleVoucher(btn) {
-  var id = btn.getAttribute("data-id");
-  openVoucher(id);
+  var el = document.getElementById("files-list");
+  var fs = active();
+  if (!fs.length) { el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">📋</div><div class=\"empty-title\">لا توجد ملفات نشطة</div><div class=\"empty-sub\">سيظهر هنا كل ملف يُسند إليك</div></div>"; return; }
+  el.innerHTML = fs.map(fc).join("");
 }
 
 function renderDone() {
-  var list  = document.getElementById("done-list");
-  var files = myDone();
-  if (files.length===0) {
-    list.innerHTML = "<div class='empty'><div class='empty-icon'>✅</div><div class='empty-title'>لا توجد ملفات مكتملة</div></div>";
-    return;
-  }
-  var html = "";
-  files.forEach(function(f) {
-    html += "<div class=\"fc\">" +
-      "<div class=\"fc-top\"><span class=\"fc-badge badge-field\">" + (f.type==="field"?"ميداني":"مكتبي") + "</span>" +
-      "<div><div class=\"fc-client\">" + f.client + "</div><div class=\"fc-service\">" + f.service + "</div>" +
-      "<div class=\"fc-loc\">📍 " + f.loc + "</div></div></div>" +
-      "<div class=\"fc-done\">✓ تم تسليم الملف — " + (f.deliveredAt||"—") + "</div>" +
-      "</div>";
-  });
-  list.innerHTML = html;
+  var el = document.getElementById("done-list");
+  var fs = done();
+  if (!fs.length) { el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">✅</div><div class=\"empty-title\">لا توجد ملفات مكتملة</div></div>"; return; }
+  el.innerHTML = fs.map(function(f){
+    return "<div class=\"fc\"><div class=\"fc-top\"><span class=\"fc-badge badge-field\">"+(f.type==="field"?"ميداني":"مكتبي")+"</span>"+
+      "<div><div class=\"fc-client\">"+f.client+"</div><div class=\"fc-service\">"+f.service+"</div><div class=\"fc-loc\">📍 "+f.loc+"</div></div></div>"+
+      "<div class=\"fc-done\">✓ تم التسليم — "+(f.doneAt||"—")+"</div></div>";
+  }).join("");
 }
 
 function renderCustody() {
-  var list  = document.getElementById("custody-list");
-  var files = myCustody();
-  if (files.length===0) {
-    list.innerHTML = "<div class='empty'><div class='empty-icon'>💰</div><div class='empty-title'>لا توجد مبالغ في عهدتك</div><div class='empty-sub'>ذمتك نظيفة</div></div>";
-    return;
-  }
-  var html = "";
-  files.forEach(function(f) {
-    html += "<div class=\"custody-row\">" +
-      "<div style=\"flex:1;\"><div class=\"cr-id\">" + f.voucher + "</div>" +
-      "<div class=\"cr-client\">" + f.client + "</div>" +
-      "<div class=\"cr-date\">" + f.received + "</div></div>" +
-      "<div style=\"text-align:left;\"><div class=\"cr-amt\">" + fmt(f.remaining) + "</div><div style=\"font-size:9px;color:#a09fa2;\">ريال</div></div>" +
-      "<span class=\"cr-status cs-eng\">في عهدتك</span>" +
-      "</div>";
-  });
-  list.innerHTML = html;
+  var el = document.getElementById("custody-list");
+  var fs = custody();
+  if (!fs.length) { el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">💰</div><div class=\"empty-title\">لا توجد مبالغ في عهدتك</div><div class=\"empty-sub\">ذمتك نظيفة</div></div>"; return; }
+  el.innerHTML = fs.map(function(f){
+    return "<div class=\"custody-row\"><div style=\"flex:1\"><div class=\"cr-id\">"+f.voucher+"</div><div class=\"cr-client\">"+f.client+"</div><div class=\"cr-date\">"+f.received+"</div></div>"+
+      "<div style=\"text-align:left\"><div class=\"cr-amt\">"+fmt(f.remaining)+"</div><div style=\"font-size:9px;color:#a09fa2\">ريال</div></div>"+
+      "<span class=\"cr-status\">في عهدتك</span></div>";
+  }).join("");
 }
 
-/* ══ TABS ══ */
-function tabClick(el) {
-  switchTab(el.dataset.tab, el);
-}
-
+/* TABS */
 function switchTab(name, el) {
   document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
   document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
@@ -1017,136 +473,75 @@ function switchTab(name, el) {
   if (el) el.classList.add("active");
 }
 
-/* ══ VOUCHER SHEET ══ */
-function openVoucher(fileId) {
-  var f = null;
-  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===fileId) { f=ALL_FILES[i]; break; } }
+/* VOUCHER */
+function clickVoucher(btn) { openVoucher(btn.dataset.fid); }
+function clickDeliver(btn) { openDeliver(btn.dataset.fid, btn.dataset.fclient); }
+
+function openVoucher(id) {
+  var f = FILES.filter(function(x){ return x.id===id; })[0];
   if (!f) return;
-  pendingVoucherId = fileId;
+  pendingVId = id;
   document.getElementById("vs-client").textContent    = f.client;
-  document.getElementById("vs-ref").textContent       = f.voucher + " · " + f.service;
+  document.getElementById("vs-ref").textContent       = f.voucher+" · "+f.service;
   document.getElementById("vs-remaining").textContent = fmt(f.remaining);
   document.getElementById("vs-amount").value          = f.remaining;
   vsUpdateWords();
-  document.querySelectorAll("#vs-chips .chip").forEach(function(c){ c.classList.remove("on"); });
+  document.querySelectorAll("#vs-chips .chip").forEach(function(c){ c.className="chip"; });
   openSheet("voucher-sheet");
 }
 
 function vsUpdateWords() {
   var v = parseInt(document.getElementById("vs-amount").value)||0;
-  document.getElementById("vs-words").textContent = v
-    ? "فقط "+n2ar(v)+" ريال سعودي لا غير"
-    : "أدخل المبلغ لتظهر الكتابة تلقائياً";
+  document.getElementById("vs-words").textContent = v ? "فقط "+n2ar(v)+" ريال سعودي لا غير" : "أدخل المبلغ...";
 }
 
 function saveVoucher() {
   var amt  = parseInt(document.getElementById("vs-amount").value)||0;
   var chip = document.querySelector("#vs-chips .chip.on");
-  if (!amt)  { showToast("يرجى إدخال المبلغ المستلَم"); return; }
+  if (!amt)  { showToast("يرجى إدخال المبلغ"); return; }
   if (!chip) { showToast("يرجى اختيار طريقة الدفع"); return; }
-
-  var f = null;
-  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===pendingVoucherId) { f=ALL_FILES[i]; break; } }
-  if (f) {
-    f.remaining = Math.max(0, f.remaining - amt);
-    f.paid      = f.paid + amt;
-  }
-
+  var f = FILES.filter(function(x){ return x.id===pendingVId; })[0];
+  if (f) { f.remaining = Math.max(0, f.remaining-amt); f.paid += amt; }
   closeSheet("voucher-sheet");
   showToast("✓ استُلم "+fmt(amt)+" ريال — سُجِّل في عهدتك");
-  setTimeout(function(){ renderAll(); }, 300);
-
-  // تحديث Supabase
-  if (currentEngUserId && f) {
-    sbPatch("vouchers", "id=eq."+f.id, {
-      paid_amount: f.paid,
-      status: f.remaining<=0 ? "settled" : "partial"
-    }).catch(function(e){ console.warn("Patch voucher failed:", e); });
-  }
-
-  // إشعار واتساب
-  var member = TEAM[currentEng];
-  sendWA("💰 *استلام دفعة*
-━━━━━━━━━━━━━━━━━━━━
-" +
-    "👤 العميل: " + (f?f.client:"—") + "
-" +
-    "💵 المبلغ: " + fmt(amt) + " ريال
-" +
-    "💳 الطريقة: " + chip.textContent + "
-" +
-    "👷 استلمه: " + (member?member.name:"—") + "
-" +
-    "🕐 " + new Date().toLocaleString("ar-SA"));
+  setTimeout(renderAll, 300);
+  if (currentUID && f) sbPatch("vouchers","id=eq."+f.id,{paid_amount:f.paid,status:f.remaining<=0?"settled":"partial"});
+  var m = TEAM[currentEng];
+  sendWA("💰 استلام دفعة\nالعميل: "+(f?f.client:"—")+"\nالمبلغ: "+fmt(amt)+" ريال\n"+chip.textContent+"\nاستلمه: "+(m?m.name:"—")+"\n"+new Date().toLocaleString("ar-SA"));
 }
 
-/* ══ DELIVER ══ */
-function openDeliver(fileId, clientName) {
-  pendingDeliverId = fileId;
-  document.getElementById("deliver-client-name").textContent = clientName;
+/* DELIVER */
+function openDeliver(id, client) {
+  pendingDId = id;
+  document.getElementById("deliver-client-name").textContent = client;
   document.getElementById("deliver-modal").classList.add("open");
 }
 
+function closeDeliverModal() { document.getElementById("deliver-modal").classList.remove("open"); }
+
 function confirmDeliver() {
-  var f = null;
-  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===pendingDeliverId) { f=ALL_FILES[i]; break; } }
-  if (f) {
-    f.status      = "done";
-    f.deliveredAt = new Date().toLocaleDateString("ar-SA");
-  }
+  var f = FILES.filter(function(x){ return x.id===pendingDId; })[0];
+  if (f) { f.status="done"; f.doneAt=new Date().toLocaleDateString("ar-SA"); }
   closeDeliverModal();
   showToast("✓ تم تسليم الملف — أُغلقت المهمة نهائياً");
-  setTimeout(function(){ renderAll(); }, 300);
-
-  // تحديث Supabase
-  if (currentEngUserId && f) {
-    sbPatch("vouchers", "id=eq."+f.id, {
-      status: "settled",
-      settled_at: new Date().toISOString()
-    }).catch(function(e){ console.warn("Deliver patch failed:", e); });
-  }
-
-  // إشعار واتساب
-  var member = TEAM[currentEng];
-  sendWA("📂 *تم تسليم ملف*
-━━━━━━━━━━━━━━━━━━━━
-" +
-    "👤 العميل: " + (f?f.client:"—") + "
-" +
-    "👷 المهندس: " + (member?member.name:"—") + "
-" +
-    "✅ أُغلق الملف نهائياً
-" +
-    "🕐 " + new Date().toLocaleString("ar-SA"));
+  setTimeout(renderAll, 300);
+  if (currentUID && f) sbPatch("vouchers","id=eq."+f.id,{status:"settled",settled_at:new Date().toISOString()});
+  var m = TEAM[currentEng];
+  sendWA("📂 تم تسليم ملف\nالعميل: "+(f?f.client:"—")+"\nالمهندس: "+(m?m.name:"—")+"\nأُغلق الملف نهائياً\n"+new Date().toLocaleString("ar-SA"));
 }
 
-function closeDeliverModal() {
-  document.getElementById("deliver-modal").classList.remove("open");
-}
-
-/* ══ WHATSAPP ══ */
-function sendWA(msg) {
-  fetch("https://api.ultramsg.com/instance"+WA_INSTANCE+"/messages/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ token:WA_TOKEN, to:ADMIN_PHONE, body:msg })
-  }).catch(function(e){ console.warn("WA failed:", e); });
-}
-
-/* ══ HELPERS ══ */
+/* HELPERS */
 function openSheet(id)  { document.getElementById(id).classList.add("open"); }
 function closeSheet(id) { document.getElementById(id).classList.remove("open"); }
+function selChip(el, g) { document.querySelectorAll("#"+g+" .chip").forEach(function(c){ c.className="chip"; }); el.className="chip on"; }
+function showToast(m)   { var t=document.getElementById("toast"); t.textContent=m; t.className="toast show"; setTimeout(function(){ t.className="toast"; },3500); }
 
-function selChip(el, gid) {
-  document.querySelectorAll("#"+gid+" .chip").forEach(function(c){ c.classList.remove("on"); });
-  el.classList.add("on");
-}
-
-function showToast(m) {
-  var t = document.getElementById("toast");
-  t.textContent = m;
-  t.classList.add("show");
-  setTimeout(function(){ t.classList.remove("show"); }, 3500);
+function sendWA(msg) {
+  var p = new URLSearchParams();
+  p.append("token", WA_TOK);
+  p.append("to", WA_TO);
+  p.append("body", msg);
+  fetch("https://api.ultramsg.com/instance"+WA_INST+"/messages/chat",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:p});
 }
 </script>
 </body>
