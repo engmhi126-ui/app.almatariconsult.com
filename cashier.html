@@ -633,6 +633,7 @@ function saveVoucher(){
   if(phone&&phone.length<10){showToast("رقم الجوال يجب أن يكون 10 أرقام");return;}
   var btn=document.getElementById("save-btn");
   btn.innerHTML="<div class='spinner'></div> جارٍ الحفظ..."; btn.disabled=true;
+  var savedVoucherRef = null;
   sbGet("vouchers","select=voucher_num&order=created_at.desc&limit=1").then(function(ex){
     var n=1;
     if(ex&&ex.length&&ex[0].voucher_num){var m=ex[0].voucher_num.replace("#","").match(/(\d+)$/);if(m)n=parseInt(m[1])+1;}
@@ -653,6 +654,7 @@ function saveVoucher(){
     });
   }).then(function(saved){
     var sv=(saved||[])[0];
+    savedVoucherRef = sv || null;
     if(sv){
       return sbPost("tasks",{
         title:        "إنجاز "+(sv.service_type||"عمل")+" — "+client,
@@ -666,6 +668,7 @@ function saveVoucher(){
     }
   }).then(function(){
     var em=teamMembers.filter(function(m){return m.id===engId;})[0];
+    var sv = savedVoucherRef;
     // حفظ بيانات السند للطباعة
     lastSavedVoucher = sv || null;
     showToast("✓ تم حفظ السند — يمكنك الطباعة الآن");
