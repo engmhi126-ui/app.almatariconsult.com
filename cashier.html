@@ -192,7 +192,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
       </div>
       <div class="login-title">المطري كونسلت</div>
-      <div class="login-sub">بوابة الاستقبال والمحاسب</div>
+      <div class="login-sub">بوابة الاستقبال — السند في عهدتك</div>
+      <div class="fg">
+        <label class="fl">اسمك (سيظهر على السند)</label>
+        <input class="fi" id="login-name" placeholder="مثال: أحمد المحاسب" autocomplete="name">
+      </div>
       <div class="fg">
         <label class="fl">كلمة المرور</label>
         <input class="fi" type="password" id="login-pass" placeholder="••••••••">
@@ -209,8 +213,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="ah-left">
       <div class="ah-dot"></div>
       <div>
-        <div class="ah-name">الاستقبال / المحاسب</div>
-        <div class="ah-role">صلاحية محدودة — إضافة ودفعات فقط</div>
+        <div class="ah-name" id="app-cashier-name">الاستقبال / المحاسب</div>
+        <div class="ah-role">العهدة في ذمتك — إضافة ودفعات فقط</div>
       </div>
     </div>
     <button class="ah-btn" onclick="doLogout()">خروج</button>
@@ -357,9 +361,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div style="font-size:9px;margin-bottom:4px;">عضو الفريق: <strong id="vp-eng-d"></strong></div>
           <div style="font-size:9px;margin-bottom:7px;">طريقة الدفع: <strong id="vp-method-d"></strong></div>
           <div style="font-size:9px;color:#888;margin-bottom:7px;">الإجمالي: <span id="vp-total">—</span> | المدفوع: <span id="vp-paid-d">—</span> | المتبقي: <span id="vp-rem-d">—</span></div>
+          <div style="font-size:9px;margin-bottom:7px;">استلمه: <strong id="vp-cashier-name">—</strong></div>
           <div class="vp-sigs">
             <div class="vp-sig"><div class="vp-sig-line"></div>توقيع المستلم</div>
-            <div class="vp-sig"><div class="vp-sig-line"></div>المحاسب</div>
+            <div class="vp-sig"><div class="vp-sig-line"></div><span id="vp-cashier-sig">المحاسب</span></div>
             <div class="vp-sig"><div class="vp-sig-line"></div>الإدارة</div>
           </div>
         </div>
@@ -367,7 +372,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
       <div style="display:flex;gap:8px;">
         <button class="btn btn-s btn-full" id="save-btn" onclick="saveVoucher()" style="flex:2;">💾 حفظ السند</button>
-        <button class="btn btn-g" id="print-btn" onclick="printVoucher()" style="padding:12px 16px;display:none;">🖨 طباعة</button>
+        <button class="btn btn-g" id="print-btn" onclick="printVoucher()" style="padding:12px 16px;" hidden>🖨 طباعة</button>
       </div>
     </div>
 
@@ -500,11 +505,17 @@ function validatePhone(el){
 }
 
 /* LOGIN */
+var currentCashierName = "المحاسب";
+
 function doLogin(){
+  var name=document.getElementById("login-name").value.trim();
   var pass=document.getElementById("login-pass").value;
   var err=document.getElementById("login-err");
   err.className="login-err";
+  if(!name){err.textContent="يرجى إدخال اسمك";err.className="login-err show";return;}
   if(pass!==PASS){err.textContent="كلمة المرور غير صحيحة";err.className="login-err show";document.getElementById("login-pass").value="";return;}
+  currentCashierName = name;
+  document.getElementById("app-cashier-name").textContent = name;
   document.getElementById("screen-login").classList.remove("active");
   document.getElementById("screen-app").classList.add("active");
   loadAll();
@@ -513,6 +524,8 @@ function doLogout(){
   document.getElementById("screen-app").classList.remove("active");
   document.getElementById("screen-login").classList.add("active");
   document.getElementById("login-pass").value="";
+  document.getElementById("login-name").value="";
+  currentCashierName="المحاسب";
 }
 
 /* LOAD */
@@ -602,6 +615,10 @@ function vPrev(){
   document.getElementById("vp-paid-d").textContent   =p?p.toLocaleString("ar-SA"):"—";
   document.getElementById("vp-rem-d").textContent    =(t&&p)?Math.max(0,t-p).toLocaleString("ar-SA"):"—";
   document.getElementById("vp-date").textContent     =new Date().toLocaleDateString("ar-SA");
+  var cn = document.getElementById("vp-cashier-name");
+  var cs = document.getElementById("vp-cashier-sig");
+  if(cn) cn.textContent = currentCashierName||"—";
+  if(cs) cs.textContent = currentCashierName||"المحاسب";
 }
 
 function toggleProof(){
@@ -674,13 +691,13 @@ function saveVoucher(){
     showToast("✓ تم حفظ السند — يمكنك الطباعة الآن");
     // إظهار زر الطباعة
     var pb = document.getElementById("print-btn");
-    if(pb) pb.style.display = "inline-flex";
+    if(pb) { pb.hidden = false; }
     // تحديث رقم السند في المعاينة
     if(sv && sv.voucher_num) {
       document.getElementById("vp-num").textContent = sv.voucher_num;
       document.getElementById("vp-date").textContent = new Date().toLocaleDateString("ar-SA");
     }
-    sendWA("🧾 سند قبض جديد\nالعميل: "+client+"\nالمدفوع: "+fmt(paid)+" ريال\nالمهندس: "+(em?em.name:"—")+"\n"+new Date().toLocaleString("ar-SA"));
+    sendWA("🧾 سند قبض جديد\nالعميل: "+client+"\nالمدفوع: "+fmt(paid)+" ريال\nالمهندس: "+(em?em.name:"—")+"\n💼 استلمه: "+currentCashierName+"\n"+new Date().toLocaleString("ar-SA"));
     resetForm();
     loadPartialVouchers();
     loadTasks();
@@ -706,7 +723,7 @@ function resetForm(){
   document.getElementById("phone-hint").textContent="";
   // إخفاء زر الطباعة عند بدء سند جديد
   var pb = document.getElementById("print-btn");
-  if(pb) pb.style.display = "none";
+  if(pb) { pb.hidden = true; }
   lastSavedVoucher = null;
 }
 
@@ -780,7 +797,7 @@ function confirmPartial(){
   }).then(function(){
     closeSheet("partial-sheet");
     showToast("✓ تم تسجيل "+fmt(amt)+" ريال — أُرسل إشعار للإدارة");
-    sendWA("💰 دفعة جزئية\nالعميل: "+pendingPId.client+"\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+"\n"+new Date().toLocaleString("ar-SA"));
+    sendWA("💰 دفعة جزئية\nالعميل: "+pendingPId.client+"\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+"\n💼 استلمه: "+currentCashierName+"\n"+new Date().toLocaleString("ar-SA"));
     loadPartialVouchers();
   }).catch(function(e){showToast("خطأ: "+e.message);});
 }
