@@ -1,1 +1,1559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>صفحة المحاسب — المطري كونسلت</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a1628">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06101e;
+  --bg2:#0a1628;
+  --bg3:#0f1e35;
+  --card:#0d1b30;
+  --card2:#112040;
+  --border:#1a3050;
+  --border2:#1e3a5f;
+  --glow:#1a6fff;
+  --glow2:rgba(26,111,255,.15);
+  --text:#e8f0fe;
+  --t2:#8ba4c8;
+  --t3:#4a6a8a;
+  --blue:#1a6fff;
+  --blue-l:rgba(26,111,255,.12);
+  --green:#00c896;
+  --green-l:rgba(0,200,150,.12);
+  --amber:#ffb300;
+  --amber-l:rgba(255,179,0,.12);
+  --red:#ff4757;
+  --red-l:rgba(255,71,87,.12);
+  --gold:#f5c842;
+  --font:"IBM Plex Sans Arabic",sans-serif;
+  --mono:"JetBrains Mono",monospace;
+  --r:10px;--r2:14px;--r3:20px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --glow-shadow:0 0 20px rgba(26,111,255,.2);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-text-size-adjust:100%;}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;}
 
+/* ══ BACKGROUND ══ */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 20% 20%,rgba(26,111,255,.08) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 80%,rgba(0,200,150,.05) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* ══ SCREENS ══ */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+
+/* ══ LOGIN ══ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-box{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:var(--r3);
+  padding:40px 36px;
+  width:100%;max-width:380px;
+  box-shadow:var(--shadow),0 0 40px rgba(26,111,255,.1);
+  position:relative;overflow:hidden;
+}
+.login-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glow),transparent);
+}
+.login-logo{
+  width:60px;height:60px;
+  background:linear-gradient(135deg,var(--blue),#0a4fff);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 0 24px rgba(26,111,255,.4);
+}
+.login-logo svg{width:26px;height:26px;fill:white;}
+.login-title{text-align:center;font-size:20px;font-weight:600;margin-bottom:4px;}
+.login-sub{text-align:center;font-size:11px;color:var(--t2);margin-bottom:32px;}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.fl{font-size:11px;font-weight:600;color:var(--t2);}
+.fi{
+  padding:11px 14px;
+  background:var(--bg3);
+  border:1.5px solid var(--border2);
+  border-radius:10px;
+  font-family:var(--font);font-size:14px;
+  color:var(--text);direction:rtl;width:100%;
+  transition:border-color .2s,box-shadow .2s;
+}
+.fi:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,255,.15);}
+.fi::placeholder{color:var(--t3);}
+.fs{
+  padding:11px 14px;
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:var(--font);font-size:14px;
+  cursor:pointer;direction:rtl;color:var(--text);width:100%;
+}
+.fs:focus{outline:none;border-color:var(--blue);}
+.login-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#1a6fff,#0a4fff);
+  color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:4px;
+  box-shadow:0 4px 16px rgba(26,111,255,.3);
+  transition:transform .15s,box-shadow .15s;
+}
+.login-btn:active{transform:scale(.98);}
+.login-err{
+  background:var(--red-l);border:1px solid rgba(255,71,87,.3);
+  border-radius:8px;padding:9px 13px;font-size:12px;color:var(--red);
+  margin-top:10px;display:none;
+}
+.login-err.show{display:block;}
+
+/* ══ APP HEADER ══ */
+.app-header{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.ah-brand{display:flex;align-items:center;gap:10px;}
+.ah-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ah-name{font-size:13px;font-weight:600;}
+.ah-role{font-size:10px;color:var(--t2);margin-top:1px;}
+.ah-right{display:flex;align-items:center;gap:8px;}
+.ah-btn{
+  padding:6px 14px;border-radius:8px;
+  background:var(--blue-l);border:1px solid var(--border2);
+  color:var(--blue);font-size:11px;font-family:var(--font);cursor:pointer;
+  transition:background .15s;
+}
+.ah-btn:hover{background:rgba(26,111,255,.2);}
+.ah-clock{font-family:var(--mono);font-size:11px;color:var(--t3);}
+
+/* ══ TABS ══ */
+.tabs-bar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;padding:0 20px;gap:4px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.tabs-bar::-webkit-scrollbar{display:none;}
+.tab{
+  padding:12px 16px;font-size:12px;font-weight:500;
+  color:var(--t2);cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+  transition:color .15s;
+}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-n{
+  font-family:var(--mono);font-size:10px;
+  padding:1px 7px;border-radius:10px;
+  background:var(--border);color:var(--t2);
+}
+.tab.active .tab-n{background:var(--blue-l);color:var(--blue);}
+
+/* ══ MAIN ══ */
+.main{padding:20px;max-width:1100px;margin:0 auto;}
+.view{display:none;}
+.view.active{display:block;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ══ STATS ══ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);padding:16px 18px;
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:transform .15s,border-color .15s;
+  cursor:pointer;
+}
+.stat:hover{transform:translateY(-2px);border-color:var(--border2);}
+.stat-glow{position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 var(--r2) var(--r2) 0;}
+.stat-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600;}
+.stat-val{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1;}
+.stat-sub{font-size:10px;color:var(--t3);margin-top:5px;}
+.c-blue{color:var(--blue);}.c-green{color:var(--green);}.c-amber{color:var(--amber);}.c-red{color:var(--red);}
+
+/* ══ CARD ══ */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);overflow:hidden;
+  margin-bottom:16px;box-shadow:var(--shadow);
+}
+.card-head{
+  padding:13px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--card2);
+}
+.card-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;}
+.card-body{padding:18px;}
+
+/* ══ SEARCH BAR ══ */
+.search-wrap{display:flex;gap:10px;margin-bottom:16px;}
+.search-input{
+  flex:1;padding:10px 16px;
+  background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:var(--font);font-size:13px;
+  color:var(--text);direction:rtl;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,255,.1);}
+.search-input::placeholder{color:var(--t3);}
+.search-btn{
+  padding:10px 18px;border-radius:10px;
+  background:var(--blue);color:#fff;border:none;
+  font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;
+  white-space:nowrap;
+}
+
+/* ══ VOUCHER FORM ══ */
+.vf-grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:12px;}
+.form-section-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{
+  padding:8px 14px;border:1.5px solid var(--border2);
+  border-radius:8px;font-size:12px;cursor:pointer;
+  font-family:var(--font);color:var(--t2);
+  background:var(--bg3);transition:all .15s;
+}
+.chip:hover{border-color:var(--blue);color:var(--blue);}
+.chip.on{border-color:var(--blue);background:var(--blue-l);color:var(--blue);font-weight:600;}
+.words-box{
+  background:var(--amber-l);border:1px solid rgba(255,179,0,.25);
+  border-radius:8px;padding:10px 13px;font-size:12px;
+  color:var(--amber);min-height:36px;margin-bottom:14px;
+  font-family:var(--font);
+}
+
+/* ══ FILE UPLOAD ══ */
+.file-upload{
+  border:2px dashed var(--border2);border-radius:10px;
+  padding:20px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;
+  position:relative;overflow:hidden;
+}
+.file-upload:hover{border-color:var(--blue);background:var(--blue-l);}
+.file-upload.has-file{border-color:var(--green);border-style:solid;background:var(--green-l);}
+.fu-input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.fu-icon{font-size:28px;margin-bottom:6px;}
+.fu-title{font-size:12px;font-weight:600;color:var(--t2);}
+.fu-sub{font-size:10px;color:var(--t3);margin-top:3px;}
+.fu-file-name{font-size:12px;font-weight:600;color:var(--green);margin-top:6px;}
+
+/* ══ VOUCHER PREVIEW ══ */
+.vp{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:var(--r2);overflow:hidden;position:sticky;top:70px;
+}
+.vp-hdr{
+  background:linear-gradient(135deg,#0a1628,#112040);
+  padding:10px 14px;font-size:10px;font-family:var(--mono);
+  color:var(--t2);display:flex;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.vp-paper{background:#fff;color:#18181a;padding:14px;font-size:11px;}
+.vp-co{display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid #18181a;margin-bottom:8px;}
+.vp-co-name{font-size:10px;font-weight:700;line-height:1.6;}
+.vp-co-en{font-size:8px;color:#58575a;line-height:1.7;}
+.vp-ttl{background:#18181a;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;}
+.vp-f{display:flex;align-items:baseline;gap:5px;border-bottom:1px solid #ddd8ce;padding:3px 0;}
+.vp-l{color:#58575a;white-space:nowrap;flex-shrink:0;font-size:10px;}
+.vp-v{font-weight:600;flex:1;min-height:13px;font-size:11px;}
+.vp-amt{border:2px solid #18181a;border-radius:7px;padding:7px 10px;display:flex;align-items:center;gap:8px;margin:7px 0;}
+.vp-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.vp-sig{text-align:center;font-size:9px;color:#58575a;}
+.vp-sig-line{border-top:1px solid #18181a;margin:14px 5px 3px;}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{
+  font-size:9px;color:var(--t3);text-transform:uppercase;
+  letter-spacing:.6px;padding:10px 14px;text-align:right;
+  font-weight:700;border-bottom:1px solid var(--border);
+  background:var(--card2);white-space:nowrap;
+}
+.tbl td{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  font-size:12px;vertical-align:middle;color:var(--text);
+}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(26,111,255,.04);cursor:pointer;}
+
+/* ══ BADGES ══ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;}
+.bd{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.bg{background:var(--green-l);color:var(--green);}
+.ba{background:var(--amber-l);color:var(--amber);}
+.br{background:var(--red-l);color:var(--red);}
+.bb{background:var(--blue-l);color:var(--blue);}
+
+/* ══ BUTTONS ══ */
+.btn{
+  padding:8px 16px;border-radius:9px;
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;border:none;transition:all .15s;
+  white-space:nowrap;display:inline-flex;align-items:center;gap:5px;
+}
+.btn-p{background:linear-gradient(135deg,var(--blue),#0a4fff);color:#fff;box-shadow:0 4px 12px rgba(26,111,255,.3);}
+.btn-p:hover{box-shadow:0 4px 20px rgba(26,111,255,.5);}
+.btn-s{background:linear-gradient(135deg,var(--green),#00a87a);color:#fff;box-shadow:0 4px 12px rgba(0,200,150,.25);}
+.btn-g{background:var(--card2);color:var(--t2);border:1px solid var(--border2);}
+.btn-g:hover{border-color:var(--blue);color:var(--blue);}
+.btn-d{background:var(--red-l);color:var(--red);border:1px solid rgba(255,71,87,.3);}
+.btn-gold{background:linear-gradient(135deg,#f5c842,#e0a800);color:#18181a;}
+.btn-sm{padding:5px 11px;font-size:11px;}
+.btn-xs{padding:3px 9px;font-size:10px;}
+
+/* ══ NOTICE ══ */
+.notice{padding:10px 14px;border-radius:9px;font-size:11px;display:flex;align-items:flex-start;gap:8px;line-height:1.7;margin-bottom:12px;}
+.n-ok{background:var(--green-l);color:var(--green);border:1px solid rgba(0,200,150,.2);}
+.n-warn{background:var(--amber-l);color:var(--amber);border:1px solid rgba(255,179,0,.2);}
+.n-info{background:var(--blue-l);color:var(--blue);border:1px solid rgba(26,111,255,.2);}
+.n-red{background:var(--red-l);color:var(--red);border:1px solid rgba(255,71,87,.2);}
+
+/* ══ BALANCE CARDS ══ */
+.balance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.bal-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;cursor:pointer;
+  transition:transform .15s,border-color .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.bal-card:hover{transform:translateY(-3px);box-shadow:var(--glow-shadow);}
+.bal-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 60%,rgba(255,255,255,.02));
+  pointer-events:none;
+}
+.bal-card.active-bal{border-color:var(--blue);box-shadow:0 0 20px rgba(26,111,255,.2);}
+.bal-icon{font-size:28px;margin-bottom:10px;}
+.bal-title{font-size:11px;color:var(--t2);font-weight:600;margin-bottom:4px;}
+.bal-val{font-size:28px;font-weight:700;font-family:var(--mono);}
+.bal-sub{font-size:10px;color:var(--t3);margin-top:4px;}
+.bal-detail{
+  margin-top:14px;background:var(--bg3);border-radius:8px;
+  padding:12px;display:none;
+}
+.bal-card.active-bal .bal-detail{display:block;}
+.bal-detail-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.bal-detail-row:last-child{border-bottom:none;}
+
+/* ══ MODAL ══ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:var(--r3);width:100%;max-width:500px;
+  box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 40px rgba(26,111,255,.1);
+  overflow:hidden;position:relative;
+}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),transparent);}
+.modal-h{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--card2);}
+.modal-title{font-size:14px;font-weight:600;}
+.modal-close{font-size:20px;color:var(--t3);background:none;border:none;cursor:pointer;line-height:1;padding:0 4px;}
+.modal-b{padding:20px;display:flex;flex-direction:column;gap:12px;max-height:70vh;overflow-y:auto;}
+.modal-f{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* ══ DIVIDER ══ */
+.div{height:1px;background:var(--border);margin:14px 0;}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--card2);border:1px solid var(--border2);
+  color:var(--text);padding:11px 22px;border-radius:30px;font-size:12px;
+  z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;
+  white-space:nowrap;max-width:90vw;text-align:center;
+  box-shadow:var(--shadow);
+}
+.toast.show{opacity:1;}
+
+/* ══ SPINNER ══ */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--t3);gap:10px;font-size:12px;}
+
+/* ══ EMPTY ══ */
+.empty{text-align:center;padding:48px 20px;}
+.empty-icon{font-size:40px;margin-bottom:10px;}
+.empty-title{font-size:14px;font-weight:600;color:var(--t2);}
+.empty-sub{font-size:11px;color:var(--t3);margin-top:5px;line-height:1.6;}
+
+/* ══ WEEKLY REPORT ══ */
+.report-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:14px;}
+.report-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text);}
+.report-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.report-item:last-child{border-bottom:none;}
+.report-val{font-family:var(--mono);font-weight:700;}
+
+/* ══ TEAM CARD ══ */
+.team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.team-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;
+  box-shadow:var(--shadow);
+  transition:transform .15s,border-color .15s;
+}
+.team-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.tc-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.tc-av{
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;flex-shrink:0;
+}
+.tc-name{font-size:13px;font-weight:600;}
+.tc-role{font-size:10px;color:var(--t3);margin-top:2px;}
+.tc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.tc-stat{background:var(--bg3);border-radius:8px;padding:8px;text-align:center;}
+.tc-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);}
+.tc-stat-lbl{font-size:9px;color:var(--t3);margin-top:2px;}
+.custody-bar{background:var(--bg3);border-radius:8px;padding:10px 12px;margin-top:10px;}
+.cb-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.cb-val{font-size:22px;font-weight:700;font-family:var(--mono);}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:768px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .vf-grid{grid-template-columns:1fr;}
+  .vp{display:none;}
+  .balance-grid{grid-template-columns:1fr;}
+  .team-grid{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .fg-row,.fg-row3{grid-template-columns:1fr;}
+}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      </div>
+      <div class="login-title">المطري كونسلت</div>
+      <div class="login-sub">بوابة المحاسب والمستقبل</div>
+      <div class="fg">
+        <label class="fl">المنصب</label>
+        <select class="fs" id="login-role">
+          <option value="">اختر منصبك...</option>
+          <option value="accountant">محاسب / استقبال</option>
+          <option value="engineer">مهندس</option>
+          <option value="admin">إدارة</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">كلمة المرور</label>
+        <input class="fi" type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">دخول</button>
+      <div class="login-err" id="login-err">كلمة المرور غير صحيحة</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="screen" id="screen-app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="ah-brand">
+      <div class="ah-dot"></div>
+      <div>
+        <div class="ah-name" id="app-name">—</div>
+        <div class="ah-role" id="app-role">—</div>
+      </div>
+    </div>
+    <div class="ah-right">
+      <div class="ah-clock" id="clock">--:--</div>
+      <button class="ah-btn" onclick="openModal('waiver-modal')">إعفاء</button>
+      <button class="ah-btn" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <div class="tab active" id="tab-voucher" onclick="switchTab('voucher',this)">📄 سند قبض <span class="tab-n" id="cnt-partial">0</span></div>
+    <div class="tab" id="tab-ledger"  onclick="switchTab('ledger',this)">📊 السجل والعهد <span class="tab-n" id="cnt-ledger">0</span></div>
+    <div class="tab" id="tab-balance" onclick="switchTab('balance',this)">💰 الرصيد</div>
+    <div class="tab" id="tab-team"    onclick="switchTab('team',this)">👷 الفريق</div>
+    <div class="tab" id="tab-waivers" onclick="switchTab('waivers',this)">🚫 الإعفاءات</div>
+    <div class="tab" id="tab-report"  onclick="switchTab('report',this)">📋 التقرير الأسبوعي</div>
+  </div>
+
+  <div class="main">
+
+    <!-- ═ VOUCHER ═ -->
+    <div class="view active" id="view-voucher">
+      <div class="vf-grid">
+        <div>
+          <!-- بحث عن عميل -->
+          <div class="form-section">
+            <div class="form-section-title">بحث عن عميل موجود</div>
+            <div class="search-wrap">
+              <input class="search-input" id="search-q" placeholder="ابحث برقم الجوال أو رقم الهوية..." oninput="searchClient()">
+              <button class="search-btn" onclick="searchClient()">🔍 بحث</button>
+            </div>
+            <div id="search-results"></div>
+          </div>
+
+          <!-- بيانات السند -->
+          <div class="form-section">
+            <div class="form-section-title">بيانات العميل</div>
+            <div class="fg-row">
+              <div class="fg">
+                <label class="fl">اسم العميل</label>
+                <input class="fi" id="v-client" placeholder="السيد / السادة..." oninput="vPrev()">
+              </div>
+              <div class="fg">
+                <label class="fl">رقم الهوية (وطنية أو إقامة)</label>
+                <input class="fi" id="v-idnum" placeholder="10 أرقام" maxlength="10" oninput="validateId(this);vPrev()">
+                <span class="field-hint" id="id-hint" style="font-size:10px;color:var(--t3);"></span>
+              </div>
+              <div class="fg">
+                <label class="fl">رقم الجوال</label>
+                <input class="fi" id="v-phone" placeholder="05xxxxxxxx" maxlength="10" oninput="validatePhone(this);vPrev()">
+                <span class="field-hint" id="phone-hint" style="font-size:10px;color:var(--t3);"></span>
+              </div>
+              <div class="fg">
+                <label class="fl">الحي</label>
+                <input class="fi" id="v-district" placeholder="حي..." oninput="vPrev()">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">تفاصيل السند</div>
+            <div class="fg-row3">
+              <div class="fg">
+                <label class="fl">الإجمالي</label>
+                <input class="fi" type="number" id="v-total" placeholder="0" oninput="vCalc();vPrev()">
+              </div>
+              <div class="fg">
+                <label class="fl">المدفوع الآن</label>
+                <input class="fi" type="number" id="v-paid" placeholder="0" oninput="vCalc();vPrev()">
+              </div>
+              <div class="fg">
+                <label class="fl">المتبقي</label>
+                <input class="fi" type="number" id="v-rem" readonly placeholder="0" style="background:var(--bg3);">
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">فقط لا غير (تلقائي)</label>
+              <div class="words-box" id="v-words">أدخل المبلغ...</div>
+            </div>
+            <div class="fg">
+              <label class="fl">طريقة الدفع</label>
+              <div class="chips" id="v-pay-chips">
+                <div class="chip" onclick="selChip(this,'v-pay-chips');togglePayProof()">نقداً</div>
+                <div class="chip" onclick="selChip(this,'v-pay-chips');togglePayProof()">شبكة</div>
+                <div class="chip" onclick="selChip(this,'v-pay-chips');togglePayProof()">تحويل بنك</div>
+              </div>
+            </div>
+            <!-- رفع إيصال -->
+            <div id="pay-proof-wrap" style="display:none;" class="fg">
+              <label class="fl">إيصال الدفع (صورة أو PDF)</label>
+              <div class="file-upload" id="pay-proof-zone">
+                <input class="fu-input" type="file" id="pay-proof-file" accept="image/*,application/pdf" onchange="onProofFile(this)">
+                <div class="fu-icon">📎</div>
+                <div class="fu-title">اسحب الملف أو اضغط للرفع</div>
+                <div class="fu-sub">صور JPG/PNG أو ملف PDF</div>
+                <div class="fu-file-name" id="proof-name" style="display:none;"></div>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">وذلك قيمة</label>
+              <input class="fi" id="v-purpose" placeholder="أتعاب إشراف هندسي..." oninput="vPrev()">
+            </div>
+            <div class="fg">
+              <label class="fl">نوع الخدمة</label>
+              <div class="chips" id="v-type-chips">
+                <div class="chip" onclick="selChip(this,'v-type-chips')">إنشائي</div>
+                <div class="chip" onclick="selChip(this,'v-type-chips')">معماري</div>
+                <div class="chip" onclick="selChip(this,'v-type-chips')">مساحة</div>
+                <div class="chip" onclick="selChip(this,'v-type-chips')">رسم</div>
+                <div class="chip" onclick="selChip(this,'v-type-chips')">أخرى</div>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">عضو الفريق المستلم (صاحب العهدة)</label>
+              <select class="fs" id="v-eng" onchange="vPrev()">
+                <option value="">اختر عضو الفريق...</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-s" style="flex:1;padding:12px;" id="save-btn" onclick="saveVoucher()">💾 حفظ السند وإنشاء المهمة</button>
+            <button class="btn btn-gold" style="padding:12px 18px;" onclick="printVoucher()">🖨 طباعة PDF</button>
+          </div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="vp">
+          <div class="vp-hdr">
+            <span>معاينة السند</span>
+            <span id="vp-num" style="color:var(--blue);">#—</span>
+          </div>
+          <div class="vp-paper" id="printable-voucher">
+            <div class="vp-co">
+              <div>
+                <div class="vp-co-name">عبدالعزيز حسن المطري للاستشارات الهندسية</div>
+                <div class="vp-co-en">A. H. AL-MATRI FOR ENGINEERING CONSULT<br>Supervision · Survey · Projects Management</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:13px;font-weight:700;color:#1a4880;">مطري كونسلت</div>
+                <div style="font-size:8px;color:#a09fa2;">MATARI CONSULT</div>
+              </div>
+              <div style="text-align:left;font-size:8px;color:#58575a;line-height:1.9;">
+                📱 +966538986031<br>✉ engmhi126@gmail.com<br>📍 جازان · العارضة
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div class="vp-ttl">سند قبض <span style="font-size:8px;opacity:.6;">Payment Voucher</span></div>
+              <div style="font-size:8px;color:#a09fa2;">التاريخ: <span id="vp-date" style="font-family:var(--mono);">—</span></div>
+              <div style="border:1px solid #ddd;border-radius:5px;font-size:9px;overflow:hidden;">
+                <div style="display:flex;justify-content:space-between;padding:2px 7px;border-bottom:1px solid #ddd;"><span style="color:#a09fa2;">الإجمالي</span><span id="vp-total" style="font-family:var(--mono);">—</span></div>
+                <div style="display:flex;justify-content:space-between;padding:2px 7px;border-bottom:1px solid #ddd;"><span style="color:#a09fa2;">المدفوع</span><span id="vp-paid-d" style="font-family:var(--mono);">—</span></div>
+                <div style="display:flex;justify-content:space-between;padding:2px 7px;"><span style="color:#a09fa2;">المتبقي</span><span id="vp-rem-d" style="font-family:var(--mono);">—</span></div>
+              </div>
+            </div>
+            <div class="vp-f"><span class="vp-l">استلمنا من السيد:</span><span class="vp-v" id="vp-client"></span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+              <div class="vp-f"><span class="vp-l">الهوية:</span><span class="vp-v" id="vp-id"></span></div>
+              <div class="vp-f"><span class="vp-l">الجوال:</span><span class="vp-v" id="vp-phone"></span></div>
+            </div>
+            <div class="vp-f"><span class="vp-l">الحي:</span><span class="vp-v" id="vp-district"></span></div>
+            <div class="vp-amt">
+              <span style="font-size:10px;color:#58575a;">مبلغ وقدرة:</span>
+              <span id="vp-amt" style="font-size:13px;font-weight:700;font-family:var(--mono);background:#fef3dc;border:1px solid rgba(122,78,0,.2);padding:2px 8px;border-radius:4px;flex:1;text-align:center;">—</span>
+              <span style="font-weight:700;font-size:11px;">ريال</span>
+            </div>
+            <div style="font-size:9px;color:#7a4e00;margin-bottom:7px;"><strong>فقط لا غير: </strong><span id="vp-words-d">—</span></div>
+            <div style="font-size:9px;margin-bottom:5px;">وذلك قيمة: <strong id="vp-purpose-d"></strong></div>
+            <div style="font-size:9px;margin-bottom:7px;">عضو الفريق: <strong id="vp-eng-d"></strong></div>
+            <div style="font-size:9px;margin-bottom:7px;">طريقة الدفع: <strong id="vp-method-d"></strong></div>
+            <div class="vp-sigs">
+              <div class="vp-sig"><div class="vp-sig-line"></div>توقيع المستلم</div>
+              <div class="vp-sig"><div class="vp-sig-line"></div>المحاسب</div>
+              <div class="vp-sig"><div class="vp-sig-line"></div>الإدارة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═ LEDGER ═ -->
+    <div class="view" id="view-ledger">
+      <div class="stats" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat" onclick="filterLedger('partial')">
+          <div class="stat-glow" style="background:var(--amber);"></div>
+          <div class="stat-lbl">في عهدة الفريق</div>
+          <div class="stat-val c-amber" id="l-custody">—</div>
+          <div class="stat-sub">ريال · بانتظار تسوية</div>
+        </div>
+        <div class="stat" onclick="filterLedger('settled')">
+          <div class="stat-glow" style="background:var(--green);"></div>
+          <div class="stat-lbl">مسوّاة الشهر</div>
+          <div class="stat-val c-green" id="l-settled">—</div>
+          <div class="stat-sub">ريال</div>
+        </div>
+        <div class="stat" onclick="filterLedger('')">
+          <div class="stat-glow" style="background:var(--blue);"></div>
+          <div class="stat-lbl">إجمالي السندات</div>
+          <div class="stat-val c-blue" id="l-total">—</div>
+          <div class="stat-sub">ريال</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">سجل السندات والعهد</span>
+          <div style="display:flex;gap:8px;">
+            <input class="search-input" id="ledger-search" placeholder="بحث بالاسم أو الجوال..." style="width:200px;padding:6px 12px;font-size:11px;" oninput="loadLedger()">
+            <select class="fs" id="ledger-filter-eng" style="width:auto;padding:6px 10px;font-size:11px;border-radius:8px;" onchange="loadLedger()"><option value="">كل الفريق</option></select>
+            <select class="fs" id="ledger-filter-status" style="width:auto;padding:6px 10px;font-size:11px;border-radius:8px;" onchange="loadLedger()">
+              <option value="">كل الحالات</option>
+              <option value="partial">متبقي</option>
+              <option value="settled">مسوّاة</option>
+              <option value="waived">مُعفاة</option>
+            </select>
+            <button class="btn btn-g btn-sm" onclick="loadLedger()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr>
+              <th>رقم السند</th><th>التاريخ</th><th>العميل</th><th>الجوال</th>
+              <th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th>
+              <th>طريقة الدفع</th><th>عضو الفريق</th><th>الحالة</th><th>إجراء</th>
+            </tr></thead>
+            <tbody id="ledger-tbody"><tr><td colspan="11" style="text-align:center;padding:30px;"><div class="loading"><div class="spinner"></div>تحميل...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═ BALANCE ═ -->
+    <div class="view" id="view-balance">
+      <div class="balance-grid">
+        <div class="bal-card" id="bal-cash" onclick="toggleBalance('cash')">
+          <div class="bal-icon">💵</div>
+          <div class="bal-title">نقداً</div>
+          <div class="bal-val c-green" id="b-cash">0</div>
+          <div class="bal-sub">ريال مستلَم نقداً</div>
+          <div class="bal-detail" id="bal-cash-detail"></div>
+        </div>
+        <div class="bal-card" id="bal-card-pay" onclick="toggleBalance('card')">
+          <div class="bal-icon">💳</div>
+          <div class="bal-title">شبكة</div>
+          <div class="bal-val c-blue" id="b-card">0</div>
+          <div class="bal-sub">ريال مستلَم بالشبكة</div>
+          <div class="bal-detail" id="bal-card-detail"></div>
+        </div>
+        <div class="bal-card" id="bal-transfer" onclick="toggleBalance('transfer')">
+          <div class="bal-icon">🏦</div>
+          <div class="bal-title">تحويل بنك</div>
+          <div class="bal-val c-amber" id="b-transfer">0</div>
+          <div class="bal-sub">ريال مستلَم بتحويل</div>
+          <div class="bal-detail" id="bal-transfer-detail"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">ملخص الإيرادات — هذا الشهر</span></div>
+        <div class="card-body">
+          <div id="balance-breakdown"><div class="loading"><div class="spinner"></div>تحميل...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═ TEAM ═ -->
+    <div class="view" id="view-team">
+      <div class="team-grid" id="team-grid"><div class="loading"><div class="spinner"></div>تحميل...</div></div>
+    </div>
+
+    <!-- ═ WAIVERS ═ -->
+    <div class="view" id="view-waivers">
+      <div class="notice n-red"><span>⚠</span><span>الإعفاء قرار إداري — يمكن إعفاء جزء أو كل المبلغ المتبقي. بعد الإعفاء يُفتح زر التسليم للمهندس.</span></div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">سجل الإعفاءات</span>
+          <button class="btn btn-d btn-sm" onclick="openModal('waiver-modal')">+ إعفاء جديد</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>رقم السند</th><th>العميل</th><th>المبلغ الأصلي</th><th>المُعفى</th><th>السبب</th><th>التاريخ</th><th>عضو الفريق</th><th>بقرار</th></tr></thead>
+            <tbody id="waiver-tbody"><tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px;">لا توجد إعفاءات مسجلة</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═ REPORT ═ -->
+    <div class="view" id="view-report">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:600;">التقرير الأسبوعي</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-gold" onclick="printReport()">🖨 طباعة التقرير</button>
+          <button class="btn btn-g btn-sm" onclick="loadReport()">↻ تحديث</button>
+        </div>
+      </div>
+      <div id="report-content"><div class="loading"><div class="spinner"></div>جارٍ إعداد التقرير...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- SETTLE -->
+<div class="modal-bg" id="settle-modal">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">تسوية العهدة</span><button class="modal-close" onclick="closeModal('settle-modal')">×</button></div>
+    <div class="modal-b">
+      <div class="notice n-ok"><span>✓</span><span id="settle-info">—</span></div>
+      <div class="fg"><label class="fl">ملاحظة</label><input class="fi" id="settle-note" placeholder="تسليم نقدي في المكتب..."></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeModal('settle-modal')">إلغاء</button>
+      <button class="btn btn-s" onclick="confirmSettle()">✓ تأكيد الاستلام وتحرير الذمة</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIAL PAYMENT -->
+<div class="modal-bg" id="partial-modal">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">استلام دفعة جزئية</span><button class="modal-close" onclick="closeModal('partial-modal')">×</button></div>
+    <div class="modal-b">
+      <div class="notice n-info"><span>ℹ</span><span id="partial-info">—</span></div>
+      <div class="fg"><label class="fl">المبلغ المستلَم (ريال)</label><input class="fi" type="number" id="partial-amount" placeholder="0"></div>
+      <div class="fg">
+        <label class="fl">طريقة الدفع</label>
+        <div class="chips" id="partial-pay-chips">
+          <div class="chip" onclick="selChip(this,'partial-pay-chips')">نقداً</div>
+          <div class="chip" onclick="selChip(this,'partial-pay-chips')">شبكة</div>
+          <div class="chip" onclick="selChip(this,'partial-pay-chips')">تحويل</div>
+        </div>
+      </div>
+      <div class="fg" id="partial-proof-wrap" style="display:none;">
+        <label class="fl">إيصال الدفع</label>
+        <div class="file-upload">
+          <input class="fu-input" type="file" accept="image/*,application/pdf">
+          <div class="fu-icon">📎</div>
+          <div class="fu-title">رفع الإيصال</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeModal('partial-modal')">إلغاء</button>
+      <button class="btn btn-s" onclick="confirmPartial()">✓ تسجيل الدفعة</button>
+    </div>
+  </div>
+</div>
+
+<!-- WAIVER -->
+<div class="modal-bg" id="waiver-modal">
+  <div class="modal">
+    <div class="modal-h"><span class="modal-title">إعفاء من مبلغ متبقٍ</span><button class="modal-close" onclick="closeModal('waiver-modal')">×</button></div>
+    <div class="modal-b">
+      <div class="notice n-red"><span>⚠</span><span id="waiver-info">سيُشطب المبلغ المحدد ويُفتح الملف للتسليم</span></div>
+      <div class="fg">
+        <label class="fl">اختر السند</label>
+        <select class="fs" id="w-voucher-sel" onchange="onWaiverChange()"><option value="">اختر السند...</option></select>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label class="fl">المتبقي الأصلي</label>
+          <input class="fi" id="w-original" readonly style="background:var(--bg3);">
+        </div>
+        <div class="fg">
+          <label class="fl">المبلغ المُعفى (جزئي أو كامل)</label>
+          <input class="fi" type="number" id="w-amount" placeholder="أدخل المبلغ المُعفى">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">سبب الإعفاء</label>
+        <select class="fs" id="w-reason">
+          <option value="">اختر السبب...</option>
+          <option>اعتذار العميل عن السداد</option>
+          <option>خصم علاقة وتقدير</option>
+          <option>خطأ في التسعير الأصلي</option>
+          <option>إعفاء جزئي بالتراضي</option>
+          <option>سبب آخر</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">ملاحظة</label><input class="fi" id="w-note" placeholder="اختياري..."></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeModal('waiver-modal')">إلغاء</button>
+      <button class="btn btn-d" onclick="confirmWaiver()">تأكيد الإعفاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- PRINT STYLES -->
+<style id="print-style">
+@media print {
+  body > *:not(#print-area) { display:none !important; }
+  #print-area { display:block !important; }
+  #printable-voucher { background:white; color:black; }
+}
+</style>
+
+<script>
+/* ══ CONFIG ══ */
+var SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
+var WA_INST = "165504";
+var WA_TOK  = "oghzjhf82g3ghqkq";
+var WA_TO   = "966538986031";
+
+/* كلمات المرور */
+var PASSWORDS = {
+  accountant: "Cash@2026",
+  engineer:   "Matari@2026",
+  admin:      "Admin@2026"
+};
+
+/* ══ STATE ══ */
+var currentRole = null;
+var currentUser = null;
+var teamMembers = [];
+var allVouchers = [];
+var _settle     = {};
+var _partial    = {};
+var _waiver     = {};
+
+/* ══ SUPABASE ══ */
+function sbGet(tbl, q) {
+  return fetch(SB_URL + "/rest/v1/" + tbl + "?" + (q||""), {
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+  }).then(function(r){ return r.json(); });
+}
+function sbPost(tbl, body) {
+  return fetch(SB_URL + "/rest/v1/" + tbl, {
+    method:"POST",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
+      "Content-Type":"application/json","Prefer":"return=representation"},
+    body:JSON.stringify(body)
+  }).then(function(r){ return r.json(); });
+}
+function sbPatch(tbl, q, body) {
+  return fetch(SB_URL + "/rest/v1/" + tbl + "?" + q, {
+    method:"PATCH",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
+      "Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+}
+
+/* ══ HELPERS ══ */
+function fmt(n){ return parseFloat(n||0).toLocaleString("ar-SA"); }
+function fmtD(d){ return d ? new Date(d).toLocaleString("ar-SA",{dateStyle:"short",timeStyle:"short"}) : "—"; }
+
+var O=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
+var T=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
+var H=["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+function n2ar(n){
+  n=parseInt(n)||0; if(!n) return "صفر";
+  if(n<20) return O[n];
+  if(n<100){var t=Math.floor(n/10),o=n%10; return o?O[o]+" و"+T[t]:T[t];}
+  if(n<1000){var h=Math.floor(n/100),r=n%100; return r?H[h]+" و"+n2ar(r):H[h];}
+  if(n<1000000){var th=Math.floor(n/1000),r2=n%1000; var tp=th===1?"ألف":th===2?"ألفان":n2ar(th)+(th<=10?" آلاف":" ألف"); return r2?tp+" و"+n2ar(r2):tp;}
+  return n.toString();
+}
+
+/* ══ VALIDATION ══ */
+function validateId(el) {
+  var v = el.value.replace(/\D/g,'');
+  el.value = v;
+  var hint = document.getElementById("id-hint");
+  if (!v) { hint.textContent=""; return; }
+  if (v.length<10) { hint.textContent="⚠ أقل من 10 أرقام"; hint.style.color="var(--amber)"; return; }
+  if (v[0]==="1") { hint.textContent="✓ هوية وطنية"; hint.style.color="var(--green)"; }
+  else if (v[0]==="2") { hint.textContent="✓ إقامة"; hint.style.color="var(--blue)"; }
+  else { hint.textContent="⚠ تحقق من الرقم"; hint.style.color="var(--amber)"; }
+}
+function validatePhone(el) {
+  var v = el.value.replace(/\D/g,'');
+  el.value = v;
+  var hint = document.getElementById("phone-hint");
+  if (!v) { hint.textContent=""; return; }
+  if (v.length<10) { hint.textContent="⚠ أقل من 10 أرقام"; hint.style.color="var(--amber)"; return; }
+  if (v[0]==="0" && v[1]==="5") { hint.textContent="✓ جوال صحيح"; hint.style.color="var(--green)"; }
+  else { hint.textContent="⚠ تحقق من الرقم"; hint.style.color="var(--amber)"; }
+}
+
+/* ══ LOGIN ══ */
+function doLogin() {
+  var role = document.getElementById("login-role").value;
+  var pass = document.getElementById("login-pass").value;
+  var err  = document.getElementById("login-err");
+  var btn  = document.getElementById("login-btn");
+  err.className = "login-err";
+  if (!role) { err.textContent="يرجى اختيار المنصب"; err.className="login-err show"; return; }
+  if (pass !== PASSWORDS[role]) {
+    err.textContent = "كلمة المرور غير صحيحة";
+    err.className = "login-err show";
+    document.getElementById("login-pass").value = "";
+    return;
+  }
+  currentRole = role;
+  var names = {accountant:"المحاسب / الاستقبال", engineer:"مهندس", admin:"الإدارة"};
+  var roles  = {accountant:"سندات القبض والمدفوعات", engineer:"متابعة الملفات", admin:"صلاحيات كاملة"};
+  document.getElementById("app-name").textContent  = names[role];
+  document.getElementById("app-role").textContent  = roles[role];
+  document.getElementById("screen-login").classList.remove("active");
+  document.getElementById("screen-app").classList.add("active");
+  init();
+}
+
+function doLogout() {
+  currentRole = null;
+  document.getElementById("screen-app").classList.remove("active");
+  document.getElementById("screen-login").classList.add("active");
+  document.getElementById("login-pass").value = "";
+  document.getElementById("login-role").value = "";
+}
+
+/* ══ INIT ══ */
+function init() {
+  sbGet("v_engineers_full","is_active=eq.true&order=full_name").then(function(data) {
+    teamMembers = (data||[]).map(function(e){
+      return {
+        id:       e.user_id,
+        name:     e.full_name,
+        initials: e.initials || e.full_name.substring(0,2),
+        role:     e.specialization||"مهندس",
+        color:    e.color||"#1a6fff",
+        bg:       e.bg_color||"#0f1e35"
+      };
+    });
+    populateSelects();
+    loadDashboard();
+    loadLedger();
+    loadBalance();
+    loadTeam();
+    loadReport();
+    loadWaiverVoucherSelect();
+  });
+  tick();
+  setInterval(tick,1000);
+}
+
+function populateSelects() {
+  var eng = document.getElementById("v-eng");
+  var lf  = document.getElementById("ledger-filter-eng");
+  eng.innerHTML = "<option value=''>اختر عضو الفريق...</option>";
+  lf.innerHTML  = "<option value=''>كل الفريق</option>";
+  teamMembers.forEach(function(m) {
+    var o1 = document.createElement("option");
+    o1.value = m.id; o1.textContent = m.name+" — "+m.role; eng.appendChild(o1);
+    var o2 = document.createElement("option");
+    o2.value = m.id; o2.textContent = m.name; lf.appendChild(o2);
+  });
+}
+
+/* ══ DASHBOARD STATS ══ */
+function loadDashboard() {
+  sbGet("v_vouchers_full","order=created_at.desc").then(function(data) {
+    allVouchers = data||[];
+    var partial  = allVouchers.filter(function(v){ return v.status==="partial"; });
+    var custAmt  = partial.reduce(function(s,v){ return s+parseFloat(v.remaining||0); },0);
+    var setAmt   = allVouchers.filter(function(v){ return v.status==="settled"; }).reduce(function(s,v){ return s+parseFloat(v.paid_amount||0); },0);
+    var totAmt   = allVouchers.reduce(function(s,v){ return s+parseFloat(v.paid_amount||0); },0);
+    document.getElementById("l-custody").textContent  = fmt(custAmt);
+    document.getElementById("l-settled").textContent  = fmt(setAmt);
+    document.getElementById("l-total").textContent    = fmt(totAmt);
+    document.getElementById("cnt-partial").textContent = partial.length;
+    document.getElementById("cnt-ledger").textContent  = allVouchers.length;
+    renderLedgerTable(allVouchers);
+    loadWaiverVoucherSelect();
+  });
+}
+
+/* ══ LEDGER ══ */
+function loadLedger() {
+  var filterEng    = document.getElementById("ledger-filter-eng").value;
+  var filterStatus = document.getElementById("ledger-filter-status").value;
+  var search       = (document.getElementById("ledger-search").value||"").toLowerCase();
+  var list = allVouchers;
+  if (filterEng)    list = list.filter(function(v){ return v.eng_user_id===filterEng; });
+  if (filterStatus) list = list.filter(function(v){ return v.status===filterStatus; });
+  if (search)       list = list.filter(function(v){
+    return (v.client_name||"").toLowerCase().includes(search) ||
+           (v.client_phone||"").includes(search) ||
+           (v.client_id_num||"").includes(search);
+  });
+  renderLedgerTable(list);
+}
+
+function filterLedger(status) {
+  document.getElementById("ledger-filter-status").value = status;
+  switchTab("ledger", document.getElementById("tab-ledger"));
+  loadLedger();
+}
+
+function renderLedgerTable(list) {
+  var tbody = document.getElementById("ledger-tbody");
+  if (!list||!list.length) {
+    tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;color:var(--t3);padding:24px;'>لا توجد سندات</td></tr>";
+    return;
+  }
+  tbody.innerHTML = list.map(function(v) {
+    var rem = parseFloat(v.remaining||0);
+    var st  = v.status==="settled" ? "<span class='badge bg'><span class='bd'></span>مسوّاة</span>" :
+              v.status==="waived"  ? "<span class='badge br'><span class='bd'></span>مُعفاة</span>" :
+                                     "<span class='badge ba'><span class='bd'></span>متبقي</span>";
+    var act = v.status==="partial"
+      ? "<button class='btn btn-s btn-xs' data-vid='"+v.id+"' data-veng='"+(v.eng_name||"—")+"' data-vpaid='"+fmt(v.paid_amount)+"' onclick='clickSettle(this)'>تسوية</button> " +
+        "<button class='btn btn-g btn-xs' data-vid='"+v.id+"' data-vrem='"+rem+"' data-vclient='"+(v.client_name||"")+"' onclick='clickPartial(this)'>دفعة</button>"
+      : "<button class='btn btn-g btn-xs' onclick='printVoucherById(\""+v.id+"\")'>طباعة</button>";
+    var payMethod = v.payment_method||"—";
+    return "<tr>" +
+      "<td style='font-family:var(--mono);color:var(--blue);font-weight:600;'>"+(v.voucher_num||"—")+"</td>" +
+      "<td style='font-size:10px;color:var(--t3);font-family:var(--mono);'>"+fmtD(v.created_at)+"</td>" +
+      "<td><div style='font-weight:500;'>"+(v.client_name||"—")+"</div><div style='font-size:10px;color:var(--t3);'>"+(v.service_type||"")+"</div></td>" +
+      "<td style='font-family:var(--mono);font-size:11px;'>"+(v.client_phone||"—")+"</td>" +
+      "<td style='font-family:var(--mono);font-weight:600;'>"+fmt(v.total_amount)+"</td>" +
+      "<td style='font-family:var(--mono);color:var(--green);font-weight:600;'>"+fmt(v.paid_amount)+"</td>" +
+      "<td style='font-family:var(--mono);color:"+(rem>0?"var(--amber)":"var(--t3)") +";font-weight:600;'>"+(rem>0?fmt(rem):"—")+"</td>" +
+      "<td><span class='badge bb'>"+payMethod+"</span></td>" +
+      "<td style='font-size:11px;'>"+(v.eng_name||"—")+"</td>" +
+      "<td>"+st+"</td>" +
+      "<td style='display:flex;gap:5px;'>"+act+"</td>" +
+      "</tr>";
+  }).join("");
+}
+
+/* ══ BALANCE ══ */
+function loadBalance() {
+  sbGet("v_vouchers_full","order=created_at.desc").then(function(data) {
+    var vs = data||[];
+    var cash=0, card=0, transfer=0;
+    var cashRows=[], cardRows=[], transRows=[];
+    vs.forEach(function(v) {
+      var p = parseFloat(v.paid_amount||0);
+      var m = (v.payment_method||"").trim();
+      if (m==="نقداً")     { cash+=p;     cashRows.push(v); }
+      else if (m==="شبكة") { card+=p;     cardRows.push(v); }
+      else if (m==="تحويل بنك") { transfer+=p; transRows.push(v); }
+    });
+    document.getElementById("b-cash").textContent     = fmt(cash);
+    document.getElementById("b-card").textContent     = fmt(card);
+    document.getElementById("b-transfer").textContent = fmt(transfer);
+    renderBalDetail("bal-cash-detail",     cashRows);
+    renderBalDetail("bal-card-detail",     cardRows);
+    renderBalDetail("bal-transfer-detail", transRows);
+
+    var bb = document.getElementById("balance-breakdown");
+    bb.innerHTML =
+      "<div class='report-item'><span>إجمالي الإيرادات</span><span class='report-val c-blue'>"+fmt(cash+card+transfer)+" ريال</span></div>" +
+      "<div class='report-item'><span>نقداً</span><span class='report-val c-green'>"+fmt(cash)+" ريال</span></div>" +
+      "<div class='report-item'><span>شبكة</span><span class='report-val c-blue'>"+fmt(card)+" ريال</span></div>" +
+      "<div class='report-item'><span>تحويل بنك</span><span class='report-val c-amber'>"+fmt(transfer)+" ريال</span></div>" +
+      "<div class='report-item'><span>عهدة غير مسوّاة</span><span class='report-val c-red'>"+fmt(vs.filter(function(v){return v.status==="partial";}).reduce(function(s,v){return s+parseFloat(v.remaining||0);},0))+" ريال</span></div>";
+  });
+}
+
+function renderBalDetail(id, rows) {
+  var el = document.getElementById(id);
+  if (!rows.length) { el.innerHTML="<div style='font-size:11px;color:var(--t3);'>لا توجد سندات</div>"; return; }
+  el.innerHTML = rows.slice(0,5).map(function(v){
+    return "<div class='bal-detail-row'><span>"+(v.client_name||"—")+"</span><span style='font-family:var(--mono);color:var(--green);'>"+fmt(v.paid_amount)+" ر</span></div>";
+  }).join("") + (rows.length>5?"<div style='font-size:10px;color:var(--t3);padding-top:6px;'>و "+(rows.length-5)+" سند آخر...</div>":"");
+}
+
+function toggleBalance(type) {
+  var ids = ["bal-cash","bal-card-pay","bal-transfer"];
+  var map = {cash:"bal-cash","card":"bal-card-pay",transfer:"bal-transfer"};
+  ids.forEach(function(id){ document.getElementById(id).classList.remove("active-bal"); });
+  var el = document.getElementById(map[type]);
+  if (el) el.classList.toggle("active-bal");
+}
+
+/* ══ TEAM ══ */
+function loadTeam() {
+  sbGet("v_custody","order=name").then(function(custody) {
+    var cust = custody||[];
+    sbGet("v_tasks_full","order=created_at.desc").then(function(tasks) {
+      var tkAll = tasks||[];
+      var grid = document.getElementById("team-grid");
+      grid.innerHTML = teamMembers.map(function(m) {
+        var c = cust.filter(function(x){ return x.eng_user_id===m.id; })[0]||{};
+        var myTasks = tkAll.filter(function(t){ return t.eng_user_id===m.id; });
+        var waiting = myTasks.filter(function(t){ return t.status==="waiting"; }).length;
+        var inprog  = myTasks.filter(function(t){ return t.status==="inprog"; }).length;
+        var done    = myTasks.filter(function(t){ return t.status==="done"; }).length;
+        var custAmt = parseFloat(c.custody_amount||0);
+        return "<div class='team-card'>" +
+          "<div class='tc-head'>" +
+          "<div class='tc-av' style='background:"+m.bg+";color:"+m.color+"'>"+m.initials+"</div>" +
+          "<div><div class='tc-name'>"+m.name+"</div><div class='tc-role'>"+m.role+"</div></div>" +
+          "<span class='badge "+(custAmt>0?"ba":"bg")+"' style='margin-right:auto;'>"+(custAmt>0?"عهدة نشطة":"لا عهدة")+"</span>" +
+          "</div>" +
+          "<div class='custody-bar'>" +
+          "<div class='cb-lbl'>العهدة الحالية</div>" +
+          "<div class='cb-val' style='color:"+(custAmt>0?"var(--amber)":"var(--green)")+"'>"+fmt(custAmt)+" <span style='font-size:13px;font-weight:400;'>ريال</span></div>" +
+          "</div>" +
+          "<div class='tc-stats'>" +
+          "<div class='tc-stat'><div class='tc-stat-val' style='color:var(--amber)'>"+waiting+"</div><div class='tc-stat-lbl'>انتظار</div></div>" +
+          "<div class='tc-stat'><div class='tc-stat-val' style='color:var(--blue)'>"+inprog+"</div><div class='tc-stat-lbl'>جارٍ</div></div>" +
+          "<div class='tc-stat'><div class='tc-stat-val' style='color:var(--green)'>"+done+"</div><div class='tc-stat-lbl'>مكتملة</div></div>" +
+          "</div></div>";
+      }).join("");
+    });
+  });
+}
+
+/* ══ WEEKLY REPORT ══ */
+function loadReport() {
+  var rc = document.getElementById("report-content");
+  sbGet("v_vouchers_full","order=created_at.desc").then(function(vs) {
+    vs = vs||[];
+    var thisWeekStart = new Date();
+    thisWeekStart.setDate(thisWeekStart.getDate()-7);
+    var week = vs.filter(function(v){ return new Date(v.created_at)>=thisWeekStart; });
+    var weekRev = week.reduce(function(s,v){ return s+parseFloat(v.paid_amount||0); },0);
+    var weekPending = week.filter(function(v){ return v.status==="partial"; }).length;
+    var totalRev = vs.reduce(function(s,v){ return s+parseFloat(v.paid_amount||0); },0);
+    var totalCust = vs.filter(function(v){ return v.status==="partial"; }).reduce(function(s,v){ return s+parseFloat(v.remaining||0); },0);
+
+    var now = new Date();
+    rc.innerHTML =
+      "<div id='weekly-report-print'>" +
+      "<div class='report-section'>" +
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);'>" +
+      "<div><div style='font-size:18px;font-weight:700;'>المطري كونسلت للاستشارات الهندسية</div><div style='font-size:12px;color:var(--t2);margin-top:3px;'>التقرير الأسبوعي — "+now.toLocaleDateString("ar-SA")+"</div></div>" +
+      "<div style='text-align:left;font-size:11px;color:var(--t2);'>المستشار مؤتمن<br>جازان · العارضة</div>" +
+      "</div>" +
+      "<div class='report-title'>📊 ملخص مالي الأسبوع</div>" +
+      "<div class='report-item'><span>إيرادات الأسبوع</span><span class='report-val c-green'>"+fmt(weekRev)+" ريال</span></div>" +
+      "<div class='report-item'><span>سندات جديدة هذا الأسبوع</span><span class='report-val c-blue'>"+week.length+" سند</span></div>" +
+      "<div class='report-item'><span>سندات بمتبقٍ هذا الأسبوع</span><span class='report-val c-amber'>"+weekPending+" سند</span></div>" +
+      "<div class='report-item'><span>إجمالي الإيرادات التراكمية</span><span class='report-val c-blue'>"+fmt(totalRev)+" ريال</span></div>" +
+      "<div class='report-item'><span>إجمالي العهدة غير المسوّاة</span><span class='report-val c-red'>"+fmt(totalCust)+" ريال</span></div>" +
+      "</div>" +
+      "<div class='report-section'><div class='report-title'>👷 أداء الفريق الأسبوع</div>" +
+      teamMembers.map(function(m) {
+        var myW = week.filter(function(v){ return v.eng_user_id===m.id; });
+        var myRev = myW.reduce(function(s,v){ return s+parseFloat(v.paid_amount||0); },0);
+        return "<div class='report-item'><span>"+m.name+"</span><span class='report-val'>"+myW.length+" ملف · "+fmt(myRev)+" ريال</span></div>";
+      }).join("") +
+      "</div>" +
+      "<div class='report-section'><div class='report-title'>📋 نقاط للنقاش مع الفريق</div>" +
+      "<div style='padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--t2);line-height:2;'>" +
+      "<div>□ مراجعة السندات المتأخرة في التسوية</div>" +
+      "<div>□ متابعة الملفات الميدانية المفتوحة</div>" +
+      "<div>□ تحديث بيانات العملاء الجدد</div>" +
+      "<div>□ مراجعة الجدول الأسبوعي القادم</div>" +
+      "<div>□ تطوير إجراءات العمل — مقترحات الفريق</div>" +
+      "</div></div>" +
+      "</div>";
+  });
+}
+
+function printReport() {
+  var content = document.getElementById("weekly-report-print");
+  if (!content) return;
+  var w = window.open("","_blank");
+  w.document.write("<html dir='rtl'><head><meta charset='UTF-8'><title>التقرير الأسبوعي</title>");
+  w.document.write("<style>body{font-family:Arial,sans-serif;color:#18181a;padding:30px;direction:rtl;} .report-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd;font-size:13px;} .report-val{font-weight:700;font-family:monospace;} .report-section{margin-bottom:20px;padding:16px;border:1px solid #ddd;border-radius:8px;} .report-title{font-size:14px;font-weight:700;margin-bottom:12px;}</style>");
+  w.document.write("</head><body>"+content.innerHTML+"</body></html>");
+  w.document.close();
+  w.print();
+}
+
+/* ══ SEARCH CLIENT ══ */
+function searchClient() {
+  var q = (document.getElementById("search-q").value||"").trim();
+  var res = document.getElementById("search-results");
+  if (q.length < 4) { res.innerHTML=""; return; }
+  sbGet("v_vouchers_full","or=(client_phone.ilike.*"+q+"*,client_id_num.ilike.*"+q+"*)&order=created_at.desc&limit=5").then(function(data) {
+    if (!data||!data.length) { res.innerHTML="<div style='font-size:11px;color:var(--t3);padding:8px;'>لا توجد نتائج</div>"; return; }
+    res.innerHTML = data.map(function(v) {
+      return "<div onclick='fillFromSearch(\""+v.id+"\")' style='padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:border-color .15s;'>" +
+        "<div style='font-size:13px;font-weight:600;'>"+(v.client_name||"—")+"</div>" +
+        "<div style='font-size:10px;color:var(--t3);margin-top:2px;'>"+(v.client_phone||"")+" · "+(v.client_id_num||"")+" · "+(v.voucher_num||"")+"</div>" +
+        "</div>";
+    }).join("");
+  });
+}
+
+function fillFromSearch(id) {
+  var v = allVouchers.filter(function(x){ return x.id===id; })[0];
+  if (!v) return;
+  document.getElementById("v-client").value   = v.client_name||"";
+  document.getElementById("v-idnum").value    = v.client_id_num||"";
+  document.getElementById("v-phone").value    = v.client_phone||"";
+  document.getElementById("v-district").value = v.client_district||"";
+  document.getElementById("search-results").innerHTML = "";
+  document.getElementById("search-q").value = "";
+  vPrev();
+  showToast("✓ تم ملء بيانات "+v.client_name);
+}
+
+/* ══ VOUCHER FORM ══ */
+function vCalc() {
+  var t = parseFloat(document.getElementById("v-total").value)||0;
+  var p = parseFloat(document.getElementById("v-paid").value)||0;
+  var r = Math.max(0,t-p);
+  document.getElementById("v-rem").value = r||"";
+  document.getElementById("v-words").textContent = p ? "فقط "+n2ar(p)+" ريال سعودي لا غير" : "أدخل المبلغ...";
+}
+
+function vPrev() {
+  function g(id){ return (document.getElementById(id)||{}).value||""; }
+  document.getElementById("vp-client").textContent    = g("v-client");
+  document.getElementById("vp-id").textContent        = g("v-idnum");
+  document.getElementById("vp-phone").textContent     = g("v-phone");
+  document.getElementById("vp-district").textContent  = g("v-district");
+  document.getElementById("vp-purpose-d").textContent = g("v-purpose");
+  var engId = g("v-eng");
+  var em = teamMembers.filter(function(m){ return m.id===engId; })[0];
+  document.getElementById("vp-eng-d").textContent     = em ? em.name : "—";
+  var chip = document.querySelector("#v-pay-chips .chip.on");
+  document.getElementById("vp-method-d").textContent  = chip ? chip.textContent : "—";
+  var p = parseFloat(g("v-paid"))||0, t = parseFloat(g("v-total"))||0;
+  document.getElementById("vp-amt").textContent       = p ? p.toLocaleString("ar-SA") : "—";
+  document.getElementById("vp-words-d").textContent   = p ? n2ar(p)+" ريال" : "—";
+  document.getElementById("vp-total").textContent     = t ? t.toLocaleString("ar-SA") : "—";
+  document.getElementById("vp-paid-d").textContent    = p ? p.toLocaleString("ar-SA") : "—";
+  document.getElementById("vp-rem-d").textContent     = (t&&p) ? Math.max(0,t-p).toLocaleString("ar-SA") : "—";
+  document.getElementById("vp-date").textContent      = new Date().toLocaleDateString("ar-SA");
+}
+
+function togglePayProof() {
+  var chip = document.querySelector("#v-pay-chips .chip.on");
+  var wrap = document.getElementById("pay-proof-wrap");
+  if (chip && (chip.textContent==="شبكة"||chip.textContent==="تحويل بنك")) {
+    wrap.style.display="block";
+  } else {
+    wrap.style.display="none";
+  }
+}
+
+function onProofFile(input) {
+  if (input.files&&input.files[0]) {
+    var nm = document.getElementById("proof-name");
+    nm.textContent = "✓ "+input.files[0].name;
+    nm.style.display="block";
+    document.getElementById("pay-proof-zone").classList.add("has-file");
+  }
+}
+
+function saveVoucher() {
+  var client = document.getElementById("v-client").value.trim();
+  var paid   = parseFloat(document.getElementById("v-paid").value)||0;
+  var total  = parseFloat(document.getElementById("v-total").value)||0;
+  var engId  = document.getElementById("v-eng").value;
+  var idnum  = document.getElementById("v-idnum").value;
+  var phone  = document.getElementById("v-phone").value;
+  var chip   = document.querySelector("#v-pay-chips .chip.on");
+  if (!client)         { showToast("يرجى إدخال اسم العميل"); return; }
+  if (!paid)           { showToast("يرجى إدخال المبلغ المدفوع"); return; }
+  if (!engId)          { showToast("يرجى اختيار عضو الفريق"); return; }
+  if (idnum&&idnum.length<10) { showToast("رقم الهوية يجب أن يكون 10 أرقام"); return; }
+  if (phone&&phone.length<10) { showToast("رقم الجوال يجب أن يكون 10 أرقام"); return; }
+  var btn = document.getElementById("save-btn");
+  btn.innerHTML = "<div class='spinner'></div> جارٍ الحفظ...";
+  btn.disabled = true;
+  sbGet("vouchers","select=voucher_num&order=created_at.desc&limit=1").then(function(existing) {
+    var nextNum = 1;
+    if (existing&&existing.length&&existing[0].voucher_num) {
+      var m = existing[0].voucher_num.replace("#","").match(/(\d+)$/);
+      if (m) nextNum = parseInt(m[1])+1;
+    }
+    var yr = new Date().getFullYear();
+    var vNum = "#"+yr+"-"+String(nextNum).padStart(3,"0");
+    var data = {
+      voucher_num:      vNum,
+      client_name:      client,
+      client_id_num:    idnum||null,
+      client_phone:     phone||null,
+      client_district:  document.getElementById("v-district").value||null,
+      service_type:     (document.querySelector("#v-type-chips .chip.on")||{}).textContent||"خدمة هندسية",
+      total_amount:     total||paid,
+      paid_amount:      paid,
+      payment_method:   chip?chip.textContent:null,
+      purpose:          document.getElementById("v-purpose").value||null,
+      eng_user_id:      engId,
+      status:           "partial"
+    };
+    return sbPost("vouchers",data);
+  }).then(function(saved) {
+    var sv = saved&&saved[0];
+    if (sv) {
+      return sbPost("tasks",{
+        title:        "إنجاز "+(sv.service_type||"عمل")+" — "+client,
+        task_client:  client,
+        task_type:    "field",
+        status:       "waiting",
+        trigger_type: "auto",
+        voucher_id:   sv.id,
+        eng_user_id:  engId
+      });
+    }
+  }).then(function() {
+    showToast("✓ تم حفظ السند وإنشاء المهمة");
+    sendWA("🧾 سند قبض جديد\nالعميل: "+client+"\nالمدفوع: "+fmt(paid)+" ريال\nالمهندس: "+(teamMembers.filter(function(m){return m.id===engId;})[0]||{}).name+"\n"+new Date().toLocaleString("ar-SA"));
+    resetVoucherForm();
+    loadDashboard();
+  }).catch(function(e) {
+    showToast("خطأ في الحفظ: "+e.message);
+  }).finally(function() {
+    btn.innerHTML = "💾 حفظ السند وإنشاء المهمة";
+    btn.disabled = false;
+  });
+}
+
+function resetVoucherForm() {
+  ["v-client","v-idnum","v-phone","v-district","v-total","v-paid","v-purpose"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value="";
+  });
+  document.getElementById("v-rem").value="";
+  document.getElementById("v-words").textContent="أدخل المبلغ...";
+  document.getElementById("v-eng").value="";
+  document.querySelectorAll(".chip.on").forEach(function(c){ c.className="chip"; });
+  document.getElementById("pay-proof-wrap").style.display="none";
+  document.getElementById("proof-name").style.display="none";
+  document.getElementById("pay-proof-zone").classList.remove("has-file");
+}
+
+function printVoucher() {
+  var content = document.getElementById("printable-voucher").innerHTML;
+  var w = window.open("","_blank");
+  w.document.write("<html dir='rtl'><head><meta charset='UTF-8'><title>سند قبض</title>");
+  w.document.write("<style>body{font-family:Arial,sans-serif;color:#18181a;padding:20px;direction:rtl;max-width:400px;margin:0 auto;} .vp-f{display:flex;gap:5px;border-bottom:1px solid #ddd;padding:3px 0;font-size:11px;} .vp-l{color:#666;white-space:nowrap;} .vp-v{font-weight:600;flex:1;} .vp-amt{border:2px solid #18181a;border-radius:7px;padding:7px;display:flex;gap:8px;margin:7px 0;} .vp-ttl{background:#18181a;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;} .vp-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;} .vp-sig{text-align:center;font-size:9px;} .vp-sig-line{border-top:1px solid #18181a;margin:14px 5px 3px;}</style>");
+  w.document.write("</head><body>"+content+"</body></html>");
+  w.document.close();
+  w.print();
+}
+
+/* ══ SETTLE ══ */
+function clickSettle(btn) {
+  _settle = {id:btn.dataset.vid, eng:btn.dataset.veng, amt:btn.dataset.vpaid};
+  document.getElementById("settle-info").textContent = "نقل "+_settle.amt+" ريال من عهدة "+_settle.eng+" وتحرير ذمته";
+  openModal("settle-modal");
+}
+function confirmSettle() {
+  sbPatch("vouchers","id=eq."+_settle.id,{status:"settled",settled_at:new Date().toISOString()}).then(function() {
+    closeModal("settle-modal");
+    showToast("✓ تمت التسوية — ذمة "+_settle.eng+" محررة");
+    sendWA("🤝 تسوية عهدة\nالمهندس: "+_settle.eng+"\nالمبلغ: "+_settle.amt+" ريال\n"+new Date().toLocaleString("ar-SA"));
+    loadDashboard(); loadBalance(); loadTeam();
+  });
+}
+
+/* ══ PARTIAL PAYMENT ══ */
+function clickPartial(btn) {
+  _partial = {id:btn.dataset.vid, rem:btn.dataset.vrem, client:btn.dataset.vclient};
+  document.getElementById("partial-info").textContent = "استلام دفعة جزئية من "+_partial.client+" (المتبقي: "+fmt(_partial.rem)+" ريال)";
+  document.getElementById("partial-amount").value = "";
+  document.querySelectorAll("#partial-pay-chips .chip").forEach(function(c){ c.className="chip"; });
+  openModal("partial-modal");
+}
+function confirmPartial() {
+  var amt  = parseFloat(document.getElementById("partial-amount").value)||0;
+  var chip = document.querySelector("#partial-pay-chips .chip.on");
+  if (!amt)  { showToast("يرجى إدخال المبلغ"); return; }
+  if (!chip) { showToast("يرجى اختيار طريقة الدفع"); return; }
+  var v = allVouchers.filter(function(x){ return x.id===_partial.id; })[0];
+  if (!v) return;
+  var newPaid = parseFloat(v.paid_amount||0)+amt;
+  var newStatus = newPaid >= parseFloat(v.total_amount||0) ? "settled" : "partial";
+  sbPatch("vouchers","id=eq."+_partial.id,{paid_amount:newPaid,status:newStatus}).then(function() {
+    closeModal("partial-modal");
+    showToast("✓ تم تسجيل دفعة "+fmt(amt)+" ريال");
+    sendWA("💰 دفعة جزئية\nالعميل: "+_partial.client+"\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+"\n"+new Date().toLocaleString("ar-SA"));
+    loadDashboard(); loadBalance();
+  });
+}
+
+/* ══ WAIVER ══ */
+function loadWaiverVoucherSelect() {
+  var sel = document.getElementById("w-voucher-sel");
+  sel.innerHTML = "<option value=''>اختر السند...</option>";
+  allVouchers.filter(function(v){ return v.status==="partial"; }).forEach(function(v) {
+    var o = document.createElement("option");
+    o.value = v.id;
+    o.dataset.rem = v.remaining;
+    o.dataset.client = v.client_name||"";
+    o.textContent = (v.voucher_num||"—")+" — "+(v.client_name||"")+" (متبقي: "+fmt(v.remaining)+")";
+    sel.appendChild(o);
+  });
+}
+function onWaiverChange() {
+  var sel = document.getElementById("w-voucher-sel");
+  var opt = sel.options[sel.selectedIndex];
+  document.getElementById("w-original").value = opt.dataset.rem ? fmt(opt.dataset.rem) : "";
+  document.getElementById("w-amount").value   = opt.dataset.rem || "";
+  _waiver = {id:sel.value, rem:opt.dataset.rem, client:opt.dataset.client};
+  document.getElementById("waiver-info").textContent = "إعفاء من مبلغ متبقٍ للعميل "+(_waiver.client||"—");
+}
+function confirmWaiver() {
+  var wAmt   = parseFloat(document.getElementById("w-amount").value)||0;
+  var reason = document.getElementById("w-reason").value;
+  if (!_waiver.id)  { showToast("يرجى اختيار السند"); return; }
+  if (!wAmt)        { showToast("يرجى إدخال المبلغ المُعفى"); return; }
+  if (!reason)      { showToast("يرجى اختيار سبب الإعفاء"); return; }
+  var v    = allVouchers.filter(function(x){ return x.id===_waiver.id; })[0];
+  var orig = parseFloat((v||{}).remaining||0);
+  var newRem = Math.max(0, orig-wAmt);
+  var newStatus = newRem===0 ? "waived" : "partial";
+  var newPaid   = parseFloat((v||{}).paid_amount||0) + wAmt;
+  sbPatch("vouchers","id=eq."+_waiver.id,{
+    paid_amount:  newPaid,
+    status:       newStatus,
+    waiver_reason:reason,
+    waiver_by:    "الإدارة",
+    settled_at:   new Date().toISOString()
+  }).then(function() {
+    closeModal("waiver-modal");
+    var tbody = document.getElementById("waiver-tbody");
+    if (tbody.querySelector("td[colspan]")) tbody.innerHTML="";
+    tbody.innerHTML += "<tr>" +
+      "<td style='font-family:var(--mono);color:var(--blue);font-weight:600;'>"+((v||{}).voucher_num||"—")+"</td>" +
+      "<td>"+(_waiver.client||"—")+"</td>" +
+      "<td style='font-family:var(--mono);'>"+fmt(orig)+" ريال</td>" +
+      "<td style='font-family:var(--mono);color:var(--red);font-weight:700;'>"+fmt(wAmt)+" ريال</td>" +
+      "<td>"+reason+"</td>" +
+      "<td style='font-size:10px;font-family:var(--mono);'>"+new Date().toLocaleDateString("ar-SA")+"</td>" +
+      "<td>"+(_waiver.client||"—")+"</td>" +
+      "<td style='color:var(--green);font-weight:600;'>✓ الإدارة</td>" +
+      "</tr>";
+    showToast("✓ تم الإعفاء"+(newRem>0?" الجزئي":"")+" — فُتح الملف للتسليم");
+    loadDashboard(); loadBalance();
+  });
+}
+
+/* ══ TABS ══ */
+function switchTab(name, el) {
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
+  document.getElementById("view-"+name).classList.add("active");
+  if (el) el.classList.add("active");
+  if (name==="balance") loadBalance();
+  if (name==="team")    loadTeam();
+  if (name==="report")  loadReport();
+}
+
+/* ══ MODALS ══ */
+function openModal(id)  { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+/* ══ CHIPS ══ */
+function selChip(el, g) {
+  document.querySelectorAll("#"+g+" .chip").forEach(function(c){ c.className="chip"; });
+  el.className = "chip on";
+}
+
+/* ══ WHATSAPP ══ */
+function sendWA(msg) {
+  var p = new URLSearchParams();
+  p.append("token",WA_TOK); p.append("to",WA_TO); p.append("body",msg);
+  fetch("https://api.ultramsg.com/instance"+WA_INST+"/messages/chat",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:p});
+}
+
+/* ══ TOAST ══ */
+function showToast(m) {
+  var t=document.getElementById("toast");
+  t.textContent=m; t.className="toast show";
+  setTimeout(function(){ t.className="toast"; },3500);
+}
+
+/* ══ CLOCK ══ */
+function tick() {
+  var el=document.getElementById("clock");
+  if(el) el.textContent=new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});
+}
+</script>
+</body>
+</html>
