@@ -414,6 +414,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="sheet-body">
       <div class="notice n-warn"><span>⚠</span><span id="ps-info">—</span></div>
       <div class="fg">
+        <label class="fl">وصف الدفعة (تلقائي — قابل للتعديل)</label>
+        <input class="fi" id="ps-desc" placeholder="جارٍ التحميل..." style="font-size:12px;">
+      </div>
+      <div class="fg">
         <label class="fl">المبلغ المستلَم (ريال)</label>
         <input class="fi" type="number" id="ps-amount" placeholder="0">
       </div>
@@ -918,12 +922,38 @@ function renderPartialList(list){
 }
 
 function openPartialSheet(btn){
-  pendingPId = {id:btn.dataset.vid, rem:btn.dataset.vrem, client:btn.dataset.vclient};
+  var vid = btn.dataset.vid;
+  var vrem = btn.dataset.vrem;
+  var vclient = btn.dataset.vclient;
+  pendingPId = {id:vid, rem:vrem, client:vclient};
+
   document.getElementById("ps-info").textContent =
-    "المتبقي على "+pendingPId.client+": "+fmt(pendingPId.rem)+" ريال";
+    "المتبقي على "+vclient+": "+fmt(vrem)+" ريال";
   document.getElementById("ps-amount").value = "";
+  document.getElementById("ps-desc").value = "";
   document.querySelectorAll("#ps-pay-chips .chip").forEach(function(c){c.className="chip";});
   document.getElementById("ps-proof-wrap").style.display = "none";
+
+  /* جلب بيانات السند لتوليد وصف تلقائي */
+  sbGet("v_vouchers_full","id=eq."+vid).then(function(data){
+    var v=(data||[])[0];
+    if(!v) return;
+    /* حساب رقم الدفعة */
+    var paid   = parseFloat(v.paid_amount||0);
+    var total  = parseFloat(v.total_amount||0);
+    var rem    = parseFloat(v.remaining||0);
+    /* تقدير رقم الدفعة: إذا paid < total فهذه ليست الأولى */
+    var payNum = paid > 0 ? 2 : 1;
+    /* بناء الوصف التلقائي */
+    var desc = "دفعة رقم "+payNum+
+               " من معاملة "+v.voucher_num+
+               " — "+v.service_type+
+               " للعميل: "+(v.client_name||"—")+
+               " (المدفوع سابقاً: "+fmt(paid)+" ريال"+
+               " · المتبقي: "+fmt(rem)+" ريال)";
+    document.getElementById("ps-desc").value = desc;
+  }).catch(function(){});
+
   openSheet("partial-sheet");
 }
 
@@ -956,11 +986,13 @@ function confirmPartial(){
     });
   }).then(function(){
     /* حفظ بيانات الدفعة للطباعة */
+    var desc = document.getElementById("ps-desc").value || "";
     lastPartialData = {
       client:  pendingPId.client,
       amount:  amt,
       method:  chip.textContent,
       cashier: currentCashier,
+      desc:    desc,
       date:    new Date().toLocaleDateString("ar-SA"),
       time:    new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"})
     };
@@ -971,8 +1003,10 @@ function confirmPartial(){
     document.getElementById("print-partial-wrap").style.display = "block";
 
     showToast("✓ تم تسجيل "+fmt(amt)+" ريال — اضغط 🖨 للطباعة");
+    var psDescVal = document.getElementById("ps-desc").value||"";
     sendWA("💰 دفعة جزئية\nالعميل: "+pendingPId.client+
            "\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+
+           (psDescVal?"\n📋 "+psDescVal:"")+
            "\n💼 استلمه: "+currentCashier+
            "\n"+new Date().toLocaleString("ar-SA"));
     loadPartialVouchers();
@@ -1003,6 +1037,7 @@ function printPartialReceipt(){
   w.document.write("<div class=\"ttl\">سند استلام دفعة</div>");
   w.document.write("<div style=\"font-size:9px;color:#888;margin-bottom:10px;\">التاريخ: "+r.date+" · الساعة: "+r.time+"</div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">العميل:</span><span class=\"val\">"+r.client+"</span></div>");
+  if(r.desc) w.document.write("<div style=\"padding:7px 0;border-bottom:1px solid #ddd;font-size:11px;color:#444;\">📋 "+r.desc+"</div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">طريقة الدفع:</span><span class=\"val\">"+r.method+"</span></div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">استلمه:</span><span class=\"val\">"+r.cashier+"</span></div>");
   w.document.write("<div class=\"amt\">"+parseFloat(r.amount).toLocaleString("ar-SA")+" ريال</div>");
