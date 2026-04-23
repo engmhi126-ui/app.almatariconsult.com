@@ -386,6 +386,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <button class="search-btn" onclick="searchPartial()">🔍</button>
         </div>
       </div>
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-g" id="print-partial-btn" onclick="printPartialReceipt()" hidden style="width:100%;padding:11px;justify-content:center;">🖨 طباعة سند الدفعة الأخيرة</button>
+      </div>
       <div id="partial-list"><div class="loading"><div class="spinner"></div>تحميل السندات...</div></div>
     </div>
 
@@ -448,6 +451,7 @@ var teamMembers  = [];
 var partialVouchers = [];
 var pendingPId   = null;
 var lastSavedVoucher = null;
+var lastPartialReceipt = null;
 
 /* SB */
 function sbGet(tbl, q) {
@@ -563,16 +567,24 @@ function searchClient(){
   var q=(document.getElementById("search-q").value||"").trim();
   var res=document.getElementById("search-results");
   if(q.length<3){res.innerHTML="";return;}
-  sbGet("v_vouchers_full","or=(client_phone.ilike.*"+q+"*,client_id_num.ilike.*"+q+"*,client_name.ilike.*"+q+"*)&order=created_at.desc&limit=4").then(function(data){
-    if(!data||!data.length){res.innerHTML="<div style='font-size:11px;color:var(--t3);padding:8px;'>لا توجد نتائج</div>";return;}
-    res.innerHTML=data.map(function(v){
-      return "<div class='search-result' data-id='"+v.id+"' onclick='fillClient(\""+v.id+"\")'>" +
-        "<div class='sr-name'>"+(v.client_name||"—")+"</div>" +
-        "<div class='sr-sub'>"+(v.client_phone||"")+" · "+(v.client_id_num||"")+" · "+(v.client_district||"")+"</div>" +
+  sbGet("v_vouchers_full","or=(client_phone.ilike.*"+q+"*,client_id_num.ilike.*"+q+"*,client_name.ilike.*"+q+"*)&order=created_at.desc&limit=20").then(function(data){
+    if(!data||!data.length){res.innerHTML="<div style=\"font-size:11px;color:var(--t3);padding:8px;\">لا توجد نتائج</div>";return;}
+    var seen={};
+    var unique=[];
+    (data||[]).forEach(function(v){
+      var key=v.client_id_num||v.client_phone||v.client_name;
+      if(!seen[key]){seen[key]=true;unique.push(v);}
+    });
+    res.innerHTML=unique.slice(0,5).map(function(v){
+      var vid=v.id;
+      return "<div class=\"search-result\" onclick=\"fillClient('"+vid+"')\">" +
+        "<div class=\"sr-name\">"+(v.client_name||"—")+"</div>" +
+        "<div class=\"sr-sub\">"+(v.client_phone||"—")+" · "+(v.client_id_num||"—")+" · "+(v.client_district||"—")+"</div>" +
         "</div>";
     }).join("");
   });
 }
+
 
 function fillClient(id){
   sbGet("v_vouchers_full","id=eq."+id).then(function(data){
@@ -753,6 +765,24 @@ function resetForm(){
   // لا نخفي زر الطباعة هنا — يبقى حتى يضغط المستخدم عليه
 }
 
+function printPartialReceipt(){
+  if(!lastPartialReceipt){showToast("لا توجد دفعة مسجلة");return;}
+  var r = lastPartialReceipt;
+  var w = window.open("","_blank");
+  w.document.write("<html dir=\'rtl\'><head><meta charset=\'UTF-8\'><title>سند دفعة</title><style>body{font-family:Arial;color:#18181a;padding:20px;direction:rtl;max-width:380px;margin:0 auto;font-size:12px;} .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ddd;} .lbl{color:#666;} .val{font-weight:600;} .title{background:#18181a;color:#fff;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:700;display:inline-block;margin:8px 0;} .co{display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid #18181a;margin-bottom:10px;} .amt{border:2px solid #18181a;border-radius:6px;padding:8px;text-align:center;margin:10px 0;font-size:18px;font-weight:700;} .sigs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;} .sig{text-align:center;font-size:10px;color:#666;} .sig-line{border-top:1px solid #18181a;margin:14px 5px 4px;}</style></head><body>");
+  w.document.write("<div class=\'co\'><div><div style=\'font-size:10px;font-weight:700;\'>عبدالعزيز حسن المطري للاستشارات الهندسية</div><div style=\'font-size:8px;color:#666;\'>A. H. AL-MATRI FOR ENGINEERING CONSULT</div></div><div style=\'text-align:center;\'><div style=\'font-size:12px;font-weight:700;color:#1a4880;\'>مطري كونسلت</div></div></div>");
+  w.document.write("<div class=\'title\'>سند استلام دفعة</div>");
+  w.document.write("<div style=\'font-size:8px;color:#888;margin-bottom:10px;\'>التاريخ: "+r.date+" الساعة "+r.time+"</div>");
+  w.document.write("<div class=\'row\'><span class=\'lbl\'>العميل:</span><span class=\'val\'>"+r.client+"</span></div>");
+  w.document.write("<div class=\'row\'><span class=\'lbl\'>طريقة الدفع:</span><span class=\'val\'>"+r.method+"</span></div>");
+  w.document.write("<div class=\'row\'><span class=\'lbl\'>استلمه:</span><span class=\'val\'>"+r.cashier+"</span></div>");
+  w.document.write("<div class=\'amt\'>"+parseFloat(r.amount).toLocaleString("ar-SA")+" ريال</div>");
+  w.document.write("<div style=\'font-size:10px;color:#7a4e00;text-align:center;margin-bottom:12px;\'>فقط "+n2ar(r.amount)+" ريال سعودي لا غير</div>");
+  w.document.write("<div class=\'sigs\'><div class=\'sig\'><div class=\'sig-line\'></div>توقيع العميل</div><div class=\'sig\'><div class=\'sig-line\'></div>"+r.cashier+"</div></div>");
+  w.document.write("</body></html>");
+  w.document.close(); w.print();
+}
+
 function printVoucher(){
   if(!lastSavedVoucher){showToast("احفظ السند أولاً ثم اطبع");return;}
   var c=document.getElementById("printable-voucher").innerHTML;
@@ -822,8 +852,19 @@ function confirmPartial(){
     return sbPatch("vouchers","id=eq."+pendingPId.id,{paid_amount:newPaid,status:newStatus,payment_method:chip.textContent});
   }).then(function(){
     closeSheet("partial-sheet");
-    showToast("✓ تم تسجيل "+fmt(amt)+" ريال — أُرسل إشعار للإدارة");
+    showToast("✓ تم تسجيل "+fmt(amt)+" ريال — يمكنك الطباعة");
     sendWA("💰 دفعة جزئية\nالعميل: "+pendingPId.client+"\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+"\n💼 استلمه: "+currentCashierName+"\n"+new Date().toLocaleString("ar-SA"));
+    // طباعة سند الدفعة
+    lastPartialReceipt = {
+      client:   pendingPId.client,
+      amount:   amt,
+      method:   chip.textContent,
+      cashier:  currentCashierName,
+      date:     new Date().toLocaleDateString("ar-SA"),
+      time:     new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"}),
+      voucher:  pendingPId.id
+    };
+    document.getElementById("print-partial-btn").hidden = false;
     loadPartialVouchers();
   }).catch(function(e){showToast("خطأ: "+e.message);});
 }
