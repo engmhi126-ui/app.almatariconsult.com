@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>بوابة الفريق — المطري كونسلت</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="بوابة الفريق">
 <meta name="theme-color" content="#0f2d52">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
 :root {
   --bg: #f0ede6;
   --card: #ffffff;
@@ -561,11 +560,12 @@ body {
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
 </style>
 </head>
 <body>
 
-<!-- ════ LOGIN SCREEN ════ -->
+<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="login-bg">
     <div class="login-logo">
@@ -573,7 +573,6 @@ body {
     </div>
     <div class="login-title">المطري كونسلت</div>
     <div class="login-sub">المستشار مؤتمن · بوابة الفريق</div>
-
     <div class="login-card">
       <div class="login-card-title">تسجيل الدخول</div>
       <div class="fg">
@@ -590,18 +589,16 @@ body {
       </div>
       <div class="fg">
         <label class="fl">كلمة المرور</label>
-        <input class="fi" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <input class="fi" type="password" id="login-pass" placeholder="••••••••">
       </div>
-      <button class="login-btn" onclick="doLogin()">دخول</button>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">دخول</button>
       <div class="login-err" id="login-err">كلمة المرور غير صحيحة</div>
     </div>
   </div>
 </div>
 
-<!-- ════ APP SCREEN ════ -->
+<!-- APP -->
 <div class="screen" id="screen-app">
-
-  <!-- Header -->
   <div class="app-header">
     <div class="ah-eng">
       <div class="ah-av" id="app-av">—</div>
@@ -615,30 +612,20 @@ body {
     </div>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs-bar">
-    <div class="tab active" onclick="switchTab('files', this)">
+    <div class="tab active" id="tab-files" onclick="switchTab('files',this)">
       ملفاتي <span class="tab-n" id="cnt-files">0</span>
     </div>
-    <div class="tab" onclick="switchTab('done', this)">
+    <div class="tab" id="tab-done" onclick="switchTab('done',this)">
       مكتملة <span class="tab-n" id="cnt-done">0</span>
     </div>
-    <div class="tab" onclick="switchTab('custody', this)">
+    <div class="tab" id="tab-custody" onclick="switchTab('custody',this)">
       عهدتي <span class="tab-n" id="cnt-custody">0</span>
     </div>
   </div>
 
-  <!-- View: Active Files -->
-  <div class="view active" id="view-files">
-    <div id="files-list"></div>
-  </div>
-
-  <!-- View: Done -->
-  <div class="view" id="view-done">
-    <div id="done-list"></div>
-  </div>
-
-  <!-- View: Custody -->
+  <div class="view active" id="view-files"><div id="files-list"></div></div>
+  <div class="view" id="view-done"><div id="done-list"></div></div>
   <div class="view" id="view-custody">
     <div class="custody-total">
       <div class="ct-lbl">إجمالي عهدتي الحالية</div>
@@ -647,10 +634,9 @@ body {
     </div>
     <div id="custody-list"></div>
   </div>
-
 </div>
 
-<!-- ════ VOUCHER SHEET ════ -->
+<!-- VOUCHER SHEET -->
 <div class="sheet-bg" id="voucher-sheet" onclick="closeSheet('voucher-sheet')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -664,72 +650,55 @@ body {
         <div class="vci-ref" id="vs-ref">—</div>
         <div class="remaining-box">
           <div>
-            <div class="rb-lbl">المبلغ المتبقي على العميل</div>
+            <div class="rb-lbl">المبلغ المتبقي</div>
             <div class="rb-val" id="vs-remaining">0</div>
           </div>
           <span style="font-size:13px;color:#7a4e00;">ريال</span>
         </div>
       </div>
-
       <div class="fg">
-        <label class="fl">المبلغ المستلَم من العميل (ريال)</label>
+        <label class="fl">المبلغ المستلَم (ريال)</label>
         <input class="fi" type="number" id="vs-amount" placeholder="0" oninput="vsUpdateWords()">
-        <div style="font-size:10px;color:#a09fa2;margin-top:3px;">يُسجَّل في عهدتك بعد الحفظ</div>
       </div>
-
       <div class="words-box" id="vs-words">أدخل المبلغ لتظهر الكتابة تلقائياً</div>
-
       <div class="fg">
         <label class="fl">طريقة الدفع</label>
         <div class="chips" id="vs-chips">
-          <div class="chip" onclick="selChip(this, 'vs-chips')">نقداً</div>
-          <div class="chip" onclick="selChip(this, 'vs-chips')">شبكة</div>
-          <div class="chip" onclick="selChip(this, 'vs-chips')">تحويل</div>
+          <div class="chip" onclick="selChip(this,'vs-chips')">نقداً</div>
+          <div class="chip" onclick="selChip(this,'vs-chips')">شبكة</div>
+          <div class="chip" onclick="selChip(this,'vs-chips')">تحويل</div>
         </div>
       </div>
-
       <div style="background:#e6f4ec;border:1px solid rgba(26,92,53,.15);border-radius:9px;padding:12px 14px;font-size:11px;color:#1a5c35;margin-bottom:14px;line-height:1.7;">
-        ✓ بعد الحفظ: يُسجَّل المبلغ في عهدتك ويظهر زر تسليم الملف للعميل
+        ✓ بعد الحفظ: يُسجَّل المبلغ في عهدتك ويظهر زر تسليم الملف
       </div>
-
-      <button class="submit-btn" onclick="saveVoucher()">
-        استلمت المبلغ — حفظ السند وتفعيل التسليم
-      </button>
+      <button class="submit-btn" onclick="saveVoucher()">استلمت المبلغ — حفظ السند</button>
     </div>
   </div>
 </div>
 
-<!-- ════ CONTACT SHEET ════ -->
+<!-- CONTACT SHEET -->
 <div class="sheet-bg" id="contact-sheet" onclick="closeSheet('contact-sheet')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
-      <span class="sheet-title">التواصل</span>
+      <span class="sheet-title">التواصل مع الإدارة</span>
       <button class="sheet-close" onclick="closeSheet('contact-sheet')">×</button>
     </div>
     <div class="sheet-body">
-      <div class="contact-opt" onclick="callAdmin()">
+      <div class="contact-opt" onclick="showToast('جارٍ الاتصال...')">
         <div class="co-icon" style="background:#e6eef8;">📞</div>
-        <div>
-          <div class="co-title">اتصال بالإدارة</div>
-          <div class="co-sub">م. محمد حمد · +966538986031</div>
-        </div>
+        <div><div class="co-title">اتصال بالإدارة</div><div class="co-sub">م. محمد حمد · +966538986031</div></div>
       </div>
-      <div class="contact-opt" onclick="whatsappAdmin()">
+      <div class="contact-opt" onclick="showToast('جارٍ فتح واتساب...')">
         <div class="co-icon" style="background:#e6f4ec;">💬</div>
-        <div>
-          <div class="co-title">واتساب الإدارة</div>
-          <div class="co-sub">إرسال تفاصيل الملف وطلب المتابعة</div>
-        </div>
-      </div>
-      <div style="background:#e6eef8;border-radius:10px;padding:12px 14px;font-size:11px;color:#1a4880;line-height:1.7;margin-top:6px;">
-        <strong>تذكير:</strong> عند تسديد العميل — افتح صفحة ملفاتك وحرّر سند المتبقي مباشرة
+        <div><div class="co-title">واتساب الإدارة</div><div class="co-sub">إرسال تفاصيل الملف</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════ DELIVER MODAL ════ -->
+<!-- DELIVER MODAL -->
 <div class="modal-wrap" id="deliver-modal">
   <div class="modal-box">
     <div class="modal-emoji">📂</div>
@@ -739,226 +708,102 @@ body {
       بعد التأكيد تُغلق المهمة نهائياً
     </div>
     <div class="modal-btns">
-      <button class="mbtn mbtn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="mbtn mbtn-cancel" onclick="closeDeliverModal()">إلغاء</button>
       <button class="mbtn mbtn-ok" onclick="confirmDeliver()">✓ نعم، سلّمت الملف</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   DATA — بيانات الفريق وكلمات المرور
-   للربط مع Supabase: استبدل passwords
-   بـ hash وتحقق من السيرفر
-   ═══════════════════════════════════════ */
-/* ══ Supabase Config ══ */
+/* ══ CONFIG ══ */
 const SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
+const WA_INSTANCE = "165504";
+const WA_TOKEN    = "oghzjhf82g3ghqkq";
+const ADMIN_PHONE = "966538986031";
 
-async function sbGet(table, params="") {
-  const r = await fetch(SB_URL+"/rest/v1/"+table+"?"+params, {
-    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
-  });
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function sbPost(table, body) {
-  const r = await fetch(SB_URL+"/rest/v1/"+table, {
-    method:"POST",
-    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
-      "Content-Type":"application/json","Prefer":"return=representation"},
-    body:JSON.stringify(body)
-  });
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function sbPatch(table, filter, body) {
-  const r = await fetch(SB_URL+"/rest/v1/"+table+"?"+filter, {
-    method:"PATCH",
-    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
-      "Content-Type":"application/json","Prefer":"return=representation"},
-    body:JSON.stringify(body)
-  });
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-
-/* ══ بيانات الفريق — تُحمَّل من Supabase ══ */
+/* ══ TEAM ══ */
 const TEAM = {
-  mhd: { name: "م. محمد حمد",        initials: "مح", role: "مهندس مدني — إدارة", pass: "Matari@2026", phone:"0538986031" },
-  mkh: { name: "م. محمد خالد",       initials: "مخ", role: "مهندس معماري",        pass: "Matari@2026", phone:"0570889155" },
-  ism: { name: "م. إسماعيل",         initials: "إس", role: "مهندس مساحة",         pass: "Matari@2026", phone:"0500000003" },
-  abr: { name: "م. عبد الرحمن خان",  initials: "عخ", role: "مهندس مساحة",         pass: "Matari@2026", phone:"0500000004" },
-  say: { name: "الرسام صايم",        initials: "صا", role: "رسام هندسي",           pass: "Matari@2026", phone:"0500000005" },
-  slh: { name: "م. صلاح بدر التمام", initials: "صب", role: "مهندس إنشائي",         pass: "Matari@2026", phone:"0500000006" },
+  mhd: { name:"م. محمد حمد",        initials:"مح", role:"مهندس مدني — إدارة", pass:"Matari@2026", phone:"0538986031" },
+  mkh: { name:"م. محمد خالد",       initials:"مخ", role:"مهندس معماري",        pass:"Matari@2026", phone:"0570889155" },
+  ism: { name:"م. إسماعيل",         initials:"إس", role:"مهندس مساحة",         pass:"Matari@2026", phone:"0500000003" },
+  abr: { name:"م. عبد الرحمن خان",  initials:"عخ", role:"مهندس مساحة",         pass:"Matari@2026", phone:"0500000004" },
+  say: { name:"الرسام صايم",        initials:"صا", role:"رسام هندسي",           pass:"Matari@2026", phone:"0500000005" },
+  slh: { name:"م. صلاح بدر التمام", initials:"صب", role:"مهندس إنشائي",         pass:"Matari@2026", phone:"0500000006" }
 };
 
-/* ═══ FILES DATA
-  في النظام الحقيقي: اجلب من Supabase
-  بناءً على engineer_id بعد تسجيل الدخول
-  ═══════════════════════════════════════ */
-const ALL_FILES = [
-  {
-    id: "F001", voucher: "#2026-003", eng: "ism",
-    client: "عبدالله محمد الغامدي", service: "إشراف هندسي", loc: "حي النزهة · جازان",
-    type: "field", received: "اليوم 08:00",
-    paid: 8500, total: 12000, remaining: 3500,
-    status: "active",
-    history: [
-      { text: "استلمت الملف", time: "اليوم 08:00", color: "#a09fa2" },
-      { text: "بدأت الإشراف الميداني", time: "اليوم 08:19", color: "#1a4880" },
-      { text: "في انتظار استكمال السداد", time: "اليوم", color: "#7a4e00" },
-    ]
-  },
-  {
-    id: "F002", voucher: "#2026-001", eng: "slh",
-    client: "فهد إبراهيم العنزي", service: "تصميم معماري", loc: "حي العزيزية · جازان",
-    type: "office", received: "19 أبريل",
-    paid: 12000, total: 18000, remaining: 6000,
-    status: "active",
-    history: [
-      { text: "استلمت الملف", time: "19 أبريل", color: "#a09fa2" },
-      { text: "جارٍ التصميم", time: "اليوم", color: "#1a4880" },
-    ]
-  },
-  {
-    id: "F003", voucher: "#2026-002", eng: "abr",
-    client: "سالم عبدالله القحطاني", service: "رفع مساحي", loc: "حي الروضة · جازان",
-    type: "field", received: "أمس",
-    paid: 4000, total: 4000, remaining: 0,
-    status: "active",
-    history: [
-      { text: "استلمت الملف", time: "أمس 14:20", color: "#a09fa2" },
-      { text: "اكتمل الرفع المساحي", time: "أمس 16:00", color: "#1a5c35" },
-      { text: "مسدد بالكامل", time: "أمس", color: "#1a5c35" },
-    ]
-  },
-  {
-    id: "F004", voucher: "#2026-004", eng: "mkh",
-    client: "محمد سالم العنزي", service: "تصميم واجهة تجارية", loc: "حي المروج · جازان",
-    type: "office", received: "اليوم",
-    paid: 5000, total: 5000, remaining: 0,
-    status: "active",
-    history: [
-      { text: "استلمت الملف", time: "اليوم 09:00", color: "#a09fa2" },
-      { text: "مسدد بالكامل", time: "اليوم", color: "#1a5c35" },
-    ]
-  },
-  {
-    id: "F005", voucher: "#2026-000", eng: "mhd",
-    client: "أحمد سعد الزهراني", service: "إشراف هندسي", loc: "حي العزيزية · جازان",
-    type: "field", received: "18 أبريل",
-    paid: 8000, total: 8000, remaining: 0,
-    status: "done", deliveredAt: "18 أبريل الساعة 10:30",
-    history: []
-  },
-  {
-    id: "F006", voucher: "#2025-099", eng: "ism",
-    client: "ناصر محمد الحربي", service: "رفع مساحي", loc: "وادي جازان",
-    type: "field", received: "15 أبريل",
-    paid: 6000, total: 6000, remaining: 0,
-    status: "done", deliveredAt: "15 أبريل الساعة 14:00",
-    history: []
-  },
-];
+/* ══ STATE ══ */
+var currentEng = null;
+var currentEngUserId = null;
+var pendingDeliverId = null;
+var pendingVoucherId = null;
+var ALL_FILES = [];
 
-
-/* ══ WHATSAPP NOTIFICATION ══ */
-const WA_INSTANCE_E = "165504";
-const WA_TOKEN_E    = "oghzjhf82g3ghqkq";
-const WA_ADMIN_E    = "966538986031";
-
-async function notifyAdmin(message) {
-  try {
-    await fetch("https://api.ultramsg.com/instance" + WA_INSTANCE_E + "/messages/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        token: WA_TOKEN_E,
-        to: WA_ADMIN_E,
-        body: message,
-        priority: "1"
-      })
-    });
-  } catch(e) {
-    console.warn("Notify failed:", e);
-  }
+/* ══ SUPABASE ══ */
+function sbGet(table, params) {
+  params = params || "";
+  return fetch(SB_URL + "/rest/v1/" + table + "?" + params, {
+    headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY }
+  }).then(function(r) {
+    if (!r.ok) return r.text().then(function(t){ throw new Error(t); });
+    return r.json();
+  });
 }
 
-/* ═══ STATE ═══ */
-let currentEng = null;
-let currentEngUserId = null;
-let pendingDeliverId = null;
-let pendingVoucherId = null;
-
-/* ══ تحميل الملفات من Supabase ══ */
-async function loadFilesFromDB() {
-  if (!currentEngUserId) { renderAll(); return; }
-  try {
-    const vouchers = await sbGet("v_vouchers_full",
-      "eng_user_id=eq."+currentEngUserId+"&order=created_at.desc");
-
-    // تحويل السندات إلى تنسيق ALL_FILES
-    ALL_FILES.length = 0;
-    vouchers.forEach((v,i) => {
-      ALL_FILES.push({
-        id:        v.id,
-        voucher:   v.voucher_num || ("V-"+i),
-        eng:       currentEng,
-        client:    v.client_name,
-        service:   v.service_type || "خدمة هندسية",
-        loc:       (v.client_district || "—") + " · جازان",
-        type:      "field",
-        received:  new Date(v.created_at).toLocaleDateString("ar-SA"),
-        paid:      parseFloat(v.paid_amount)||0,
-        total:     parseFloat(v.total_amount)||0,
-        remaining: parseFloat(v.remaining)||0,
-        status:    v.status === "settled" ? "done" : "active",
-        deliveredAt: v.settled_at ? new Date(v.settled_at).toLocaleDateString("ar-SA") : null,
-        history:   []
-      });
-    });
-    renderAll();
-  } catch(e) {
-    console.error("loadFilesFromDB error:", e);
-    renderAll(); // fallback للبيانات المحلية
-  }
+function sbPatch(table, filter, body) {
+  return fetch(SB_URL + "/rest/v1/" + table + "?" + filter, {
+    method: "PATCH",
+    headers: {
+      "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY,
+      "Content-Type": "application/json", "Prefer": "return=minimal"
+    },
+    body: JSON.stringify(body)
+  });
 }
 
-/* ═══ ARABIC NUMBERS ═══ */
-const _o = ["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
-const _t = ["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
-const _h = ["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+/* ══ NUMBERS ══ */
+function fmt(n) { return parseFloat(n||0).toLocaleString("ar-SA"); }
+var _o=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
+var _t=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
+var _h=["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
 function n2ar(n) {
-  n = parseInt(n) || 0;
+  n = parseInt(n)||0;
   if (!n) return "صفر";
-  if (n < 20) return _o[n];
-  if (n < 100) { const t = Math.floor(n/10), o = n%10; return o ? _o[o] + " و" + _t[t] : _t[t]; }
-  if (n < 1000) { const h = Math.floor(n/100), r = n%100; return r ? _h[h] + " و" + n2ar(r) : _h[h]; }
-  if (n < 1000000) {
-    const th = Math.floor(n/1000), r = n%1000;
-    let tp = th===1 ? "ألف" : th===2 ? "ألفان" : th<=10 ? n2ar(th)+" آلاف" : n2ar(th)+" ألف";
-    return r ? tp + " و" + n2ar(r) : tp;
+  if (n<20) return _o[n];
+  if (n<100) { var t=Math.floor(n/10),o=n%10; return o?_o[o]+" و"+_t[t]:_t[t]; }
+  if (n<1000) { var h=Math.floor(n/100),r=n%100; return r?_h[h]+" و"+n2ar(r):_h[h]; }
+  if (n<1000000) {
+    var th=Math.floor(n/1000),r2=n%1000;
+    var tp=th===1?"ألف":th===2?"ألفان":th<=10?n2ar(th)+" آلاف":n2ar(th)+" ألف";
+    return r2?tp+" و"+n2ar(r2):tp;
   }
   return n.toLocaleString("ar-SA");
 }
-function fmt(n) { return parseInt(n||0).toLocaleString("ar-SA"); }
 
-/* ═══ LOGIN ═══ */
-async function doLogin() {
-  const id   = document.getElementById("login-name").value;
-  const pass = document.getElementById("login-pass").value;
-  const err  = document.getElementById("login-err");
-  const btn  = document.querySelector(".login-btn");
-  if (!id) { err.textContent = "يرجى اختيار اسمك"; err.classList.add("show"); return; }
+/* ══ LOGIN ══ */
+function doLogin() {
+  var id   = document.getElementById("login-name").value;
+  var pass = document.getElementById("login-pass").value;
+  var err  = document.getElementById("login-err");
+  var btn  = document.getElementById("login-btn");
 
-  const member = TEAM[id];
-  if (!member) { err.textContent = "خطأ في البيانات"; err.classList.add("show"); return; }
+  err.classList.remove("show");
 
-  // تحقق محلي مؤقت ← استبدله لاحقاً بـ RPC engineer_login
+  if (!id) {
+    err.textContent = "يرجى اختيار اسمك";
+    err.classList.add("show");
+    return;
+  }
+
+  var member = TEAM[id];
+  if (!member) {
+    err.textContent = "خطأ في البيانات";
+    err.classList.add("show");
+    return;
+  }
+
   if (pass !== member.pass) {
     err.textContent = "كلمة المرور غير صحيحة";
     err.classList.add("show");
@@ -966,51 +811,81 @@ async function doLogin() {
     return;
   }
 
+  // دخول ناجح
   btn.textContent = "جارٍ الدخول...";
   btn.disabled = true;
 
-  try {
-    // جلب ملفات المهندس من Supabase
-    const users = await sbGet("users", "phone=eq."+member.phone+"&select=id,full_name,role");
-    if (users.length > 0) {
-      currentEngUserId = users[0].id;
-    }
-    err.classList.remove("show");
-    currentEng = id;
-    document.getElementById("app-av").textContent = member.initials;
-    document.getElementById("app-name").textContent = member.name;
-    document.getElementById("app-role").textContent = member.role;
-    document.getElementById("screen-login").classList.remove("active");
-    document.getElementById("screen-app").classList.add("active");
-    await loadFilesFromDB();
-  } catch(e) {
-    // fallback للبيانات المحلية إذا فشل الاتصال
-    currentEng = id;
-    document.getElementById("app-av").textContent = member.initials;
-    document.getElementById("app-name").textContent = member.name;
-    document.getElementById("app-role").textContent = member.role;
-    document.getElementById("screen-login").classList.remove("active");
-    document.getElementById("screen-app").classList.add("active");
-    renderAll();
-  } finally {
-    btn.textContent = "دخول";
-    btn.disabled = false;
-  }
+  currentEng = id;
+
+  document.getElementById("app-av").textContent   = member.initials;
+  document.getElementById("app-name").textContent  = member.name;
+  document.getElementById("app-role").textContent  = member.role;
+
+  document.getElementById("screen-login").classList.remove("active");
+  document.getElementById("screen-app").classList.add("active");
+
+  btn.textContent = "دخول";
+  btn.disabled = false;
+
+  // جلب الملفات من Supabase
+  loadFilesFromDB(member.phone);
 }
 
 function doLogout() {
   currentEng = null;
+  currentEngUserId = null;
+  ALL_FILES = [];
   document.getElementById("screen-app").classList.remove("active");
   document.getElementById("screen-login").classList.add("active");
   document.getElementById("login-pass").value = "";
   document.getElementById("login-name").value = "";
-  switchTab("files", document.querySelector(".tab"));
+  switchTab("files", document.getElementById("tab-files"));
 }
 
-/* ═══ RENDER ═══ */
-function myFiles() { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "active"); }
-function myDone()  { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "done"); }
-function myCustody() { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "active" && f.remaining > 0); }
+/* ══ LOAD FROM SUPABASE ══ */
+function loadFilesFromDB(phone) {
+  // أولاً: جلب user_id
+  sbGet("users", "phone=eq." + phone + "&select=id").then(function(users) {
+    if (users && users.length > 0) {
+      currentEngUserId = users[0].id;
+      // جلب السندات
+      return sbGet("v_vouchers_full", "eng_user_id=eq." + currentEngUserId + "&order=created_at.desc");
+    }
+    return [];
+  }).then(function(vouchers) {
+    ALL_FILES = [];
+    if (vouchers && vouchers.length > 0) {
+      vouchers.forEach(function(v) {
+        ALL_FILES.push({
+          id:        v.id,
+          voucher:   v.voucher_num || "—",
+          eng:       currentEng,
+          client:    v.client_name,
+          service:   v.service_type || "خدمة هندسية",
+          loc:       (v.client_district || "—") + " · جازان",
+          type:      "field",
+          received:  new Date(v.created_at).toLocaleDateString("ar-SA"),
+          paid:      parseFloat(v.paid_amount) || 0,
+          total:     parseFloat(v.total_amount) || 0,
+          remaining: parseFloat(v.remaining) || 0,
+          status:    v.status === "settled" ? "done" : "active",
+          deliveredAt: v.settled_at ? new Date(v.settled_at).toLocaleDateString("ar-SA") : null,
+          history:   []
+        });
+      });
+    }
+    renderAll();
+  }).catch(function(e) {
+    console.error("loadFilesFromDB error:", e);
+    showToast("تعذر تحميل الملفات — " + e.message);
+    renderAll();
+  });
+}
+
+/* ══ RENDER ══ */
+function myFiles()   { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="active"; }); }
+function myDone()    { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="done"; }); }
+function myCustody() { return ALL_FILES.filter(function(f){ return f.eng===currentEng && f.status==="active" && f.remaining>0; }); }
 
 function renderAll() {
   renderFiles();
@@ -1020,241 +895,239 @@ function renderAll() {
 }
 
 function updateCounts() {
-  document.getElementById("cnt-files").textContent = myFiles().length;
-  document.getElementById("cnt-done").textContent = myDone().length;
-  const custodyFiles = myCustody();
+  document.getElementById("cnt-files").textContent   = myFiles().length;
+  document.getElementById("cnt-done").textContent    = myDone().length;
+  var custodyFiles = myCustody();
   document.getElementById("cnt-custody").textContent = custodyFiles.length;
-  const total = custodyFiles.reduce((s, f) => s + f.remaining, 0);
-  const totalEl = document.getElementById("custody-total-val");
-  totalEl.textContent = fmt(total);
-  totalEl.className = "ct-val " + (total > 0 ? "" : "ct-zero");
-  document.getElementById("custody-total-sub").textContent = total > 0 ? "ريال سعودي — في عهدتك" : "ريال — ذمتك نظيفة ✓";
+  var total = custodyFiles.reduce(function(s,f){ return s+f.remaining; }, 0);
+  var tv = document.getElementById("custody-total-val");
+  tv.textContent = fmt(total);
+  tv.className = "ct-val " + (total>0 ? "" : "ct-zero");
+  document.getElementById("custody-total-sub").textContent =
+    total>0 ? "ريال سعودي — في عهدتك" : "ريال — ذمتك نظيفة ✓";
 }
 
 function renderFiles() {
-  const list = document.getElementById("files-list");
-  const files = myFiles();
-  if (files.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">لا توجد ملفات نشطة</div><div class="empty-sub">سيظهر هنا كل ملف يُسند إليك</div></div>';
+  var list  = document.getElementById("files-list");
+  var files = myFiles();
+  if (files.length===0) {
+    list.innerHTML = "<div class='empty'><div class='empty-icon'>📋</div><div class='empty-title'>لا توجد ملفات نشطة</div><div class='empty-sub'>سيظهر هنا كل ملف يُسند إليك</div></div>";
     return;
   }
-  list.innerHTML = files.map(f => {
-    const fullPay = f.remaining === 0;
-    const typeLabel = f.type === "field" ? "ميداني" : "مكتبي";
-    const typeBadge = f.type === "field" ? "badge-field" : "badge-office";
+  var html = "";
+  files.forEach(function(f) {
+    var fullPay   = f.remaining === 0;
+    var typeLabel = f.type==="field" ? "ميداني" : "مكتبي";
+    var typeBadge = f.type==="field" ? "badge-field" : "badge-office";
 
-    const paySection = fullPay
-      ? '<div class="pay-badge pay-full"><span class="pay-icon">✅</span><div><span>مسدد بالكامل</span><div class="pay-sub">بإمكانك تسليم الملف للعميل</div></div></div>'
-      : '<div class="pay-badge pay-partial"><span class="pay-icon">⏳</span><div><span>متبقي على العميل</span><span class="pay-amount">' + fmt(f.remaining) + ' <span style="font-size:13px;font-weight:400">ريال</span></span><div class="pay-sub">لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>';
+    var paySection = fullPay
+      ? "<div class='pay-badge pay-full'><span class='pay-icon'>✅</span><div><span>مسدد بالكامل</span><div class='pay-sub'>بإمكانك تسليم الملف للعميل</div></div></div>"
+      : "<div class='pay-badge pay-partial'><span class='pay-icon'>⏳</span><div><span>متبقي على العميل</span><span class='pay-amount'>" + fmt(f.remaining) + " <span style='font-size:13px;font-weight:400'>ريال</span></span><div class='pay-sub'>لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>";
 
-    const notice = fullPay
-      ? '<div class="fc-notice n-ok"><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>'
-      : '<div class="fc-notice n-warn"><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط "استلام وسند" لتسجيله في عهدتك</span></div>';
+    var notice = fullPay
+      ? "<div class='fc-notice n-ok'><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>"
+      : "<div class='fc-notice n-warn'><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط استلام وسند</span></div>";
 
-    const actionRow1 = fullPay
-      ? '<button class="abtn abtn-deliver" onclick="openDeliver(\'' + f.id + '\',\'' + f.client + '\')">📂 تسليم الملف للعميل</button><button class="abtn abtn-contact" onclick="openContact(\'' + f.client + '\')">تواصل</button>'
-      : '<button class="abtn abtn-disabled" disabled>🔒 تسليم الملف</button><button class="abtn abtn-contact" onclick="openContact(\'' + f.client + '\')">تواصل</button>';
+    var actions = fullPay
+      ? "<button class='abtn abtn-deliver' onclick="openDeliver('" + f.id + "','" + f.client + "')">📂 تسليم الملف للعميل</button><button class='abtn abtn-contact' onclick="openSheet('contact-sheet')">تواصل</button>"
+      : "<button class='abtn abtn-disabled' disabled>🔒 تسليم الملف</button><button class='abtn abtn-contact' onclick="openSheet('contact-sheet')">تواصل</button>";
 
-    const actionRow2 = !fullPay
-      ? '<div class="fc-actions" style="padding-top:0;"><button class="abtn abtn-voucher" onclick="openVoucher(\'' + f.id + '\')">📄 استلام ' + fmt(f.remaining) + ' ريال وتحرير سند</button></div>'
-      : '';
+    var voucherBtn = !fullPay
+      ? "<div class='fc-actions' style='padding-top:0;'><button class='abtn abtn-voucher' onclick="openVoucher('" + f.id + "')">📄 استلام " + fmt(f.remaining) + " ريال وتحرير سند</button></div>"
+      : "";
 
-    const hist = f.history.map(h =>
-      '<div class="hist-item"><div class="hdot" style="background:' + h.color + '"></div>' + h.text + '<span class="htime">' + h.time + '</span></div>'
-    ).join("");
-
-    return '<div class="fc" id="fc-' + f.id + '">' +
-      '<div class="fc-top"><span class="fc-badge ' + typeBadge + '">' + typeLabel + '</span>' +
-      '<div><div class="fc-client">' + f.client + '</div>' +
-      '<div class="fc-service">' + f.service + '</div>' +
-      '<div class="fc-loc">📍 ' + f.loc + '</div>' +
-      '<div class="fc-ref">' + f.voucher + ' · استُلم: ' + f.received + '</div></div></div>' +
-      '<div class="fc-pay">' + paySection + '</div>' +
+    html += "<div class='fc'>" +
+      "<div class='fc-top'><span class='fc-badge " + typeBadge + "'>" + typeLabel + "</span>" +
+      "<div><div class='fc-client'>" + f.client + "</div>" +
+      "<div class='fc-service'>" + f.service + "</div>" +
+      "<div class='fc-loc'>📍 " + f.loc + "</div>" +
+      "<div class='fc-ref'>" + f.voucher + " · استُلم: " + f.received + "</div></div></div>" +
+      "<div class='fc-pay'>" + paySection + "</div>" +
       notice +
-      '<div class="fc-actions">' + actionRow1 + '</div>' +
-      actionRow2 +
-      (hist ? '<div class="fc-hist"><div class="hist-lbl">سجل الملف</div>' + hist + '</div>' : '') +
-      '</div>';
-  }).join("");
+      "<div class='fc-actions'>" + actions + "</div>" +
+      voucherBtn +
+      "</div>";
+  });
+  list.innerHTML = html;
 }
 
 function renderDone() {
-  const list = document.getElementById("done-list");
-  const files = myDone();
-  if (files.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">لا توجد ملفات مكتملة بعد</div><div class="empty-sub">ستظهر هنا الملفات التي سلّمتها للعملاء</div></div>';
+  var list  = document.getElementById("done-list");
+  var files = myDone();
+  if (files.length===0) {
+    list.innerHTML = "<div class='empty'><div class='empty-icon'>✅</div><div class='empty-title'>لا توجد ملفات مكتملة</div></div>";
     return;
   }
-  list.innerHTML = files.map(f =>
-    '<div class="fc">' +
-    '<div class="fc-top"><span class="fc-badge ' + (f.type==="field"?"badge-field":"badge-office") + '">' + (f.type==="field"?"ميداني":"مكتبي") + '</span>' +
-    '<div><div class="fc-client">' + f.client + '</div>' +
-    '<div class="fc-service">' + f.service + '</div>' +
-    '<div class="fc-loc">📍 ' + f.loc + '</div>' +
-    '<div class="fc-ref">' + f.voucher + ' · استُلم: ' + f.received + '</div></div></div>' +
-    '<div class="fc-done">✓ تم تسليم الملف للعميل — ' + f.deliveredAt + '</div>' +
-    '</div>'
-  ).join("");
+  var html = "";
+  files.forEach(function(f) {
+    html += "<div class='fc'>" +
+      "<div class='fc-top'><span class='fc-badge badge-field'>" + (f.type==="field"?"ميداني":"مكتبي") + "</span>" +
+      "<div><div class='fc-client'>" + f.client + "</div><div class='fc-service'>" + f.service + "</div>" +
+      "<div class='fc-loc'>📍 " + f.loc + "</div></div></div>" +
+      "<div class='fc-done'>✓ تم تسليم الملف — " + (f.deliveredAt||"—") + "</div>" +
+      "</div>";
+  });
+  list.innerHTML = html;
 }
 
 function renderCustody() {
-  const list = document.getElementById("custody-list");
-  const files = myCustody();
-  if (files.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">💰</div><div class="empty-title">لا توجد مبالغ في عهدتك</div><div class="empty-sub">ذمتك نظيفة</div></div>';
+  var list  = document.getElementById("custody-list");
+  var files = myCustody();
+  if (files.length===0) {
+    list.innerHTML = "<div class='empty'><div class='empty-icon'>💰</div><div class='empty-title'>لا توجد مبالغ في عهدتك</div><div class='empty-sub'>ذمتك نظيفة</div></div>";
     return;
   }
-  list.innerHTML = files.map(f =>
-    '<div class="custody-row">' +
-    '<div style="flex:1;">' +
-    '<div class="cr-id">' + f.voucher + '</div>' +
-    '<div class="cr-client">' + f.client + '</div>' +
-    '<div class="cr-date">' + f.received + '</div>' +
-    '</div>' +
-    '<div style="text-align:left;">' +
-    '<div class="cr-amt">' + fmt(f.remaining) + '</div>' +
-    '<div style="font-size:9px;color:#a09fa2;margin-top:1px;">ريال</div>' +
-    '</div>' +
-    '<span class="cr-status cs-eng">في عهدتك</span>' +
-    '</div>'
-  ).join("");
+  var html = "";
+  files.forEach(function(f) {
+    html += "<div class='custody-row'>" +
+      "<div style='flex:1;'><div class='cr-id'>" + f.voucher + "</div>" +
+      "<div class='cr-client'>" + f.client + "</div>" +
+      "<div class='cr-date'>" + f.received + "</div></div>" +
+      "<div style='text-align:left;'><div class='cr-amt'>" + fmt(f.remaining) + "</div><div style='font-size:9px;color:#a09fa2;'>ريال</div></div>" +
+      "<span class='cr-status cs-eng'>في عهدتك</span>" +
+      "</div>";
+  });
+  list.innerHTML = html;
 }
 
-/* ═══ TABS ═══ */
+/* ══ TABS ══ */
 function switchTab(name, el) {
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.getElementById("view-" + name).classList.add("active");
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
+  document.getElementById("view-"+name).classList.add("active");
   if (el) el.classList.add("active");
 }
 
-/* ═══ VOUCHER SHEET ═══ */
+/* ══ VOUCHER SHEET ══ */
 function openVoucher(fileId) {
-  const f = ALL_FILES.find(x => x.id === fileId);
+  var f = null;
+  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===fileId) { f=ALL_FILES[i]; break; } }
   if (!f) return;
   pendingVoucherId = fileId;
-  document.getElementById("vs-client").textContent = f.client;
-  document.getElementById("vs-ref").textContent = f.voucher + " · " + f.service;
+  document.getElementById("vs-client").textContent    = f.client;
+  document.getElementById("vs-ref").textContent       = f.voucher + " · " + f.service;
   document.getElementById("vs-remaining").textContent = fmt(f.remaining);
-  document.getElementById("vs-amount").value = f.remaining;
+  document.getElementById("vs-amount").value          = f.remaining;
   vsUpdateWords();
-  document.querySelectorAll("#vs-chips .chip").forEach(c => c.classList.remove("on"));
+  document.querySelectorAll("#vs-chips .chip").forEach(function(c){ c.classList.remove("on"); });
   openSheet("voucher-sheet");
 }
 
 function vsUpdateWords() {
-  const v = parseInt(document.getElementById("vs-amount").value) || 0;
+  var v = parseInt(document.getElementById("vs-amount").value)||0;
   document.getElementById("vs-words").textContent = v
-    ? "فقط " + n2ar(v) + " ريال سعودي لا غير"
+    ? "فقط "+n2ar(v)+" ريال سعودي لا غير"
     : "أدخل المبلغ لتظهر الكتابة تلقائياً";
 }
 
 function saveVoucher() {
-  const amt = parseInt(document.getElementById("vs-amount").value) || 0;
-  if (!amt) { showToast("يرجى إدخال المبلغ المستلَم"); return; }
-  const chip = document.querySelector("#vs-chips .chip.on");
+  var amt  = parseInt(document.getElementById("vs-amount").value)||0;
+  var chip = document.querySelector("#vs-chips .chip.on");
+  if (!amt)  { showToast("يرجى إدخال المبلغ المستلَم"); return; }
   if (!chip) { showToast("يرجى اختيار طريقة الدفع"); return; }
-  const f = ALL_FILES.find(x => x.id === pendingVoucherId);
+
+  var f = null;
+  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===pendingVoucherId) { f=ALL_FILES[i]; break; } }
   if (f) {
     f.remaining = Math.max(0, f.remaining - amt);
+    f.paid      = f.paid + amt;
   }
+
   closeSheet("voucher-sheet");
-  showToast("✓ استُلم " + fmt(amt) + " ريال — سُجِّل في عهدتك");
-  setTimeout(() => { renderAll(); }, 400);
-  // إشعار الإدارة
-  const engMember = TEAM[currentEng];
-  const vFile = ALL_FILES.find(x => x.id === pendingVoucherId);
-  notifyAdmin(
-    "💰 *استلام دفعة متبقية*\n" +
-    "━━━━━━━━━━━━━━━━━━━━\n" +
-    "👤 *العميل:* " + (vFile ? vFile.client : "—") + "\n" +
-    "💵 *المبلغ المستلَم:* " + fmt(amt) + " ريال\n" +
-    "👷 *استلمه:* " + (engMember ? engMember.name : "—") + "\n" +
-    "📋 *السند:* " + (vFile ? vFile.voucher : "—") + "\n" +
-    "🕐 " + new Date().toLocaleString("ar-SA")
-  );
-  // حفظ في Supabase
-  if (currentEngUserId) {
-    try {
-      const f = ALL_FILES.find(x => x.id === pendingVoucherId);
-      if (f) {
-        await sbPatch("vouchers", "id=eq."+f.id, {
-          paid_amount: f.paid,
-          status: f.remaining <= 0 ? "settled" : "partial"
-        });
-      }
-    } catch(e) { console.warn("Save voucher to DB failed:", e); }
+  showToast("✓ استُلم "+fmt(amt)+" ريال — سُجِّل في عهدتك");
+  setTimeout(function(){ renderAll(); }, 300);
+
+  // تحديث Supabase
+  if (currentEngUserId && f) {
+    sbPatch("vouchers", "id=eq."+f.id, {
+      paid_amount: f.paid,
+      status: f.remaining<=0 ? "settled" : "partial"
+    }).catch(function(e){ console.warn("Patch voucher failed:", e); });
   }
+
+  // إشعار واتساب
+  var member = TEAM[currentEng];
+  sendWA("💰 *استلام دفعة*
+━━━━━━━━━━━━━━━━━━━━
+" +
+    "👤 العميل: " + (f?f.client:"—") + "
+" +
+    "💵 المبلغ: " + fmt(amt) + " ريال
+" +
+    "💳 الطريقة: " + chip.textContent + "
+" +
+    "👷 استلمه: " + (member?member.name:"—") + "
+" +
+    "🕐 " + new Date().toLocaleString("ar-SA"));
 }
 
-/* ═══ CONTACT ═══ */
-function openContact(client) {
-  openSheet("contact-sheet");
-}
-function callAdmin() {
-  closeSheet("contact-sheet");
-  showToast("جارٍ الاتصال بالإدارة...");
-}
-function whatsappAdmin() {
-  closeSheet("contact-sheet");
-  showToast("جارٍ فتح واتساب...");
-}
-
-/* ═══ DELIVER ═══ */
+/* ══ DELIVER ══ */
 function openDeliver(fileId, clientName) {
   pendingDeliverId = fileId;
   document.getElementById("deliver-client-name").textContent = clientName;
   document.getElementById("deliver-modal").classList.add("open");
 }
+
 function confirmDeliver() {
-  const f = ALL_FILES.find(x => x.id === pendingDeliverId);
+  var f = null;
+  for (var i=0; i<ALL_FILES.length; i++) { if (ALL_FILES[i].id===pendingDeliverId) { f=ALL_FILES[i]; break; } }
   if (f) {
-    f.status = "done";
-    f.deliveredAt = new Date().toLocaleDateString("ar-SA") + " الساعة " + new Date().toLocaleTimeString("ar-SA", {hour:"2-digit",minute:"2-digit"});
+    f.status      = "done";
+    f.deliveredAt = new Date().toLocaleDateString("ar-SA");
   }
-  closeModal();
+  closeDeliverModal();
   showToast("✓ تم تسليم الملف — أُغلقت المهمة نهائياً");
-  setTimeout(() => { renderAll(); }, 400);
-  // إشعار الإدارة
-  const eng = TEAM[currentEng];
-  notifyAdmin(
-    "📂 *تم تسليم ملف للعميل*\n" +
-    "━━━━━━━━━━━━━━━━━━━━\n" +
-    "👤 *العميل:* " + document.getElementById("deliver-client-name").textContent + "\n" +
-    "👷 *المهندس:* " + (eng ? eng.name : "—") + "\n" +
-    "✅ *أُغلق الملف نهائياً*\n" +
-    "🕐 " + new Date().toLocaleString("ar-SA")
-  );
-  // تحديث في Supabase
-  if (currentEngUserId) {
-    try {
-      const f = ALL_FILES.find(x => x.id === pendingDeliverId);
-      if (f) await sbPatch("vouchers","id=eq."+f.id,{
-        status:"settled", settled_at: new Date().toISOString()
-      });
-    } catch(e) { console.warn("Deliver update failed:", e); }
+  setTimeout(function(){ renderAll(); }, 300);
+
+  // تحديث Supabase
+  if (currentEngUserId && f) {
+    sbPatch("vouchers", "id=eq."+f.id, {
+      status: "settled",
+      settled_at: new Date().toISOString()
+    }).catch(function(e){ console.warn("Deliver patch failed:", e); });
   }
+
+  // إشعار واتساب
+  var member = TEAM[currentEng];
+  sendWA("📂 *تم تسليم ملف*
+━━━━━━━━━━━━━━━━━━━━
+" +
+    "👤 العميل: " + (f?f.client:"—") + "
+" +
+    "👷 المهندس: " + (member?member.name:"—") + "
+" +
+    "✅ أُغلق الملف نهائياً
+" +
+    "🕐 " + new Date().toLocaleString("ar-SA"));
 }
-function closeModal() {
+
+function closeDeliverModal() {
   document.getElementById("deliver-modal").classList.remove("open");
 }
 
-/* ═══ SHEETS ═══ */
-function openSheet(id) { document.getElementById(id).classList.add("open"); }
+/* ══ WHATSAPP ══ */
+function sendWA(msg) {
+  fetch("https://api.ultramsg.com/instance"+WA_INSTANCE+"/messages/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ token:WA_TOKEN, to:ADMIN_PHONE, body:msg })
+  }).catch(function(e){ console.warn("WA failed:", e); });
+}
+
+/* ══ HELPERS ══ */
+function openSheet(id)  { document.getElementById(id).classList.add("open"); }
 function closeSheet(id) { document.getElementById(id).classList.remove("open"); }
 
-/* ═══ CHIPS ═══ */
-function selChip(el, groupId) {
-  document.querySelectorAll("#" + groupId + " .chip").forEach(c => c.classList.remove("on"));
+function selChip(el, gid) {
+  document.querySelectorAll("#"+gid+" .chip").forEach(function(c){ c.classList.remove("on"); });
   el.classList.add("on");
 }
 
-/* ═══ TOAST ═══ */
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
+function showToast(m) {
+  var t = document.getElementById("toast");
+  t.textContent = m;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3500);
+  setTimeout(function(){ t.classList.remove("show"); }, 3500);
 }
 </script>
 </body>
