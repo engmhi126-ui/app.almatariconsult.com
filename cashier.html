@@ -597,8 +597,9 @@ function loadAll(){
 }
 
 function loadPartialVouchers(){
+  /* نجلب partial فقط ونتأكد remaining > 0 */
   sbGet("v_vouchers_full","status=eq.partial&order=created_at.desc").then(function(data){
-    partialVouchers = data||[];
+    partialVouchers = (data||[]).filter(function(v){ return parseFloat(v.remaining||0) > 0; });
     renderPartialList(partialVouchers);
   });
 }
@@ -780,18 +781,22 @@ function saveVoucher(){
     }
   }).then(function(){
     /* ── نجح الحفظ في Supabase ── */
-    lastSavedVoucher = savedRef;
+    lastSavedVoucher = savedRef || {voucher_num: "محفوظ"};
 
     /* تحديث رقم السند في المعاينة */
-    if(savedRef && savedRef.voucher_num){
-      document.getElementById("vp-num").textContent = savedRef.voucher_num;
+    var vNum = savedRef && savedRef.voucher_num ? savedRef.voucher_num : "";
+    if(vNum) document.getElementById("vp-num").textContent = vNum;
+
+    /* تحويل الزر لطباعة — يعمل حتى لو savedRef كان null */
+    var actionBtn = document.getElementById("main-action-btn");
+    if(actionBtn){
+      actionBtn.innerHTML = "🖨 طباعة السند";
+      actionBtn.className = "btn btn-print btn-full";
+      actionBtn.dataset.mode = "print";
+      actionBtn.disabled = false;
     }
 
-    /* تحويل الزر لطباعة + إخفاء المسودة */
-    var actionBtn = document.getElementById("main-action-btn");
-    actionBtn.innerHTML = "🖨 طباعة السند";
-    actionBtn.className = "btn btn-print btn-full";
-    actionBtn.dataset.mode = "print";
+    /* إخفاء المسودة */
     var stamp = document.getElementById("draft-stamp");
     if(stamp) stamp.style.display = "none";
 
@@ -888,8 +893,10 @@ function searchPartial(){
 
 function renderPartialList(list){
   var el = document.getElementById("partial-list");
-  if(!list||!list.length){
-    el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">💳</div><div class=\"empty-title\">لا توجد سندات بمتبقٍ</div><div class=\"empty-sub\">جميع السندات مسوّاة</div></div>";
+  /* فلترة: عرض فقط السندات التي لا تزال بمتبقٍ > 0 */
+  list = (list||[]).filter(function(v){ return parseFloat(v.remaining||0) > 0; });
+  if(!list.length){
+    el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">✅</div><div class=\"empty-title\">لا توجد دفعات متبقية</div><div class=\"empty-sub\">جميع السندات مسوّاة بالكامل</div></div>";
     return;
   }
   el.innerHTML = list.map(function(v){
