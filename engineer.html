@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>بوابة الفريق — المطري كونسلت</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="بوابة الفريق">
+<meta name="theme-color" content="#0f2d52">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0ede6;
+  --card: #ffffff;
+  --border: #ddd8ce;
+  --border2: #c8c2b6;
+  --text: #18181a;
+  --t2: #58575a;
+  --t3: #a09fa2;
+  --blue: #1a4880;
+  --blue-d: #0f2d52;
+  --blue-l: #e6eef8;
+  --green: #1a5c35;
+  --green-l: #e6f4ec;
+  --amber: #7a4e00;
+  --amber-l: #fef3dc;
+  --red: #7a1f1f;
+  --red-l: #faeaea;
+  --font: "IBM Plex Sans Arabic", sans-serif;
+  --mono: "JetBrains Mono", monospace;
+  --r: 12px;
+  --r2: 16px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07), 0 6px 16px rgba(0,0,0,.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── LOGIN ── */
+.login-bg {
+  background: var(--blue-d);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.login-bg::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+  top: -80px; left: -80px;
+}
+.login-bg::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.03);
+  bottom: -40px; right: -40px;
+}
+.login-logo {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,.12);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.login-logo svg { width: 28px; height: 28px; fill: white; }
+.login-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.login-sub { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 36px; }
+.login-card {
+  background: #fff;
+  border-radius: var(--r2);
+  padding: 24px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.login-card-title { font-size: 15px; font-weight: 600; margin-bottom: 18px; color: var(--text); }
+.fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.fl { font-size: 11px; font-weight: 600; color: var(--t2); }
+.fi {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
+  direction: rtl;
+  transition: border-color .15s;
+  background: #fff;
+  width: 100%;
+}
+.fi:focus { outline: none; border-color: var(--blue); background: var(--blue-l); }
+.fs {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  direction: rtl;
+  background: #fff;
+  width: 100%;
+  color: var(--text);
+}
+.fs:focus { outline: none; border-color: var(--blue); }
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background .15s;
+}
+.login-btn:hover { background: var(--blue-d); }
+.login-err {
+  background: var(--red-l);
+  border: 1px solid rgba(122,31,31,.2);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 10px;
+  display: none;
+}
+.login-err.show { display: block; }
+
+/* ── APP HEADER ── */
+.app-header {
+  background: var(--blue-d);
+  padding: 0 16px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.ah-eng { display: flex; align-items: center; gap: 10px; }
+.ah-av {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.ah-name { font-size: 13px; font-weight: 600; color: #fff; }
+.ah-role { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 1px; }
+.ah-right { display: flex; gap: 8px; }
+.ah-btn {
+  padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255,255,255,.7);
+  font-size: 11px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all .15s;
+}
+.ah-btn:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+.ah-btn.active-tab { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.3); }
+
+/* ── TABS ── */
+.tabs-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  position: sticky;
+  top: 54px;
+  z-index: 40;
+}
+.tab {
+  flex: 1;
+  padding: 11px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all .15s;
+}
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-n {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--border);
+  color: var(--t2);
+}
+.tab.active .tab-n { background: var(--blue-l); color: var(--blue); }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 14px; animation: fadeIn .2s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ── FILE CARD ── */
+.fc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.fc-top {
+  padding: 14px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.fc-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.badge-field { background: var(--amber-l); color: var(--amber); }
+.badge-office { background: var(--blue-l); color: var(--blue); }
+.fc-client { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.fc-service { font-size: 11px; color: var(--t3); margin-top: 2px; }
+.fc-loc { font-size: 11px; color: var(--t2); margin-top: 5px; }
+.fc-ref { font-size: 10px; font-family: var(--mono); color: var(--t3); margin-top: 3px; }
+
+/* ── PAY STATUS ── */
+.fc-pay {
+  padding: 11px 16px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pay-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pay-full { background: var(--green-l); color: var(--green); }
+.pay-partial { background: var(--amber-l); color: var(--amber); }
+.pay-icon { font-size: 18px; }
+.pay-amount {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--mono);
+  display: block;
+  margin-top: 3px;
+}
+.pay-sub { font-size: 10px; font-weight: 400; opacity: .75; }
+
+/* ── NOTICE ── */
+.fc-notice {
+  margin: 0 16px 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.n-ok { background: var(--green-l); color: var(--green); border: 1px solid rgba(26,92,53,.15); }
+.n-warn { background: var(--amber-l); color: var(--amber); border: 1px solid rgba(122,78,0,.15); }
+.n-info { background: var(--blue-l); color: var(--blue); border: 1px solid rgba(26,72,128,.15); }
+
+/* ── ACTIONS ── */
+.fc-actions {
+  padding: 11px 16px;
+  display: flex;
+  gap: 8px;
+}
+.abtn {
+  flex: 1;
+  padding: 11px 10px;
+  border-radius: 9px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  transition: all .15s;
+  line-height: 1.3;
+}
+.abtn:active { transform: scale(.98); }
+.abtn-deliver { background: var(--green); color: #fff; }
+.abtn-deliver:active { background: #144d2b; }
+.abtn-voucher { background: var(--blue); color: #fff; }
+.abtn-voucher:active { background: var(--blue-d); }
+.abtn-contact { background: var(--blue-l); color: var(--blue); border: 1px solid rgba(26,72,128,.2); }
+.abtn-disabled { background: var(--border); color: var(--t3); cursor: not-allowed; opacity: .6; }
+
+/* ── HISTORY ── */
+.fc-hist {
+  padding: 10px 16px;
+  background: #faf9f7;
+  border-top: 1px solid var(--border);
+}
+.hist-lbl { font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 7px; font-weight: 600; }
+.hist-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--t2); margin-bottom: 5px; }
+.hdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.htime { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-right: auto; }
+
+/* ── DONE STAMP ── */
+.fc-done {
+  padding: 9px 16px;
+  background: var(--green-l);
+  border-top: 1px solid rgba(26,92,53,.15);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ── CUSTODY VIEW ── */
+.custody-total {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 20px;
+  margin-bottom: 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.ct-lbl { font-size: 10px; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 8px; }
+.ct-val { font-size: 36px; font-weight: 700; font-family: var(--mono); color: var(--amber); }
+.ct-sub { font-size: 11px; color: var(--t3); margin-top: 6px; }
+.ct-zero { color: var(--green); }
+.custody-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 13px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.cr-id { font-family: var(--mono); font-size: 11px; color: var(--blue); font-weight: 600; }
+.cr-client { font-size: 12px; font-weight: 600; }
+.cr-date { font-size: 10px; color: var(--t3); margin-top: 2px; }
+.cr-amt { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--amber); }
+.cr-status { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.cs-eng { background: var(--amber-l); color: var(--amber); }
+.cs-done { background: var(--green-l); color: var(--green); }
+
+/* ── BOTTOM SHEET ── */
+.sheet-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+}
+.sheet-bg.open { display: flex; }
+.sheet {
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.sheet-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sheet-title { font-size: 15px; font-weight: 600; }
+.sheet-close {
+  font-size: 22px; color: var(--t3);
+  background: none; border: none;
+  cursor: pointer; line-height: 1; padding: 0 4px;
+}
+.sheet-body { padding: 18px 20px; }
+
+/* ── VOUCHER FORM ── */
+.v-client-info {
+  background: var(--blue-l);
+  border-radius: 10px;
+  padding: 13px 14px;
+  margin-bottom: 16px;
+}
+.vci-name { font-size: 14px; font-weight: 600; color: var(--blue); }
+.vci-ref { font-size: 11px; color: rgba(26,72,128,.6); margin-top: 2px; }
+.remaining-box {
+  background: var(--amber-l);
+  border-radius: 8px;
+  padding: 10px 13px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rb-lbl { font-size: 10px; color: var(--amber); font-weight: 600; }
+.rb-val { font-size: 22px; font-weight: 700; font-family: var(--mono); color: var(--amber); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.chip.on { border-color: var(--blue); background: var(--blue-l); color: var(--blue); font-weight: 600; }
+.words-box {
+  background: var(--amber-l);
+  border: 1px solid rgba(122,78,0,.2);
+  border-radius: 8px;
+  padding: 10px 13px;
+  font-size: 12px;
+  color: var(--amber);
+  min-height: 36px;
+  margin-bottom: 13px;
+}
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.submit-btn:active { background: #144d2b; }
+
+/* ── CONTACT SHEET ── */
+.contact-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 10px;
+}
+.contact-opt:active { background: var(--blue-l); border-color: var(--blue); }
+.co-icon {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.co-title { font-size: 13px; font-weight: 600; }
+.co-sub { font-size: 11px; color: var(--t3); margin-top: 2px; }
+
+/* ── DELIVER MODAL ── */
+.modal-wrap {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+}
+.modal-wrap.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  width: 100%;
+  padding: 28px 20px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+.modal-emoji { font-size: 44px; text-align: center; margin-bottom: 12px; }
+.modal-title { font-size: 16px; font-weight: 600; text-align: center; margin-bottom: 6px; }
+.modal-body-text { font-size: 12px; color: var(--t2); text-align: center; margin-bottom: 22px; line-height: 1.7; }
+.modal-btns { display: flex; gap: 10px; }
+.mbtn { flex: 1; padding: 13px; border-radius: 10px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.mbtn-cancel { background: var(--bg); color: var(--t2); }
+.mbtn-ok { background: var(--green); color: #fff; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: #fff;
+  padding: 11px 22px;
+  border-radius: 30px;
+  font-size: 13px;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; }
+
+/* ── EMPTY ── */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+}
+.empty-icon { font-size: 40px; margin-bottom: 10px; }
+.empty-title { font-size: 14px; font-weight: 600; color: var(--t2); }
+.empty-sub { font-size: 11px; color: var(--t3); margin-top: 5px; line-height: 1.6; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div class="screen active" id="screen-login">
+  <div class="login-bg">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    </div>
+    <div class="login-title">المطري كونسلت</div>
+    <div class="login-sub">المستشار مؤتمن · بوابة الفريق</div>
+
+    <div class="login-card">
+      <div class="login-card-title">تسجيل الدخول</div>
+      <div class="fg">
+        <label class="fl">اسم العضو</label>
+        <select class="fs" id="login-name">
+          <option value="">اختر اسمك...</option>
+          <option value="mhd">م. محمد حمد</option>
+          <option value="mkh">م. محمد خالد</option>
+          <option value="ism">م. إسماعيل</option>
+          <option value="abr">م. عبد الرحمن خان</option>
+          <option value="say">الرسام صايم</option>
+          <option value="slh">م. صلاح بدر التمام</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">كلمة المرور</label>
+        <input class="fi" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="login-btn" onclick="doLogin()">دخول</button>
+      <div class="login-err" id="login-err">كلمة المرور غير صحيحة</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ APP SCREEN ════ -->
+<div class="screen" id="screen-app">
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="ah-eng">
+      <div class="ah-av" id="app-av">—</div>
+      <div>
+        <div class="ah-name" id="app-name">—</div>
+        <div class="ah-role" id="app-role">—</div>
+      </div>
+    </div>
+    <div class="ah-right">
+      <button class="ah-btn" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <div class="tab active" onclick="switchTab('files', this)">
+      ملفاتي <span class="tab-n" id="cnt-files">0</span>
+    </div>
+    <div class="tab" onclick="switchTab('done', this)">
+      مكتملة <span class="tab-n" id="cnt-done">0</span>
+    </div>
+    <div class="tab" onclick="switchTab('custody', this)">
+      عهدتي <span class="tab-n" id="cnt-custody">0</span>
+    </div>
+  </div>
+
+  <!-- View: Active Files -->
+  <div class="view active" id="view-files">
+    <div id="files-list"></div>
+  </div>
+
+  <!-- View: Done -->
+  <div class="view" id="view-done">
+    <div id="done-list"></div>
+  </div>
+
+  <!-- View: Custody -->
+  <div class="view" id="view-custody">
+    <div class="custody-total">
+      <div class="ct-lbl">إجمالي عهدتي الحالية</div>
+      <div class="ct-val" id="custody-total-val">0</div>
+      <div class="ct-sub" id="custody-total-sub">ريال سعودي</div>
+    </div>
+    <div id="custody-list"></div>
+  </div>
+
+</div>
+
+<!-- ════ VOUCHER SHEET ════ -->
+<div class="sheet-bg" id="voucher-sheet" onclick="closeSheet('voucher-sheet')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span class="sheet-title">تحرير سند المتبقي</span>
+      <button class="sheet-close" onclick="closeSheet('voucher-sheet')">×</button>
+    </div>
+    <div class="sheet-body">
+      <div class="v-client-info">
+        <div class="vci-name" id="vs-client">—</div>
+        <div class="vci-ref" id="vs-ref">—</div>
+        <div class="remaining-box">
+          <div>
+            <div class="rb-lbl">المبلغ المتبقي على العميل</div>
+            <div class="rb-val" id="vs-remaining">0</div>
+          </div>
+          <span style="font-size:13px;color:#7a4e00;">ريال</span>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">المبلغ المستلَم من العميل (ريال)</label>
+        <input class="fi" type="number" id="vs-amount" placeholder="0" oninput="vsUpdateWords()">
+        <div style="font-size:10px;color:#a09fa2;margin-top:3px;">يُسجَّل في عهدتك بعد الحفظ</div>
+      </div>
+
+      <div class="words-box" id="vs-words">أدخل المبلغ لتظهر الكتابة تلقائياً</div>
+
+      <div class="fg">
+        <label class="fl">طريقة الدفع</label>
+        <div class="chips" id="vs-chips">
+          <div class="chip" onclick="selChip(this, 'vs-chips')">نقداً</div>
+          <div class="chip" onclick="selChip(this, 'vs-chips')">شبكة</div>
+          <div class="chip" onclick="selChip(this, 'vs-chips')">تحويل</div>
+        </div>
+      </div>
+
+      <div style="background:#e6f4ec;border:1px solid rgba(26,92,53,.15);border-radius:9px;padding:12px 14px;font-size:11px;color:#1a5c35;margin-bottom:14px;line-height:1.7;">
+        ✓ بعد الحفظ: يُسجَّل المبلغ في عهدتك ويظهر زر تسليم الملف للعميل
+      </div>
+
+      <button class="submit-btn" onclick="saveVoucher()">
+        استلمت المبلغ — حفظ السند وتفعيل التسليم
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CONTACT SHEET ════ -->
+<div class="sheet-bg" id="contact-sheet" onclick="closeSheet('contact-sheet')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <span class="sheet-title">التواصل</span>
+      <button class="sheet-close" onclick="closeSheet('contact-sheet')">×</button>
+    </div>
+    <div class="sheet-body">
+      <div class="contact-opt" onclick="callAdmin()">
+        <div class="co-icon" style="background:#e6eef8;">📞</div>
+        <div>
+          <div class="co-title">اتصال بالإدارة</div>
+          <div class="co-sub">م. محمد حمد · +966538986031</div>
+        </div>
+      </div>
+      <div class="contact-opt" onclick="whatsappAdmin()">
+        <div class="co-icon" style="background:#e6f4ec;">💬</div>
+        <div>
+          <div class="co-title">واتساب الإدارة</div>
+          <div class="co-sub">إرسال تفاصيل الملف وطلب المتابعة</div>
+        </div>
+      </div>
+      <div style="background:#e6eef8;border-radius:10px;padding:12px 14px;font-size:11px;color:#1a4880;line-height:1.7;margin-top:6px;">
+        <strong>تذكير:</strong> عند تسديد العميل — افتح صفحة ملفاتك وحرّر سند المتبقي مباشرة
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DELIVER MODAL ════ -->
+<div class="modal-wrap" id="deliver-modal">
+  <div class="modal-box">
+    <div class="modal-emoji">📂</div>
+    <div class="modal-title">تأكيد تسليم الملف</div>
+    <div class="modal-body-text">
+      هل تؤكد تسليم ملف <strong id="deliver-client-name">—</strong> للعميل؟<br>
+      بعد التأكيد تُغلق المهمة نهائياً
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="mbtn mbtn-ok" onclick="confirmDeliver()">✓ نعم، سلّمت الملف</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA — بيانات الفريق وكلمات المرور
+   للربط مع Supabase: استبدل passwords
+   بـ hash وتحقق من السيرفر
+   ═══════════════════════════════════════ */
+/* ══ Supabase Config ══ */
+const SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
+
+async function sbGet(table, params="") {
+  const r = await fetch(SB_URL+"/rest/v1/"+table+"?"+params, {
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbPost(table, body) {
+  const r = await fetch(SB_URL+"/rest/v1/"+table, {
+    method:"POST",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
+      "Content-Type":"application/json","Prefer":"return=representation"},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbPatch(table, filter, body) {
+  const r = await fetch(SB_URL+"/rest/v1/"+table+"?"+filter, {
+    method:"PATCH",
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,
+      "Content-Type":"application/json","Prefer":"return=representation"},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+/* ══ بيانات الفريق — تُحمَّل من Supabase ══ */
+const TEAM = {
+  mhd: { name: "م. محمد حمد",        initials: "مح", role: "مهندس مدني — إدارة", pass: "Matari@2026", phone:"0538986031" },
+  mkh: { name: "م. محمد خالد",       initials: "مخ", role: "مهندس معماري",        pass: "Matari@2026", phone:"0570889155" },
+  ism: { name: "م. إسماعيل",         initials: "إس", role: "مهندس مساحة",         pass: "Matari@2026", phone:"0500000003" },
+  abr: { name: "م. عبد الرحمن خان",  initials: "عخ", role: "مهندس مساحة",         pass: "Matari@2026", phone:"0500000004" },
+  say: { name: "الرسام صايم",        initials: "صا", role: "رسام هندسي",           pass: "Matari@2026", phone:"0500000005" },
+  slh: { name: "م. صلاح بدر التمام", initials: "صب", role: "مهندس إنشائي",         pass: "Matari@2026", phone:"0500000006" },
+};
+
+/* ═══ FILES DATA
+  في النظام الحقيقي: اجلب من Supabase
+  بناءً على engineer_id بعد تسجيل الدخول
+  ═══════════════════════════════════════ */
+const ALL_FILES = [
+  {
+    id: "F001", voucher: "#2026-003", eng: "ism",
+    client: "عبدالله محمد الغامدي", service: "إشراف هندسي", loc: "حي النزهة · جازان",
+    type: "field", received: "اليوم 08:00",
+    paid: 8500, total: 12000, remaining: 3500,
+    status: "active",
+    history: [
+      { text: "استلمت الملف", time: "اليوم 08:00", color: "#a09fa2" },
+      { text: "بدأت الإشراف الميداني", time: "اليوم 08:19", color: "#1a4880" },
+      { text: "في انتظار استكمال السداد", time: "اليوم", color: "#7a4e00" },
+    ]
+  },
+  {
+    id: "F002", voucher: "#2026-001", eng: "slh",
+    client: "فهد إبراهيم العنزي", service: "تصميم معماري", loc: "حي العزيزية · جازان",
+    type: "office", received: "19 أبريل",
+    paid: 12000, total: 18000, remaining: 6000,
+    status: "active",
+    history: [
+      { text: "استلمت الملف", time: "19 أبريل", color: "#a09fa2" },
+      { text: "جارٍ التصميم", time: "اليوم", color: "#1a4880" },
+    ]
+  },
+  {
+    id: "F003", voucher: "#2026-002", eng: "abr",
+    client: "سالم عبدالله القحطاني", service: "رفع مساحي", loc: "حي الروضة · جازان",
+    type: "field", received: "أمس",
+    paid: 4000, total: 4000, remaining: 0,
+    status: "active",
+    history: [
+      { text: "استلمت الملف", time: "أمس 14:20", color: "#a09fa2" },
+      { text: "اكتمل الرفع المساحي", time: "أمس 16:00", color: "#1a5c35" },
+      { text: "مسدد بالكامل", time: "أمس", color: "#1a5c35" },
+    ]
+  },
+  {
+    id: "F004", voucher: "#2026-004", eng: "mkh",
+    client: "محمد سالم العنزي", service: "تصميم واجهة تجارية", loc: "حي المروج · جازان",
+    type: "office", received: "اليوم",
+    paid: 5000, total: 5000, remaining: 0,
+    status: "active",
+    history: [
+      { text: "استلمت الملف", time: "اليوم 09:00", color: "#a09fa2" },
+      { text: "مسدد بالكامل", time: "اليوم", color: "#1a5c35" },
+    ]
+  },
+  {
+    id: "F005", voucher: "#2026-000", eng: "mhd",
+    client: "أحمد سعد الزهراني", service: "إشراف هندسي", loc: "حي العزيزية · جازان",
+    type: "field", received: "18 أبريل",
+    paid: 8000, total: 8000, remaining: 0,
+    status: "done", deliveredAt: "18 أبريل الساعة 10:30",
+    history: []
+  },
+  {
+    id: "F006", voucher: "#2025-099", eng: "ism",
+    client: "ناصر محمد الحربي", service: "رفع مساحي", loc: "وادي جازان",
+    type: "field", received: "15 أبريل",
+    paid: 6000, total: 6000, remaining: 0,
+    status: "done", deliveredAt: "15 أبريل الساعة 14:00",
+    history: []
+  },
+];
+
+
+/* ══ WHATSAPP NOTIFICATION ══ */
+const WA_INSTANCE_E = "165504";
+const WA_TOKEN_E    = "oghzjhf82g3ghqkq";
+const WA_ADMIN_E    = "966538986031";
+
+async function notifyAdmin(message) {
+  try {
+    await fetch("https://api.ultramsg.com/instance" + WA_INSTANCE_E + "/messages/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        token: WA_TOKEN_E,
+        to: WA_ADMIN_E,
+        body: message,
+        priority: "1"
+      })
+    });
+  } catch(e) {
+    console.warn("Notify failed:", e);
+  }
+}
+
+/* ═══ STATE ═══ */
+let currentEng = null;
+let currentEngUserId = null;
+let pendingDeliverId = null;
+let pendingVoucherId = null;
+
+/* ══ تحميل الملفات من Supabase ══ */
+async function loadFilesFromDB() {
+  if (!currentEngUserId) { renderAll(); return; }
+  try {
+    const vouchers = await sbGet("v_vouchers_full",
+      "eng_user_id=eq."+currentEngUserId+"&order=created_at.desc");
+
+    // تحويل السندات إلى تنسيق ALL_FILES
+    ALL_FILES.length = 0;
+    vouchers.forEach((v,i) => {
+      ALL_FILES.push({
+        id:        v.id,
+        voucher:   v.voucher_num || ("V-"+i),
+        eng:       currentEng,
+        client:    v.client_name,
+        service:   v.service_type || "خدمة هندسية",
+        loc:       (v.client_district || "—") + " · جازان",
+        type:      "field",
+        received:  new Date(v.created_at).toLocaleDateString("ar-SA"),
+        paid:      parseFloat(v.paid_amount)||0,
+        total:     parseFloat(v.total_amount)||0,
+        remaining: parseFloat(v.remaining)||0,
+        status:    v.status === "settled" ? "done" : "active",
+        deliveredAt: v.settled_at ? new Date(v.settled_at).toLocaleDateString("ar-SA") : null,
+        history:   []
+      });
+    });
+    renderAll();
+  } catch(e) {
+    console.error("loadFilesFromDB error:", e);
+    renderAll(); // fallback للبيانات المحلية
+  }
+}
+
+/* ═══ ARABIC NUMBERS ═══ */
+const _o = ["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
+const _t = ["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
+const _h = ["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+function n2ar(n) {
+  n = parseInt(n) || 0;
+  if (!n) return "صفر";
+  if (n < 20) return _o[n];
+  if (n < 100) { const t = Math.floor(n/10), o = n%10; return o ? _o[o] + " و" + _t[t] : _t[t]; }
+  if (n < 1000) { const h = Math.floor(n/100), r = n%100; return r ? _h[h] + " و" + n2ar(r) : _h[h]; }
+  if (n < 1000000) {
+    const th = Math.floor(n/1000), r = n%1000;
+    let tp = th===1 ? "ألف" : th===2 ? "ألفان" : th<=10 ? n2ar(th)+" آلاف" : n2ar(th)+" ألف";
+    return r ? tp + " و" + n2ar(r) : tp;
+  }
+  return n.toLocaleString("ar-SA");
+}
+function fmt(n) { return parseInt(n||0).toLocaleString("ar-SA"); }
+
+/* ═══ LOGIN ═══ */
+async function doLogin() {
+  const id   = document.getElementById("login-name").value;
+  const pass = document.getElementById("login-pass").value;
+  const err  = document.getElementById("login-err");
+  const btn  = document.querySelector(".login-btn");
+  if (!id) { err.textContent = "يرجى اختيار اسمك"; err.classList.add("show"); return; }
+
+  const member = TEAM[id];
+  if (!member) { err.textContent = "خطأ في البيانات"; err.classList.add("show"); return; }
+
+  // تحقق محلي مؤقت ← استبدله لاحقاً بـ RPC engineer_login
+  if (pass !== member.pass) {
+    err.textContent = "كلمة المرور غير صحيحة";
+    err.classList.add("show");
+    document.getElementById("login-pass").value = "";
+    return;
+  }
+
+  btn.textContent = "جارٍ الدخول...";
+  btn.disabled = true;
+
+  try {
+    // جلب ملفات المهندس من Supabase
+    const users = await sbGet("users", "phone=eq."+member.phone+"&select=id,full_name,role");
+    if (users.length > 0) {
+      currentEngUserId = users[0].id;
+    }
+    err.classList.remove("show");
+    currentEng = id;
+    document.getElementById("app-av").textContent = member.initials;
+    document.getElementById("app-name").textContent = member.name;
+    document.getElementById("app-role").textContent = member.role;
+    document.getElementById("screen-login").classList.remove("active");
+    document.getElementById("screen-app").classList.add("active");
+    await loadFilesFromDB();
+  } catch(e) {
+    // fallback للبيانات المحلية إذا فشل الاتصال
+    currentEng = id;
+    document.getElementById("app-av").textContent = member.initials;
+    document.getElementById("app-name").textContent = member.name;
+    document.getElementById("app-role").textContent = member.role;
+    document.getElementById("screen-login").classList.remove("active");
+    document.getElementById("screen-app").classList.add("active");
+    renderAll();
+  } finally {
+    btn.textContent = "دخول";
+    btn.disabled = false;
+  }
+}
+
+function doLogout() {
+  currentEng = null;
+  document.getElementById("screen-app").classList.remove("active");
+  document.getElementById("screen-login").classList.add("active");
+  document.getElementById("login-pass").value = "";
+  document.getElementById("login-name").value = "";
+  switchTab("files", document.querySelector(".tab"));
+}
+
+/* ═══ RENDER ═══ */
+function myFiles() { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "active"); }
+function myDone()  { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "done"); }
+function myCustody() { return ALL_FILES.filter(f => f.eng === currentEng && f.status === "active" && f.remaining > 0); }
+
+function renderAll() {
+  renderFiles();
+  renderDone();
+  renderCustody();
+  updateCounts();
+}
+
+function updateCounts() {
+  document.getElementById("cnt-files").textContent = myFiles().length;
+  document.getElementById("cnt-done").textContent = myDone().length;
+  const custodyFiles = myCustody();
+  document.getElementById("cnt-custody").textContent = custodyFiles.length;
+  const total = custodyFiles.reduce((s, f) => s + f.remaining, 0);
+  const totalEl = document.getElementById("custody-total-val");
+  totalEl.textContent = fmt(total);
+  totalEl.className = "ct-val " + (total > 0 ? "" : "ct-zero");
+  document.getElementById("custody-total-sub").textContent = total > 0 ? "ريال سعودي — في عهدتك" : "ريال — ذمتك نظيفة ✓";
+}
+
+function renderFiles() {
+  const list = document.getElementById("files-list");
+  const files = myFiles();
+  if (files.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">لا توجد ملفات نشطة</div><div class="empty-sub">سيظهر هنا كل ملف يُسند إليك</div></div>';
+    return;
+  }
+  list.innerHTML = files.map(f => {
+    const fullPay = f.remaining === 0;
+    const typeLabel = f.type === "field" ? "ميداني" : "مكتبي";
+    const typeBadge = f.type === "field" ? "badge-field" : "badge-office";
+
+    const paySection = fullPay
+      ? '<div class="pay-badge pay-full"><span class="pay-icon">✅</span><div><span>مسدد بالكامل</span><div class="pay-sub">بإمكانك تسليم الملف للعميل</div></div></div>'
+      : '<div class="pay-badge pay-partial"><span class="pay-icon">⏳</span><div><span>متبقي على العميل</span><span class="pay-amount">' + fmt(f.remaining) + ' <span style="font-size:13px;font-weight:400">ريال</span></span><div class="pay-sub">لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>';
+
+    const notice = fullPay
+      ? '<div class="fc-notice n-ok"><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>'
+      : '<div class="fc-notice n-warn"><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط "استلام وسند" لتسجيله في عهدتك</span></div>';
+
+    const actionRow1 = fullPay
+      ? '<button class="abtn abtn-deliver" onclick="openDeliver(\'' + f.id + '\',\'' + f.client + '\')">📂 تسليم الملف للعميل</button><button class="abtn abtn-contact" onclick="openContact(\'' + f.client + '\')">تواصل</button>'
+      : '<button class="abtn abtn-disabled" disabled>🔒 تسليم الملف</button><button class="abtn abtn-contact" onclick="openContact(\'' + f.client + '\')">تواصل</button>';
+
+    const actionRow2 = !fullPay
+      ? '<div class="fc-actions" style="padding-top:0;"><button class="abtn abtn-voucher" onclick="openVoucher(\'' + f.id + '\')">📄 استلام ' + fmt(f.remaining) + ' ريال وتحرير سند</button></div>'
+      : '';
+
+    const hist = f.history.map(h =>
+      '<div class="hist-item"><div class="hdot" style="background:' + h.color + '"></div>' + h.text + '<span class="htime">' + h.time + '</span></div>'
+    ).join("");
+
+    return '<div class="fc" id="fc-' + f.id + '">' +
+      '<div class="fc-top"><span class="fc-badge ' + typeBadge + '">' + typeLabel + '</span>' +
+      '<div><div class="fc-client">' + f.client + '</div>' +
+      '<div class="fc-service">' + f.service + '</div>' +
+      '<div class="fc-loc">📍 ' + f.loc + '</div>' +
+      '<div class="fc-ref">' + f.voucher + ' · استُلم: ' + f.received + '</div></div></div>' +
+      '<div class="fc-pay">' + paySection + '</div>' +
+      notice +
+      '<div class="fc-actions">' + actionRow1 + '</div>' +
+      actionRow2 +
+      (hist ? '<div class="fc-hist"><div class="hist-lbl">سجل الملف</div>' + hist + '</div>' : '') +
+      '</div>';
+  }).join("");
+}
+
+function renderDone() {
+  const list = document.getElementById("done-list");
+  const files = myDone();
+  if (files.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">لا توجد ملفات مكتملة بعد</div><div class="empty-sub">ستظهر هنا الملفات التي سلّمتها للعملاء</div></div>';
+    return;
+  }
+  list.innerHTML = files.map(f =>
+    '<div class="fc">' +
+    '<div class="fc-top"><span class="fc-badge ' + (f.type==="field"?"badge-field":"badge-office") + '">' + (f.type==="field"?"ميداني":"مكتبي") + '</span>' +
+    '<div><div class="fc-client">' + f.client + '</div>' +
+    '<div class="fc-service">' + f.service + '</div>' +
+    '<div class="fc-loc">📍 ' + f.loc + '</div>' +
+    '<div class="fc-ref">' + f.voucher + ' · استُلم: ' + f.received + '</div></div></div>' +
+    '<div class="fc-done">✓ تم تسليم الملف للعميل — ' + f.deliveredAt + '</div>' +
+    '</div>'
+  ).join("");
+}
+
+function renderCustody() {
+  const list = document.getElementById("custody-list");
+  const files = myCustody();
+  if (files.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">💰</div><div class="empty-title">لا توجد مبالغ في عهدتك</div><div class="empty-sub">ذمتك نظيفة</div></div>';
+    return;
+  }
+  list.innerHTML = files.map(f =>
+    '<div class="custody-row">' +
+    '<div style="flex:1;">' +
+    '<div class="cr-id">' + f.voucher + '</div>' +
+    '<div class="cr-client">' + f.client + '</div>' +
+    '<div class="cr-date">' + f.received + '</div>' +
+    '</div>' +
+    '<div style="text-align:left;">' +
+    '<div class="cr-amt">' + fmt(f.remaining) + '</div>' +
+    '<div style="font-size:9px;color:#a09fa2;margin-top:1px;">ريال</div>' +
+    '</div>' +
+    '<span class="cr-status cs-eng">في عهدتك</span>' +
+    '</div>'
+  ).join("");
+}
+
+/* ═══ TABS ═══ */
+function switchTab(name, el) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("view-" + name).classList.add("active");
+  if (el) el.classList.add("active");
+}
+
+/* ═══ VOUCHER SHEET ═══ */
+function openVoucher(fileId) {
+  const f = ALL_FILES.find(x => x.id === fileId);
+  if (!f) return;
+  pendingVoucherId = fileId;
+  document.getElementById("vs-client").textContent = f.client;
+  document.getElementById("vs-ref").textContent = f.voucher + " · " + f.service;
+  document.getElementById("vs-remaining").textContent = fmt(f.remaining);
+  document.getElementById("vs-amount").value = f.remaining;
+  vsUpdateWords();
+  document.querySelectorAll("#vs-chips .chip").forEach(c => c.classList.remove("on"));
+  openSheet("voucher-sheet");
+}
+
+function vsUpdateWords() {
+  const v = parseInt(document.getElementById("vs-amount").value) || 0;
+  document.getElementById("vs-words").textContent = v
+    ? "فقط " + n2ar(v) + " ريال سعودي لا غير"
+    : "أدخل المبلغ لتظهر الكتابة تلقائياً";
+}
+
+function saveVoucher() {
+  const amt = parseInt(document.getElementById("vs-amount").value) || 0;
+  if (!amt) { showToast("يرجى إدخال المبلغ المستلَم"); return; }
+  const chip = document.querySelector("#vs-chips .chip.on");
+  if (!chip) { showToast("يرجى اختيار طريقة الدفع"); return; }
+  const f = ALL_FILES.find(x => x.id === pendingVoucherId);
+  if (f) {
+    f.remaining = Math.max(0, f.remaining - amt);
+  }
+  closeSheet("voucher-sheet");
+  showToast("✓ استُلم " + fmt(amt) + " ريال — سُجِّل في عهدتك");
+  setTimeout(() => { renderAll(); }, 400);
+  // إشعار الإدارة
+  const engMember = TEAM[currentEng];
+  const vFile = ALL_FILES.find(x => x.id === pendingVoucherId);
+  notifyAdmin(
+    "💰 *استلام دفعة متبقية*\n" +
+    "━━━━━━━━━━━━━━━━━━━━\n" +
+    "👤 *العميل:* " + (vFile ? vFile.client : "—") + "\n" +
+    "💵 *المبلغ المستلَم:* " + fmt(amt) + " ريال\n" +
+    "👷 *استلمه:* " + (engMember ? engMember.name : "—") + "\n" +
+    "📋 *السند:* " + (vFile ? vFile.voucher : "—") + "\n" +
+    "🕐 " + new Date().toLocaleString("ar-SA")
+  );
+  // حفظ في Supabase
+  if (currentEngUserId) {
+    try {
+      const f = ALL_FILES.find(x => x.id === pendingVoucherId);
+      if (f) {
+        await sbPatch("vouchers", "id=eq."+f.id, {
+          paid_amount: f.paid,
+          status: f.remaining <= 0 ? "settled" : "partial"
+        });
+      }
+    } catch(e) { console.warn("Save voucher to DB failed:", e); }
+  }
+}
+
+/* ═══ CONTACT ═══ */
+function openContact(client) {
+  openSheet("contact-sheet");
+}
+function callAdmin() {
+  closeSheet("contact-sheet");
+  showToast("جارٍ الاتصال بالإدارة...");
+}
+function whatsappAdmin() {
+  closeSheet("contact-sheet");
+  showToast("جارٍ فتح واتساب...");
+}
+
+/* ═══ DELIVER ═══ */
+function openDeliver(fileId, clientName) {
+  pendingDeliverId = fileId;
+  document.getElementById("deliver-client-name").textContent = clientName;
+  document.getElementById("deliver-modal").classList.add("open");
+}
+function confirmDeliver() {
+  const f = ALL_FILES.find(x => x.id === pendingDeliverId);
+  if (f) {
+    f.status = "done";
+    f.deliveredAt = new Date().toLocaleDateString("ar-SA") + " الساعة " + new Date().toLocaleTimeString("ar-SA", {hour:"2-digit",minute:"2-digit"});
+  }
+  closeModal();
+  showToast("✓ تم تسليم الملف — أُغلقت المهمة نهائياً");
+  setTimeout(() => { renderAll(); }, 400);
+  // إشعار الإدارة
+  const eng = TEAM[currentEng];
+  notifyAdmin(
+    "📂 *تم تسليم ملف للعميل*\n" +
+    "━━━━━━━━━━━━━━━━━━━━\n" +
+    "👤 *العميل:* " + document.getElementById("deliver-client-name").textContent + "\n" +
+    "👷 *المهندس:* " + (eng ? eng.name : "—") + "\n" +
+    "✅ *أُغلق الملف نهائياً*\n" +
+    "🕐 " + new Date().toLocaleString("ar-SA")
+  );
+  // تحديث في Supabase
+  if (currentEngUserId) {
+    try {
+      const f = ALL_FILES.find(x => x.id === pendingDeliverId);
+      if (f) await sbPatch("vouchers","id=eq."+f.id,{
+        status:"settled", settled_at: new Date().toISOString()
+      });
+    } catch(e) { console.warn("Deliver update failed:", e); }
+  }
+}
+function closeModal() {
+  document.getElementById("deliver-modal").classList.remove("open");
+}
+
+/* ═══ SHEETS ═══ */
+function openSheet(id) { document.getElementById(id).classList.add("open"); }
+function closeSheet(id) { document.getElementById(id).classList.remove("open"); }
+
+/* ═══ CHIPS ═══ */
+function selChip(el, groupId) {
+  document.querySelectorAll("#" + groupId + " .chip").forEach(c => c.classList.remove("on"));
+  el.classList.add("on");
+}
+
+/* ═══ TOAST ═══ */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
+</body>
+</html>
