@@ -921,34 +921,49 @@ function renderFiles() {
     var typeBadge = f.type==="field" ? "badge-field" : "badge-office";
 
     var paySection = fullPay
-      ? "<div class='pay-badge pay-full'><span class='pay-icon'>✅</span><div><span>مسدد بالكامل</span><div class='pay-sub'>بإمكانك تسليم الملف للعميل</div></div></div>"
-      : "<div class='pay-badge pay-partial'><span class='pay-icon'>⏳</span><div><span>متبقي على العميل</span><span class='pay-amount'>" + fmt(f.remaining) + " <span style='font-size:13px;font-weight:400'>ريال</span></span><div class='pay-sub'>لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>";
+      ? "<div class=\"pay-badge pay-full\"><span class=\"pay-icon\">✅</span><div><span>مسدد بالكامل</span><div class=\"pay-sub\">بإمكانك تسليم الملف للعميل</div></div></div>"
+      : "<div class=\"pay-badge pay-partial\"><span class=\"pay-icon\">⏳</span><div><span>متبقي على العميل</span><span class=\"pay-amount\">" + fmt(f.remaining) + " <span style=\"font-size:13px;font-weight:400\">ريال</span></span><div class=\"pay-sub\">لا يُسلَّم الملف قبل استلام المبلغ</div></div></div>";
 
     var notice = fullPay
-      ? "<div class='fc-notice n-ok'><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>"
-      : "<div class='fc-notice n-warn'><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط استلام وسند</span></div>";
+      ? "<div class=\"fc-notice n-ok\"><span>✓</span><span>العميل أتم السداد — يمكنك تسليم الملف عند حضوره</span></div>"
+      : "<div class=\"fc-notice n-warn\"><span>⚠</span><span>إذا أحضر العميل المبلغ — اضغط استلام وسند</span></div>";
 
-    var actions = fullPay
-      ? "<button class='abtn abtn-deliver' onclick="openDeliver('" + f.id + "','" + f.client + "')">📂 تسليم الملف للعميل</button><button class='abtn abtn-contact' onclick="openSheet('contact-sheet')">تواصل</button>"
-      : "<button class='abtn abtn-disabled' disabled>🔒 تسليم الملف</button><button class='abtn abtn-contact' onclick="openSheet('contact-sheet')">تواصل</button>";
+    // استخدام data attributes لتجنب مشكلة الـ quotes
+    var deliverBtn = fullPay
+      ? "<button class=\"abtn abtn-deliver\" data-id=\"" + f.id + "\" data-client=\"" + f.client.replace(/"/g,"") + "\" onclick=\"handleDeliver(this)\">📂 تسليم الملف للعميل</button>"
+      : "<button class=\"abtn abtn-disabled\" disabled>🔒 تسليم الملف</button>";
+
+    var contactBtn = "<button class=\"abtn abtn-contact\" onclick=\"openSheet(this.getAttribute('data-sheet'))\" data-sheet=\"contact-sheet\">تواصل</button>";
 
     var voucherBtn = !fullPay
-      ? "<div class='fc-actions' style='padding-top:0;'><button class='abtn abtn-voucher' onclick="openVoucher('" + f.id + "')">📄 استلام " + fmt(f.remaining) + " ريال وتحرير سند</button></div>"
+      ? "<div class=\"fc-actions\" style=\"padding-top:0;\"><button class=\"abtn abtn-voucher\" data-id=\"" + f.id + "\" onclick=\"handleVoucher(this)\">📄 استلام " + fmt(f.remaining) + " ريال وتحرير سند</button></div>"
       : "";
 
-    html += "<div class='fc'>" +
-      "<div class='fc-top'><span class='fc-badge " + typeBadge + "'>" + typeLabel + "</span>" +
-      "<div><div class='fc-client'>" + f.client + "</div>" +
-      "<div class='fc-service'>" + f.service + "</div>" +
-      "<div class='fc-loc'>📍 " + f.loc + "</div>" +
-      "<div class='fc-ref'>" + f.voucher + " · استُلم: " + f.received + "</div></div></div>" +
-      "<div class='fc-pay'>" + paySection + "</div>" +
+    html += "<div class=\"fc\">" +
+      "<div class=\"fc-top\"><span class=\"fc-badge " + typeBadge + "\">" + typeLabel + "</span>" +
+      "<div><div class=\"fc-client\">" + f.client + "</div>" +
+      "<div class=\"fc-service\">" + f.service + "</div>" +
+      "<div class=\"fc-loc\">📍 " + f.loc + "</div>" +
+      "<div class=\"fc-ref\">" + f.voucher + " · استُلم: " + f.received + "</div></div></div>" +
+      "<div class=\"fc-pay\">" + paySection + "</div>" +
       notice +
-      "<div class='fc-actions'>" + actions + "</div>" +
+      "<div class=\"fc-actions\">" + deliverBtn + contactBtn + "</div>" +
       voucherBtn +
       "</div>";
   });
   list.innerHTML = html;
+}
+
+/* ══ EVENT HANDLERS ══ */
+function handleDeliver(btn) {
+  var id     = btn.getAttribute("data-id");
+  var client = btn.getAttribute("data-client");
+  openDeliver(id, client);
+}
+
+function handleVoucher(btn) {
+  var id = btn.getAttribute("data-id");
+  openVoucher(id);
 }
 
 function renderDone() {
@@ -960,11 +975,11 @@ function renderDone() {
   }
   var html = "";
   files.forEach(function(f) {
-    html += "<div class='fc'>" +
-      "<div class='fc-top'><span class='fc-badge badge-field'>" + (f.type==="field"?"ميداني":"مكتبي") + "</span>" +
-      "<div><div class='fc-client'>" + f.client + "</div><div class='fc-service'>" + f.service + "</div>" +
-      "<div class='fc-loc'>📍 " + f.loc + "</div></div></div>" +
-      "<div class='fc-done'>✓ تم تسليم الملف — " + (f.deliveredAt||"—") + "</div>" +
+    html += "<div class=\"fc\">" +
+      "<div class=\"fc-top\"><span class=\"fc-badge badge-field\">" + (f.type==="field"?"ميداني":"مكتبي") + "</span>" +
+      "<div><div class=\"fc-client\">" + f.client + "</div><div class=\"fc-service\">" + f.service + "</div>" +
+      "<div class=\"fc-loc\">📍 " + f.loc + "</div></div></div>" +
+      "<div class=\"fc-done\">✓ تم تسليم الملف — " + (f.deliveredAt||"—") + "</div>" +
       "</div>";
   });
   list.innerHTML = html;
@@ -979,18 +994,22 @@ function renderCustody() {
   }
   var html = "";
   files.forEach(function(f) {
-    html += "<div class='custody-row'>" +
-      "<div style='flex:1;'><div class='cr-id'>" + f.voucher + "</div>" +
-      "<div class='cr-client'>" + f.client + "</div>" +
-      "<div class='cr-date'>" + f.received + "</div></div>" +
-      "<div style='text-align:left;'><div class='cr-amt'>" + fmt(f.remaining) + "</div><div style='font-size:9px;color:#a09fa2;'>ريال</div></div>" +
-      "<span class='cr-status cs-eng'>في عهدتك</span>" +
+    html += "<div class=\"custody-row\">" +
+      "<div style=\"flex:1;\"><div class=\"cr-id\">" + f.voucher + "</div>" +
+      "<div class=\"cr-client\">" + f.client + "</div>" +
+      "<div class=\"cr-date\">" + f.received + "</div></div>" +
+      "<div style=\"text-align:left;\"><div class=\"cr-amt\">" + fmt(f.remaining) + "</div><div style=\"font-size:9px;color:#a09fa2;\">ريال</div></div>" +
+      "<span class=\"cr-status cs-eng\">في عهدتك</span>" +
       "</div>";
   });
   list.innerHTML = html;
 }
 
 /* ══ TABS ══ */
+function tabClick(el) {
+  switchTab(el.dataset.tab, el);
+}
+
 function switchTab(name, el) {
   document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
   document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
