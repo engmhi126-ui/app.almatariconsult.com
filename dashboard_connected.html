@@ -811,7 +811,7 @@ function applyLedgerFilters(){
     const acts = v.status==="partial"
       ? `<button class="btn btn-s btn-xs" data-vid="${v.id}" data-veng="${v.eng_name||"—"}" data-vpaid="${fmt(v.paid_amount)}" onclick="openSettleFor(this)">تسوية</button>
          <button class="btn btn-d btn-xs" style="margin-top:3px;" data-vid="${v.id}" onclick="openWaiverFor(this)">إعفاء</button>`
-      : `<button class="btn btn-g btn-xs">طباعة</button>`;
+      : `<button class="btn btn-g btn-xs" onclick="printVoucherRow('"+v.id+"')" data-vid="${v.id}">🖨 طباعة</button>`;
     return `<tr>
       <td style="font-family:var(--mono);color:var(--blue);font-weight:600;">${v.voucher_num||"—"}</td>
       <td style="font-size:10px;color:var(--t3);font-family:var(--mono);">${fmtDate(v.created_at)}</td>
@@ -1212,6 +1212,84 @@ function closeModal(id){ document.getElementById(id).classList.remove("open"); }
 function selChip(el,g){
   document.querySelectorAll("#"+g+" .chip").forEach(c=>c.className="chip");
   el.className="chip on";
+}
+
+/* ══ PRINT VOUCHER ══ */
+function printVoucherRow(id){
+  const v = allVouchers.find(x=>x.id===id);
+  if(!v){ showToast("لم يُوجد السند"); return; }
+  const w = window.open("","_blank");
+  const paid = parseFloat(v.paid_amount||0);
+  const rem  = parseFloat(v.remaining||0);
+  const total= parseFloat(v.total_amount||0);
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+  <title>سند قبض ${v.voucher_num||""}</title>
+  <style>
+    body{font-family:Arial,sans-serif;color:#18181a;padding:24px;direction:rtl;max-width:420px;margin:0 auto;}
+    .co{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:8px;border-bottom:2px solid #18181a;margin-bottom:10px;}
+    .co-name{font-size:9px;font-weight:700;line-height:1.7;}
+    .co-en{font-size:8px;color:#666;}
+    .ttl{background:#18181a;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px;}
+    .row{display:flex;gap:6px;border-bottom:1px solid #ddd;padding:4px 0;font-size:11px;}
+    .lbl{color:#666;white-space:nowrap;flex-shrink:0;}
+    .val{font-weight:600;flex:1;}
+    .amt-box{border:2px solid #18181a;border-radius:7px;padding:8px 12px;display:flex;align-items:center;gap:10px;margin:8px 0;}
+    .totals{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;}
+    .tot{border:1px solid #ddd;border-radius:6px;padding:6px;text-align:center;}
+    .tot-v{font-size:13px;font-weight:700;font-family:monospace;}
+    .tot-l{font-size:8px;color:#888;margin-top:2px;}
+    .sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+    .sig{text-align:center;font-size:9px;color:#666;}
+    .sig-line{border-top:1px solid #18181a;margin:14px 5px 4px;}
+    @media print{body{padding:10px;}}
+  </style></head><body>`);
+  w.document.write(`
+    <div class="co">
+      <div>
+        <div class="co-name">عبدالعزيز حسن المطري للاستشارات الهندسية</div>
+        <div class="co-en">A. H. AL-MATRI FOR ENGINEERING CONSULT</div>
+        <div style="font-size:8px;color:#666;margin-top:3px;">📱 +966538986031 · 📍 جازان · العارضة</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:13px;font-weight:700;color:#1a4880;">مطري كونسلت</div>
+        <div style="font-size:8px;color:#888;">MATARI CONSULT</div>
+      </div>
+      <div style="text-align:left;font-size:8px;color:#888;">
+        رقم السند: <strong style="font-size:10px;">${v.voucher_num||"—"}</strong><br>
+        التاريخ: ${new Date(v.created_at).toLocaleDateString("ar-SA")}
+      </div>
+    </div>
+    <div class="ttl">سند قبض &nbsp; Payment Voucher</div>
+    <div class="row"><span class="lbl">استلمنا من السيد:</span><span class="val">${v.client_name||"—"}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div class="row"><span class="lbl">رقم الهوية:</span><span class="val">${v.client_id_num||"—"}</span></div>
+      <div class="row"><span class="lbl">رقم الجوال:</span><span class="val">${v.client_phone||"—"}</span></div>
+    </div>
+    <div class="row"><span class="lbl">الحي:</span><span class="val">${v.client_district||"—"}</span></div>
+    <div class="amt-box">
+      <span style="font-size:10px;color:#666;">مبلغ وقدرة:</span>
+      <span style="font-size:14px;font-weight:700;font-family:monospace;background:#fef3dc;padding:2px 10px;border-radius:4px;flex:1;text-align:center;">${paid.toLocaleString("ar-SA")}</span>
+      <span style="font-weight:700;">ريال</span>
+    </div>
+    <div style="font-size:10px;color:#7a4e00;margin-bottom:6px;"><strong>فقط لا غير: </strong>${n2ar(paid)} ريال سعودي</div>
+    <div class="totals">
+      <div class="tot"><div class="tot-v">${total.toLocaleString("ar-SA")}</div><div class="tot-l">الإجمالي</div></div>
+      <div class="tot"><div class="tot-v" style="color:green;">${paid.toLocaleString("ar-SA")}</div><div class="tot-l">المدفوع</div></div>
+      <div class="tot"><div class="tot-v" style="color:${rem>0?"orange":"green"};">${rem>0?rem.toLocaleString("ar-SA"):"—"}</div><div class="tot-l">المتبقي</div></div>
+    </div>
+    <div class="row"><span class="lbl">وذلك قيمة:</span><span class="val">${v.purpose||v.service_type||"—"}</span></div>
+    <div class="row"><span class="lbl">نوع الخدمة:</span><span class="val">${v.service_type||"—"}</span></div>
+    <div class="row"><span class="lbl">طريقة الدفع:</span><span class="val">${v.payment_method||"—"}</span></div>
+    <div class="row"><span class="lbl">عضو الفريق المستلم:</span><span class="val">${v.eng_name||"—"}</span></div>
+    <div class="sigs">
+      <div class="sig"><div class="sig-line"></div>توقيع المستلم</div>
+      <div class="sig"><div class="sig-line"></div>المحاسب</div>
+      <div class="sig"><div class="sig-line"></div>الإدارة</div>
+    </div>
+  `);
+  w.document.write("</body></html>");
+  w.document.close();
+  setTimeout(()=>w.print(), 500);
 }
 
 /* ══ WA ══ */
