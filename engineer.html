@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://qxklfethbynwcxswacwj.supabase.co https://n8n.srv1243842.hstgr.cloud/webhook https://api.ultramsg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>بوابة الفريق — المطري كونسلت</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -280,9 +281,9 @@ body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:1
 
 <script>
 var SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
-var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
-var WA_INST = "165504";
-var WA_TOK  = "oghzjhf82g3ghqkq";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjQ3MDUsImV4cCI6MjA4OTk0MDcwNX0.BOxmuQEHM8FmzKGTyy1Yo0bfaIMpUX-WcHrfaZF1dv0";
+// WA_INST moved to n8n
+// WA_TOK moved to n8n
 var WA_TO   = "966538986031";
 
 var TEAM = {
@@ -393,9 +394,9 @@ function loadFiles(phone) {
 }
 
 /* RENDER */
-function active()   { return FILES.filter(function(f){ return f.status==="active"; }); }
+function active()   { return FILES.filter(function(f){ return f.status!=="done" && f.status!=="cancelled"; }); }
 function done()     { return FILES.filter(function(f){ return f.status==="done"; }); }
-function custody()  { return FILES.filter(function(f){ return f.status==="active" && f.remaining>0; }); }
+function custody()  { return FILES.filter(function(f){ return f.status!=="done" && f.status!=="cancelled" && f.remaining>0; }); }
 
 function renderAll() { renderFiles(); renderDone(); renderCustody(); updateCounts(); }
 
@@ -411,7 +412,7 @@ function updateCounts() {
 }
 
 function fc(f) {
-  var full = f.remaining===0;
+  var full = (parseFloat(f.remaining_amount||f.remaining||0)) <= 0;
   var pay  = full
     ? "<div class=\"pay-badge pay-full\"><span class=\"pay-icon\">✅</span><div><span>مسدد بالكامل</span><div class=\"pay-sub\">بإمكانك تسليم الملف للعميل</div></div></div>"
     : "<div class=\"pay-badge pay-partial\"><span class=\"pay-icon\">⏳</span><div><span>متبقي على العميل</span><span class=\"pay-amount\">"+fmt(f.remaining)+"</span><div class=\"pay-sub\">لا يُسلَّم الملف قبل السداد</div></div></div>";

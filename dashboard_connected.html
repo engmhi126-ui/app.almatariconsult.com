@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://qxklfethbynwcxswacwj.supabase.co https://n8n.srv1243842.hstgr.cloud/webhook https://api.ultramsg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة الإدارة — المطري كونسلت</title>
 <meta name="theme-color" content="#0a1628">
@@ -443,7 +444,7 @@ body::before{content:'';position:fixed;inset:0;
         <select class="fs fi-sm" id="tf-status" onchange="applyTaskFilters()">
           <option value="">كل الحالات</option>
           <option value="waiting">انتظار</option>
-          <option value="inprog">جارٍ</option>
+          <option value="in_progress"value="in_progress">جارٍ</option>
           <option value="done">مكتملة</option>
         </select>
         <select class="fs fi-sm" id="tf-type" onchange="applyTaskFilters()">
@@ -631,9 +632,9 @@ body::before{content:'';position:fixed;inset:0;
 
 <script>
 const SB_URL = "https://qxklfethbynwcxswacwj.supabase.co";
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjQ3MDUsImV4cCI6MjA4OTk0MDcwNX0.BOxmuQEHM8FmzKGTyy1Yo0bfaIMpUX-WcHrfaZF1dv0";
 const WA_INST = "165504";
-const WA_TOK  = "oghzjhf82g3ghqkq";
+const WA_TOK  = "[moved-to-n8n]";
 const WA_TO   = "966538986031";
 
 let teamMembers  = [];
@@ -943,7 +944,7 @@ async function updateTaskStatus(){
   const id  = document.getElementById("ts-id").value;
   const chip= document.querySelector("#ts-chips .chip.on");
   if(!chip){showToast("اختر الحالة");return;}
-  const stMap={"انتظار":"waiting","جارٍ":"inprog","مكتملة":"done"};
+  const stMap={"انتظار":"waiting","جارٍ":"in_progress","مكتملة":"done"};
   const st=stMap[chip.textContent]||"waiting";
   try {
     await sbPatch("tasks","id=eq."+id,{status:st,done_at:st==="done"?new Date().toISOString():null});
@@ -1002,7 +1003,7 @@ async function loadTeam(){
   const grid=document.getElementById("team-grid");
   grid.innerHTML="<div class='loading'><div class='spinner'></div>تحميل...</div>";
   try {
-    const custody=await sbGet("v_custody","order=name");
+    const custody=await sbGet("v_real_custody","order=name");
     const tasks  =await sbGet("v_tasks_full","order=created_at.desc");
     const vs     =await sbGet("v_vouchers_full","order=created_at.desc");
     const services=["إنشائي","معماري","مساحة","رسم","أخرى"];
@@ -1012,7 +1013,7 @@ async function loadTeam(){
       const myT=(tasks||[]).filter(t=>t.eng_user_id===m.id);
       const myV=(vs||[]).filter(v=>v.eng_user_id===m.id);
       const waiting=myT.filter(t=>t.status==="waiting").length;
-      const inprog =myT.filter(t=>t.status==="inprog").length;
+      const inprog =myT.filter(t=>t.status==="in_progress").length;
       const done   =myT.filter(t=>t.status==="done").length;
       const custAmt=parseFloat(myC.custody_amount||0);
       const totalRev=myV.reduce((s,v)=>s+parseFloat(v.paid_amount||0),0);
@@ -1223,6 +1224,7 @@ function printVoucherRow(id){
   const rem  = parseFloat(v.remaining||0);
   const total= parseFloat(v.total_amount||0);
   w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://qxklfethbynwcxswacwj.supabase.co https://n8n.srv1243842.hstgr.cloud/webhook https://api.ultramsg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:;">
   <title>سند قبض ${v.voucher_num||""}</title>
   <style>
     body{font-family:Arial,sans-serif;color:#18181a;padding:24px;direction:rtl;max-width:420px;margin:0 auto;}
@@ -1295,9 +1297,8 @@ function printVoucherRow(id){
 /* ══ WA ══ */
 function sendWA(msg){
   const p=new URLSearchParams();
-  p.append("token",WA_TOK); p.append("to",WA_TO); p.append("body",msg);
-  fetch("https://api.ultramsg.com/instance"+WA_INST+"/messages/chat",
-    {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:p});
+  // إرسال عبر n8n (الـ token في n8n فقط)
+  fetch("https://n8n.srv1243842.hstgr.cloud/webhook/notify/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:WA_TO,message:msg})}).catch(function(){});
 }
 
 /* ══ TOAST ══ */

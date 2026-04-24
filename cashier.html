@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://qxklfethbynwcxswacwj.supabase.co https://n8n.srv1243842.hstgr.cloud/webhook https://api.ultramsg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>استقبال — المطري كونسلت</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -448,12 +449,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script>
 var SB_URL  = "https://qxklfethbynwcxswacwj.supabase.co";
-var SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDM2NDcwNSwiZXhwIjoyMDg5OTQwNzA1fQ.EUC8TfrKrflvvIQoQMVUdk-6WQL5SyJKisBD6Pf9110";
-var WA_INST = "165504";
-var WA_TOK  = "oghzjhf82g3ghqkq";
+var SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4a2xmZXRoYnlud2N4c3dhY3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjQ3MDUsImV4cCI6MjA4OTk0MDcwNX0.BOxmuQEHM8FmzKGTyy1Yo0bfaIMpUX-WcHrfaZF1dv0";
+// WA_INST moved to n8n
+// WA_TOK moved to n8n
 var WA_TO   = "966538986031";
 
-/* كلمات مرور الفريق */
+/* ⚠️ SECURITY TODO: كلمات المرور هنا مؤقتة — يجب نقلها لـ n8n webhook /auth/login */
+/* كلمات مرور الفريق — مؤقتة */
 var MEMBER_PASSWORDS = {
   cashier: { name: "المحاسب / الاستقبال", pass: "Cash@2026" },
   mhd:     { name: "م. محمد حمد",          pass: "Mhd@2026"  },
@@ -622,7 +624,7 @@ function loadAll(){
 
 function loadPartialVouchers(){
   sbGet("v_vouchers_full","status=eq.partial&order=created_at.desc").then(function(data){
-    partialVouchers=(data||[]).filter(function(v){return parseFloat(v.remaining||0)>0;});
+    partialVouchers=(data||[]).filter(function(v){return parseFloat(v.remaining_amount||v.remaining||0)>0;});
     renderPartialList(partialVouchers);
   });
 }
@@ -861,13 +863,13 @@ function searchPartial(){
 
 function renderPartialList(list){
   var el=document.getElementById("partial-list");
-  list=(list||[]).filter(function(v){return parseFloat(v.remaining||0)>0;});
+  list=(list||[]).filter(function(v){return parseFloat(v.remaining_amount||v.remaining||0)>0;});
   if(!list.length){
     el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">✅</div><div class=\"empty-title\">لا توجد دفعات متبقية</div><div class=\"empty-sub\">جميع السندات مسوّاة بالكامل</div></div>";
     return;
   }
   el.innerHTML=list.map(function(v){
-    var rem=parseFloat(v.remaining||0);
+    var rem = parseFloat(v.remaining_amount||v.remaining||0);
     var em=teamMembers.filter(function(m){return m.id===v.eng_user_id;})[0]||{};
     return "<div class=\"partial-card\">" +
       "<div class=\"pc-head\">" +
@@ -1043,9 +1045,8 @@ function selChip(el,g){
 /* ══ WA ══ */
 function sendWA(msg){
   var p=new URLSearchParams();
-  p.append("token",WA_TOK); p.append("to",WA_TO); p.append("body",msg);
-  fetch("https://api.ultramsg.com/instance"+WA_INST+"/messages/chat",
-    {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:p});
+  // إرسال عبر n8n (الـ token في n8n فقط)
+  fetch("https://n8n.srv1243842.hstgr.cloud/webhook/notify/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:WA_TO,message:msg})}).catch(function(){});
 }
 
 /* ══ TOAST ══ */
