@@ -95,7 +95,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn-p{background:linear-gradient(135deg,#1a6fff,#0a4fff);color:#fff;box-shadow:0 4px 12px rgba(26,111,255,.25);}
 .btn-s{background:linear-gradient(135deg,var(--green),#00a87a);color:#fff;}
 .btn-g{background:var(--card2);color:var(--t2);border:1px solid var(--border2);}
-.btn-print{background:linear-gradient(135deg,#f5c842,#e0a800);color:#18181a;font-weight:700;}
+.btn-print{background:linear-gradient(135deg,#f5c842,#e0a800);color:#18181a;font-weight:700;width:100%;justify-content:center;}
 .btn-full{width:100%;justify-content:center;padding:12px;}
 /* VOUCHER PREVIEW */
 .vp{background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:12px;}
@@ -369,9 +369,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
       <!-- زر واحد: حفظ → يتحول لطباعة بعد الحفظ -->
       <div class="action-row">
-        <button class="btn btn-s btn-full" id="main-action-btn" onclick="mainAction()" style="flex:1;">
+        <button class="btn btn-s btn-full" id="main-action-btn" onclick="mainAction()">
           💾 حفظ السند
         </button>
+        <button class="btn btn-g" id="new-voucher-btn" onclick="startNewVoucher()" style="padding:12px 16px;display:none;">+ جديد</button>
       </div>
     </div>
 
@@ -454,23 +455,25 @@ var WA_TO   = "966538986031";
 
 /* كلمات مرور الفريق */
 var MEMBER_PASSWORDS = {
-  cashier: { name: "المحاسب / الاستقبال", pass: "Cash@2026"  },
-  mhd:     { name: "م. محمد حمد",          pass: "Mhd@2026"   },
-  mkh:     { name: "م. محمد خالد",         pass: "Mkh@2026"   },
-  ism:     { name: "م. إسماعيل",           pass: "Ism@2026"   },
-  abr:     { name: "م. عبد الرحمن خان",    pass: "Abr@2026"   },
-  say:     { name: "الرسام صايم",          pass: "Say@2026"   },
-  slh:     { name: "م. صلاح بدر التمام",   pass: "Slh@2026"   }
+  cashier: { name: "المحاسب / الاستقبال", pass: "Cash@2026" },
+  mhd:     { name: "م. محمد حمد",          pass: "Mhd@2026"  },
+  mkh:     { name: "م. محمد خالد",         pass: "Mkh@2026"  },
+  ism:     { name: "م. إسماعيل",           pass: "Ism@2026"  },
+  abr:     { name: "م. عبد الرحمن خان",    pass: "Abr@2026"  },
+  say:     { name: "الرسام صايم",          pass: "Say@2026"  },
+  slh:     { name: "م. صلاح بدر التمام",   pass: "Slh@2026"  }
 };
 
-var teamMembers      = [];
-var partialVouchers  = [];
-var pendingPId       = null;
-var lastSavedVoucher = null;
-var lastPartialData  = null;
-var currentCashier   = "";
+var teamMembers     = [];
+var partialVouchers = [];
+var pendingPId      = null;
+var lastSavedVoucher= null;
+var lastPartialData = null;
+var currentCashier  = "";
+/* حالة الزر: false=حفظ, true=طباعة */
+var btnIsPrint      = false;
 
-/* SB */
+/* ══ SUPABASE ══ */
 function sbGet(tbl, q) {
   return fetch(SB_URL+"/rest/v1/"+tbl+"?"+(q||""),{
     headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
@@ -492,7 +495,7 @@ function sbPatch(tbl, q, body) {
   });
 }
 
-/* NUMBERS */
+/* ══ NUMBERS ══ */
 function fmt(n){ return parseFloat(n||0).toLocaleString("ar-SA"); }
 var O=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"];
 var T=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
@@ -506,9 +509,9 @@ function n2ar(n){
   return n.toString();
 }
 
-/* VALIDATE */
+/* ══ VALIDATE ══ */
 function validateId(el){
-  var v=el.value.replace(/\D/g,''); el.value=v;
+  var v=el.value.replace(/\D/g,""); el.value=v;
   var h=document.getElementById("id-hint");
   if(!v){h.textContent="";return;}
   if(v.length<10){h.textContent="⚠ أقل من 10 أرقام";h.className="hint hint-warn";return;}
@@ -517,7 +520,7 @@ function validateId(el){
   else{h.textContent="⚠ تحقق من الرقم";h.className="hint hint-warn";}
 }
 function validatePhone(el){
-  var v=el.value.replace(/\D/g,''); el.value=v;
+  var v=el.value.replace(/\D/g,""); el.value=v;
   var h=document.getElementById("phone-hint");
   if(!v){h.textContent="";return;}
   if(v.length<10){h.textContent="⚠ أقل من 10 أرقام";h.className="hint hint-warn";return;}
@@ -525,75 +528,92 @@ function validatePhone(el){
   else{h.textContent="⚠ تحقق من الرقم";h.className="hint hint-warn";}
 }
 
-/* LOGIN */
+/* ══ BTN HELPERS ══ */
+function setBtnSave(){
+  btnIsPrint = false;
+  var b = document.getElementById("main-action-btn");
+  if(!b) return;
+  b.innerHTML = "💾 حفظ السند";
+  b.className = "btn btn-s btn-full";
+  b.disabled  = false;
+  var nb = document.getElementById("new-voucher-btn");
+  if(nb) nb.style.display = "none";
+}
+function setBtnPrint(){
+  btnIsPrint = true;
+  var b = document.getElementById("main-action-btn");
+  if(!b) return;
+  b.textContent = "🖨 طباعة السند";
+  b.className   = "btn btn-print btn-full";
+  b.disabled    = false;
+  var nb = document.getElementById("new-voucher-btn");
+  if(nb) nb.style.display = "inline-flex";
+}
+function setBtnLoading(){
+  var b = document.getElementById("main-action-btn");
+  if(!b) return;
+  b.innerHTML  = "<span style=\"display:inline-flex;align-items:center;gap:7px;\"><span style=\"width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;\"></span>جارٍ الحفظ...</span>";
+  b.disabled   = true;
+}
+function showDraft(){
+  var s = document.getElementById("draft-stamp");
+  if(s) s.style.display = "flex";
+}
+function hideDraft(){
+  var s = document.getElementById("draft-stamp");
+  if(s) s.style.display = "none";
+}
+
+/* ══ LOGIN ══ */
 function doLogin(){
   var memberId = document.getElementById("login-member").value;
   var pass     = document.getElementById("login-pass").value;
   var err      = document.getElementById("login-err");
-  var btn      = document.getElementById("login-btn");
   err.className = "login-err";
-
-  if(!memberId){
-    err.textContent = "يرجى اختيار اسمك";
-    err.className = "login-err show";
-    return;
-  }
-
+  if(!memberId){ err.textContent="يرجى اختيار اسمك"; err.className="login-err show"; return; }
   var member = MEMBER_PASSWORDS[memberId];
-  if(!member || pass !== member.pass){
-    err.textContent = "كلمة المرور غير صحيحة";
-    err.className = "login-err show";
-    document.getElementById("login-pass").value = "";
+  if(!member||pass!==member.pass){
+    err.textContent="كلمة المرور غير صحيحة";
+    err.className="login-err show";
+    document.getElementById("login-pass").value="";
     return;
   }
-
   currentCashier = member.name;
   document.getElementById("app-cashier-name").textContent = currentCashier;
-
-  /* تحديث المعاينة باسم المحاسب */
-  var cs = document.getElementById("vp-cashier-sig");
-  var ss = document.getElementById("vp-sig-cashier");
-  if(cs) cs.textContent = currentCashier;
-  if(ss) ss.textContent = currentCashier;
-
+  var cs=document.getElementById("vp-cashier-sig"); if(cs) cs.textContent=currentCashier;
+  var ss=document.getElementById("vp-sig-cashier"); if(ss) ss.textContent=currentCashier;
   document.getElementById("screen-login").classList.remove("active");
   document.getElementById("screen-app").classList.add("active");
+  showDraft();
+  setBtnSave();
   loadAll();
 }
 
 function doLogout(){
-  currentCashier = "";
-  lastSavedVoucher = null;
-  lastPartialData  = null;
+  currentCashier=""; lastSavedVoucher=null; lastPartialData=null;
   document.getElementById("screen-app").classList.remove("active");
   document.getElementById("screen-login").classList.add("active");
-  document.getElementById("login-pass").value = "";
-  document.getElementById("login-member").value = "";
-  document.getElementById("print-btn").hidden = true;
-  document.getElementById("print-partial-wrap").style.display = "none";
-  var actionBtn = document.getElementById("main-action-btn");
-  if(actionBtn){
-    actionBtn.innerHTML = "💾 حفظ السند";
-    actionBtn.className = "btn btn-s btn-full";
-    actionBtn.dataset.mode = "save";
-  }
-  var stamp = document.getElementById("draft-stamp");
-  if(stamp) stamp.style.display = "flex";
+  document.getElementById("login-pass").value="";
+  document.getElementById("login-member").value="";
+  document.getElementById("print-partial-wrap").style.display="none";
+  showDraft();
+  setBtnSave();
 }
 
-/* LOAD */
+/* ══ LOAD ══ */
 function loadAll(){
   sbGet("v_engineers_full","is_active=eq.true&order=full_name").then(function(data){
-    teamMembers = (data||[]).map(function(e){
-      return{id:e.user_id,name:e.full_name,initials:e.initials||e.full_name.substring(0,2),
-             role:e.specialization||"مهندس",color:e.color||"#1a6fff",bg:e.bg_color||"#0f1e35"};
+    teamMembers=(data||[]).map(function(e){
+      return{id:e.user_id,name:e.full_name,
+             initials:e.initials||e.full_name.substring(0,2),
+             role:e.specialization||"مهندس",
+             color:e.color||"#1a6fff",bg:e.bg_color||"#0f1e35"};
     });
-    var sel = document.getElementById("v-eng");
-    sel.innerHTML = "<option value=''>اختر عضو الفريق...</option>";
+    var sel=document.getElementById("v-eng");
+    sel.innerHTML="<option value=''>اختر عضو الفريق...</option>";
     teamMembers.forEach(function(m){
-      var o = document.createElement("option");
-      o.value = m.id; o.textContent = m.name+" — "+m.role;
-      sel.appendChild(o);
+      var o=document.createElement("option");
+      o.value=m.id; o.textContent=m.name+" — "+m.role; sel.appendChild(o);
     });
   });
   loadPartialVouchers();
@@ -601,9 +621,8 @@ function loadAll(){
 }
 
 function loadPartialVouchers(){
-  /* نجلب partial فقط ونتأكد remaining > 0 */
   sbGet("v_vouchers_full","status=eq.partial&order=created_at.desc").then(function(data){
-    partialVouchers = (data||[]).filter(function(v){ return parseFloat(v.remaining||0) > 0; });
+    partialVouchers=(data||[]).filter(function(v){return parseFloat(v.remaining||0)>0;});
     renderPartialList(partialVouchers);
   });
 }
@@ -614,28 +633,22 @@ function loadTasks(){
   });
 }
 
-/* SEARCH CLIENT — بدون تكرار */
+/* ══ SEARCH CLIENT ══ */
 function searchClient(){
-  var q = (document.getElementById("search-q").value||"").trim();
-  var res = document.getElementById("search-results");
-  if(q.length < 3){ res.innerHTML=""; return; }
+  var q=(document.getElementById("search-q").value||"").trim();
+  var res=document.getElementById("search-results");
+  if(q.length<3){res.innerHTML="";return;}
   sbGet("v_vouchers_full",
     "or=(client_phone.ilike.*"+q+"*,client_id_num.ilike.*"+q+"*,client_name.ilike.*"+q+"*)&order=created_at.desc&limit=20"
   ).then(function(data){
-    if(!data||!data.length){
-      res.innerHTML="<div style=\"font-size:11px;color:var(--t3);padding:8px;\">لا توجد نتائج</div>";
-      return;
-    }
-    /* إزالة التكرار بناءً على رقم الهوية أو الجوال */
-    var seen = {};
-    var unique = [];
+    if(!data||!data.length){res.innerHTML="<div style=\"font-size:11px;color:var(--t3);padding:8px;\">لا توجد نتائج</div>";return;}
+    var seen={},unique=[];
     data.forEach(function(v){
-      var key = v.client_id_num || v.client_phone || v.client_name;
-      if(!seen[key]){ seen[key]=true; unique.push(v); }
+      var key=v.client_id_num||v.client_phone||v.client_name;
+      if(!seen[key]){seen[key]=true;unique.push(v);}
     });
-    res.innerHTML = unique.slice(0,5).map(function(v){
-      var vid = v.id;
-      return "<div class=\"search-result\" onclick=\"fillClient('"+vid+"')\">" +
+    res.innerHTML=unique.slice(0,5).map(function(v){
+      return "<div class=\"search-result\" onclick=\"fillClient('"+v.id+"')\">" +
         "<div class=\"sr-name\">"+(v.client_name||"—")+"</div>" +
         "<div class=\"sr-sub\">"+(v.client_phone||"—")+" · "+(v.client_id_num||"—")+" · "+(v.client_district||"—")+"</div>" +
         "</div>";
@@ -646,106 +659,86 @@ function searchClient(){
 function fillClient(id){
   sbGet("v_vouchers_full","id=eq."+id).then(function(data){
     var v=(data||[])[0]; if(!v)return;
-    document.getElementById("v-client").value   = v.client_name||"";
-    document.getElementById("v-idnum").value    = v.client_id_num||"";
-    document.getElementById("v-phone").value    = v.client_phone||"";
-    document.getElementById("v-district").value = v.client_district||"";
-    document.getElementById("search-results").innerHTML = "";
-    document.getElementById("search-q").value = "";
+    document.getElementById("v-client").value   =v.client_name||"";
+    document.getElementById("v-idnum").value    =v.client_id_num||"";
+    document.getElementById("v-phone").value    =v.client_phone||"";
+    document.getElementById("v-district").value =v.client_district||"";
+    document.getElementById("search-results").innerHTML="";
+    document.getElementById("search-q").value="";
     vPrev();
     showToast("✓ تم ملء بيانات "+v.client_name);
   });
 }
 
-/* VOUCHER FORM */
+/* ══ VOUCHER FORM ══ */
 function vCalc(){
   var t=parseFloat(document.getElementById("v-total").value)||0;
   var p=parseFloat(document.getElementById("v-paid").value)||0;
-  document.getElementById("v-rem").value = Math.max(0,t-p)||"";
-  document.getElementById("v-words").textContent = p ? "فقط "+n2ar(p)+" ريال سعودي لا غير" : "أدخل المبلغ...";
+  document.getElementById("v-rem").value=Math.max(0,t-p)||"";
+  document.getElementById("v-words").textContent=p?"فقط "+n2ar(p)+" ريال سعودي لا غير":"أدخل المبلغ...";
 }
 
 function vPrev(){
-  function g(id){ return (document.getElementById(id)||{}).value||""; }
-  document.getElementById("vp-client").textContent    = g("v-client");
-  document.getElementById("vp-id").textContent        = g("v-idnum");
-  document.getElementById("vp-phone").textContent     = g("v-phone");
-  document.getElementById("vp-district").textContent  = g("v-district");
-  document.getElementById("vp-purpose-d").textContent = g("v-purpose");
-  var engId = g("v-eng");
-  var em = teamMembers.filter(function(m){return m.id===engId;})[0];
-  document.getElementById("vp-eng-d").textContent     = em ? em.name : "—";
-  var chip = document.querySelector("#v-pay-chips .chip.on");
-  document.getElementById("vp-method-d").textContent  = chip ? chip.textContent : "—";
-  var p=parseFloat(g("v-paid"))||0, t=parseFloat(g("v-total"))||0;
-  document.getElementById("vp-amt").textContent       = p ? p.toLocaleString("ar-SA") : "—";
-  document.getElementById("vp-words-d").textContent   = p ? n2ar(p)+" ريال" : "—";
-  document.getElementById("vp-total").textContent     = t ? t.toLocaleString("ar-SA") : "—";
-  document.getElementById("vp-paid-d").textContent    = p ? p.toLocaleString("ar-SA") : "—";
-  document.getElementById("vp-rem-d").textContent     = (t&&p) ? Math.max(0,t-p).toLocaleString("ar-SA") : "—";
-  document.getElementById("vp-date").textContent      = new Date().toLocaleDateString("ar-SA");
-  /* اسم المحاسب */
-  var cs = document.getElementById("vp-cashier-sig");
-  var ss = document.getElementById("vp-sig-cashier");
-  if(cs) cs.textContent = currentCashier||"—";
-  if(ss) ss.textContent = currentCashier||"المحاسب";
+  function g(id){return(document.getElementById(id)||{}).value||"";}
+  document.getElementById("vp-client").textContent   =g("v-client");
+  document.getElementById("vp-id").textContent       =g("v-idnum");
+  document.getElementById("vp-phone").textContent    =g("v-phone");
+  document.getElementById("vp-district").textContent =g("v-district");
+  document.getElementById("vp-purpose-d").textContent=g("v-purpose");
+  var engId=g("v-eng");
+  var em=teamMembers.filter(function(m){return m.id===engId;})[0];
+  document.getElementById("vp-eng-d").textContent    =em?em.name:"—";
+  var chip=document.querySelector("#v-pay-chips .chip.on");
+  document.getElementById("vp-method-d").textContent =chip?chip.textContent:"—";
+  var p=parseFloat(g("v-paid"))||0,t=parseFloat(g("v-total"))||0;
+  document.getElementById("vp-amt").textContent      =p?p.toLocaleString("ar-SA"):"—";
+  document.getElementById("vp-words-d").textContent  =p?n2ar(p)+" ريال":"—";
+  document.getElementById("vp-total").textContent    =t?t.toLocaleString("ar-SA"):"—";
+  document.getElementById("vp-paid-d").textContent   =p?p.toLocaleString("ar-SA"):"—";
+  document.getElementById("vp-rem-d").textContent    =(t&&p)?Math.max(0,t-p).toLocaleString("ar-SA"):"—";
+  document.getElementById("vp-date").textContent     =new Date().toLocaleDateString("ar-SA");
+  var cs=document.getElementById("vp-cashier-sig"); if(cs) cs.textContent=currentCashier||"—";
+  var ss=document.getElementById("vp-sig-cashier"); if(ss) ss.textContent=currentCashier||"المحاسب";
 }
 
 function toggleProof(){
-  var chip = document.querySelector("#v-pay-chips .chip.on");
-  document.getElementById("proof-wrap").style.display =
-    (chip&&(chip.textContent==="شبكة"||chip.textContent==="تحويل بنك")) ? "block" : "none";
+  var chip=document.querySelector("#v-pay-chips .chip.on");
+  document.getElementById("proof-wrap").style.display=
+    (chip&&(chip.textContent==="شبكة"||chip.textContent==="تحويل بنك"))?"block":"none";
 }
 
 function onProofFile(input){
   if(input.files&&input.files[0]){
-    var nm = document.getElementById("proof-name");
-    nm.textContent = "✓ "+input.files[0].name;
-    nm.style.display = "block";
+    var nm=document.getElementById("proof-name");
+    nm.textContent="✓ "+input.files[0].name; nm.style.display="block";
     document.getElementById("proof-zone").classList.add("has-file");
   }
 }
 
-/* SAVE VOUCHER */
+/* ══ MAIN ACTION BTN ══ */
 function mainAction(){
-  var btn = document.getElementById("main-action-btn");
-  if(btn.dataset.mode === "print"){
-    printVoucher();
-  } else {
-    saveVoucher();
-  }
+  if(btnIsPrint){ printVoucher(); }
+  else           { saveVoucher(); }
 }
 
+/* ══ SAVE VOUCHER ══ */
 function saveVoucher(){
-  var client = document.getElementById("v-client").value.trim();
-  var paid   = parseFloat(document.getElementById("v-paid").value)||0;
-  var total  = parseFloat(document.getElementById("v-total").value)||0;
-  var engId  = document.getElementById("v-eng").value;
-  var idnum  = document.getElementById("v-idnum").value;
-  var phone  = document.getElementById("v-phone").value;
-  var chip   = document.querySelector("#v-pay-chips .chip.on");
+  var client=document.getElementById("v-client").value.trim();
+  var paid  =parseFloat(document.getElementById("v-paid").value)||0;
+  var total =parseFloat(document.getElementById("v-total").value)||0;
+  var engId =document.getElementById("v-eng").value;
+  var idnum =document.getElementById("v-idnum").value;
+  var phone =document.getElementById("v-phone").value;
+  var chip  =document.querySelector("#v-pay-chips .chip.on");
+  if(!client)             {showToast("يرجى إدخال اسم العميل");return;}
+  if(!paid)               {showToast("يرجى إدخال المبلغ المدفوع");return;}
+  if(!engId)              {showToast("يرجى اختيار عضو الفريق");return;}
+  if(idnum&&idnum.length<10){showToast("رقم الهوية يجب 10 أرقام");return;}
+  if(phone&&phone.length<10){showToast("رقم الجوال يجب 10 أرقام");return;}
 
-  if(!client)             { showToast("يرجى إدخال اسم العميل"); return; }
-  if(!paid)               { showToast("يرجى إدخال المبلغ المدفوع"); return; }
-  if(!engId)              { showToast("يرجى اختيار عضو الفريق"); return; }
-  if(idnum&&idnum.length<10){ showToast("رقم الهوية يجب 10 أرقام"); return; }
-  if(phone&&phone.length<10){ showToast("رقم الجوال يجب 10 أرقام"); return; }
-
-  var btn = document.getElementById("main-action-btn");
-  btn.innerHTML = "<div class=\"spinner\"></div> جارٍ الحفظ...";
-  btn.disabled = true;
-
-  /* إخفاء زر الطباعة حتى يكتمل الحفظ */
+  setBtnLoading();
+  showDraft();
   lastSavedVoucher = null;
-  /* المسودة تبقى دائماً مرئية — لا تُخفَى إلا بعد الحفظ */
-  var actionBtn = document.getElementById("main-action-btn");
-  if(actionBtn){
-    actionBtn.innerHTML = "💾 حفظ السند";
-    actionBtn.className = "btn btn-s btn-full";
-    actionBtn.dataset.mode = "save";
-  }
-  var stamp = document.getElementById("draft-stamp");
-  if(stamp) stamp.style.display = "flex";
 
   var savedRef = null;
 
@@ -755,7 +748,7 @@ function saveVoucher(){
       var m=ex[0].voucher_num.replace("#","").match(/(\d+)$/);
       if(m) n=parseInt(m[1])+1;
     }
-    var vNum = "#"+new Date().getFullYear()+"-"+String(n).padStart(3,"0");
+    var vNum="#"+new Date().getFullYear()+"-"+String(n).padStart(3,"0");
     return sbPost("vouchers",{
       voucher_num:     vNum,
       client_name:     client,
@@ -765,13 +758,13 @@ function saveVoucher(){
       service_type:    (document.querySelector("#v-type-chips .chip.on")||{}).textContent||"خدمة هندسية",
       total_amount:    total||paid,
       paid_amount:     paid,
-      payment_method:  chip ? chip.textContent : null,
+      payment_method:  chip?chip.textContent:null,
       purpose:         document.getElementById("v-purpose").value||null,
       eng_user_id:     engId,
       status:          "partial"
     });
   }).then(function(saved){
-    savedRef = (saved||[])[0];
+    savedRef=(saved||[])[0]||null;
     if(savedRef){
       return sbPost("tasks",{
         title:        "إنجاز "+(savedRef.service_type||"عمل")+" — "+client,
@@ -784,92 +777,65 @@ function saveVoucher(){
       });
     }
   }).then(function(){
-    /* ── نجح الحفظ في Supabase ── */
-    lastSavedVoucher = savedRef || {voucher_num: "محفوظ"};
+    /* ✅ نجح الحفظ */
+    lastSavedVoucher = savedRef || {voucher_num:"محفوظ"};
 
-    /* تحديث رقم السند في المعاينة */
-    var vNum = savedRef && savedRef.voucher_num ? savedRef.voucher_num : "";
-    if(vNum) document.getElementById("vp-num").textContent = vNum;
+    /* تحديث رقم السند */
+    if(savedRef&&savedRef.voucher_num)
+      document.getElementById("vp-num").textContent = savedRef.voucher_num;
 
-    /* تحويل الزر لطباعة — يعمل حتى لو savedRef كان null */
-    var actionBtn = document.getElementById("main-action-btn");
-    if(actionBtn){
-      actionBtn.innerHTML = "🖨 طباعة السند";
-      actionBtn.className = "btn btn-print btn-full";
-      actionBtn.dataset.mode = "print";
-      actionBtn.disabled = false;
-    }
-
-    /* إخفاء المسودة */
-    var stamp = document.getElementById("draft-stamp");
-    if(stamp) stamp.style.display = "none";
-
-    var em = teamMembers.filter(function(m){return m.id===engId;})[0];
+    /* تحويل الزر لطباعة + إخفاء المسودة */
+    var em=teamMembers.filter(function(m){return m.id===engId;})[0];
     showToast("✓ تم حفظ السند — اضغط 🖨 للطباعة");
     sendWA("🧾 سند قبض جديد\nالعميل: "+client+
            "\nالمدفوع: "+fmt(paid)+" ريال"+
            "\nالمهندس: "+(em?em.name:"—")+
            "\n💼 استلمه: "+currentCashier+
            "\n"+new Date().toLocaleString("ar-SA"));
-    resetForm();
+    /* أولاً: تحويل الزر لطباعة وإخفاء المسودة */
+    hideDraft();
+    setBtnPrint();
+    /* ثم مسح الحقول وتحديث القوائم */
+    resetFormFields();
     loadPartialVouchers();
     loadTasks();
   }).catch(function(e){
     showToast("خطأ في الحفظ: "+e.message);
-    var actionBtn = document.getElementById("main-action-btn");
-    actionBtn.innerHTML = "💾 حفظ السند";
-    actionBtn.className = "btn btn-s btn-full";
-    actionBtn.dataset.mode = "save";
-    var stamp = document.getElementById("draft-stamp");
-    if(stamp) stamp.style.display = "flex";
-  }).finally(function(){
-    /* لا نعيد الزر — إذا نجح الحفظ يكون الزر طباعة، إذا فشل تم إعادته في catch */
-    var btn2 = document.getElementById("main-action-btn");
-    if(btn2) btn2.disabled = false;
-    var saveBtnOld = document.getElementById("save-btn");
-    if(saveBtnOld){ saveBtnOld.innerHTML="💾 حفظ السند"; saveBtnOld.disabled=false; }
+    showDraft();
+    setBtnSave();
   });
 }
 
-function resetForm(){
+/* resetForm — لا يُعيد الزر ولا المسودة */
+/* يمسح حقول النموذج فقط — لا يلمس الزر ولا المسودة */
+function resetFormFields(){
   ["v-client","v-idnum","v-phone","v-district","v-total","v-paid","v-purpose"].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value="";
   });
-  document.getElementById("v-rem").value = "";
-  document.getElementById("v-words").textContent = "أدخل المبلغ...";
-  document.getElementById("v-eng").value = "";
-  document.querySelectorAll(".chip.on").forEach(function(c){c.className="chip";});
-  document.getElementById("proof-wrap").style.display = "none";
-  document.getElementById("proof-name").style.display = "none";
+  document.getElementById("v-rem").value="";
+  document.getElementById("v-words").textContent="أدخل المبلغ...";
+  document.getElementById("v-eng").value="";
+  document.querySelectorAll("#view-new .chip.on").forEach(function(c){c.className="chip";});
+  document.getElementById("proof-wrap").style.display="none";
+  document.getElementById("proof-name").style.display="none";
   document.getElementById("proof-zone").classList.remove("has-file");
-  document.getElementById("id-hint").textContent = "";
-  document.getElementById("phone-hint").textContent = "";
-  /* إعادة الزر لحفظ + إعادة المسودة عند بدء سند جديد */
-  var actionBtn = document.getElementById("main-action-btn");
-  if(actionBtn){
-    actionBtn.innerHTML = "💾 حفظ السند";
-    actionBtn.className = "btn btn-s btn-full";
-    actionBtn.dataset.mode = "save";
-  }
-  var actionBtn = document.getElementById("main-action-btn");
-  if(actionBtn){
-    actionBtn.innerHTML = "💾 حفظ السند";
-    actionBtn.className = "btn btn-s btn-full";
-    actionBtn.dataset.mode = "save";
-  }
-  var stamp = document.getElementById("draft-stamp");
-  if(stamp) stamp.style.display = "flex";
+  document.getElementById("id-hint").textContent="";
+  document.getElementById("phone-hint").textContent="";
+}
+/* عند بدء سند جديد يدوياً — يُعيد الزر لحفظ والمسودة */
+function startNewVoucher(){
+  resetFormFields();
+  showDraft();
+  setBtnSave();
+  lastSavedVoucher=null;
 }
 
-/* PRINT VOUCHER — فقط بعد الحفظ */
+/* ══ PRINT VOUCHER ══ */
 function printVoucher(){
-  if(!lastSavedVoucher){
-    showToast("احفظ السند أولاً ثم اطبع");
-    return;
-  }
-  var c = document.getElementById("printable-voucher").innerHTML;
-  var w = window.open("","_blank");
-  w.document.write("<html dir=\"rtl\"><head><meta charset=\"UTF-8\"><title>سند "+lastSavedVoucher.voucher_num+"</title>");
+  if(!lastSavedVoucher){showToast("احفظ السند أولاً");return;}
+  var c=document.getElementById("printable-voucher").innerHTML;
+  var w=window.open("","_blank");
+  w.document.write("<html dir=\"rtl\"><head><meta charset=\"UTF-8\"><title>سند قبض</title>");
   w.document.write("<style>body{font-family:Arial;color:#18181a;padding:20px;direction:rtl;max-width:400px;margin:0 auto;}");
   w.document.write(".vp-f{display:flex;gap:5px;border-bottom:1px solid #ddd;padding:3px 0;font-size:11px;}");
   w.document.write(".vp-l{color:#666;white-space:nowrap;}.vp-v{font-weight:600;flex:1;}");
@@ -878,189 +844,172 @@ function printVoucher(){
   w.document.write(".vp-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}");
   w.document.write(".vp-sig{text-align:center;font-size:9px;color:#666;}.vp-sig-line{border-top:1px solid #18181a;margin:12px 5px 3px;}");
   w.document.write(".vp-co{display:flex;justify-content:space-between;padding-bottom:7px;border-bottom:2px solid #18181a;margin-bottom:7px;}");
+  w.document.write("#draft-stamp{display:none!important;}");
   w.document.write("</style></head><body>"+c+"</body></html>");
-  w.document.close();
-  w.print();
+  w.document.close(); w.print();
 }
 
-/* PARTIAL */
+/* ══ PARTIAL LIST ══ */
 function searchPartial(){
-  var q = (document.getElementById("psearch-q").value||"").toLowerCase();
-  var list = partialVouchers;
-  if(q) list = list.filter(function(v){
-    return (v.client_name||"").toLowerCase().includes(q)||
-           (v.client_phone||"").includes(q)||
-           (v.voucher_num||"").includes(q);
+  var q=(document.getElementById("psearch-q").value||"").toLowerCase();
+  var list=partialVouchers.filter(function(v){
+    return !q||(v.client_name||"").toLowerCase().includes(q)||
+           (v.client_phone||"").includes(q)||(v.voucher_num||"").includes(q);
   });
   renderPartialList(list);
 }
 
 function renderPartialList(list){
-  var el = document.getElementById("partial-list");
-  /* فلترة: عرض فقط السندات التي لا تزال بمتبقٍ > 0 */
-  list = (list||[]).filter(function(v){ return parseFloat(v.remaining||0) > 0; });
+  var el=document.getElementById("partial-list");
+  list=(list||[]).filter(function(v){return parseFloat(v.remaining||0)>0;});
   if(!list.length){
     el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">✅</div><div class=\"empty-title\">لا توجد دفعات متبقية</div><div class=\"empty-sub\">جميع السندات مسوّاة بالكامل</div></div>";
     return;
   }
-  el.innerHTML = list.map(function(v){
-    var rem = parseFloat(v.remaining||0);
-    var em  = teamMembers.filter(function(m){return m.id===v.eng_user_id;})[0]||{};
-    var vid = v.id;
-    var vcl = (v.client_name||"").replace(/'/g,"");
-    var vrm = rem;
+  el.innerHTML=list.map(function(v){
+    var rem=parseFloat(v.remaining||0);
+    var em=teamMembers.filter(function(m){return m.id===v.eng_user_id;})[0]||{};
     return "<div class=\"partial-card\">" +
       "<div class=\"pc-head\">" +
       "<div><div class=\"pc-client\">"+(v.client_name||"—")+"</div>" +
       "<div class=\"pc-ref\">"+(v.voucher_num||"—")+" · "+(v.service_type||"")+"</div></div>" +
-      "<div style=\"text-align:left;\"><div style=\"font-size:9px;color:var(--t3);\">المتبقي</div><div class=\"pc-rem\">"+fmt(rem)+" <span style=\"font-size:12px;font-weight:400;color:var(--t2);\">ريال</span></div></div>" +
+      "<div style=\"text-align:left;\"><div style=\"font-size:9px;color:var(--t3);\">المتبقي</div>" +
+      "<div class=\"pc-rem\">"+fmt(rem)+" <span style=\"font-size:12px;font-weight:400;color:var(--t2);\">ريال</span></div></div>" +
       "</div>" +
       "<div style=\"font-size:11px;color:var(--t2);margin-bottom:10px;\">👷 "+(em.name||"—")+" · 📱 "+(v.client_phone||"—")+"</div>" +
-      "<button class=\"btn btn-s btn-full\" data-vid=\""+vid+"\" data-vrem=\""+vrm+"\" data-vclient=\""+vcl+"\" onclick=\"openPartialSheet(this)\">💳 استلام دفعة</button>" +
+      "<button class=\"btn btn-s btn-full\" data-vid=\""+v.id+"\" data-vrem=\""+rem+"\" data-vclient=\""+(v.client_name||"")+"\" data-vnum=\""+(v.voucher_num||"")+"\" data-vservice=\""+(v.service_type||"")+"\" data-vpaid=\""+(v.paid_amount||0)+"\" onclick=\"openPartialSheet(this)\">💳 استلام دفعة</button>" +
       "</div>";
   }).join("");
 }
 
 function openPartialSheet(btn){
-  var vid = btn.dataset.vid;
-  var vrem = btn.dataset.vrem;
-  var vclient = btn.dataset.vclient;
-  pendingPId = {id:vid, rem:vrem, client:vclient};
+  pendingPId={
+    id:      btn.dataset.vid,
+    rem:     btn.dataset.vrem,
+    client:  btn.dataset.vclient,
+    vnum:    btn.dataset.vnum,
+    service: btn.dataset.vservice,
+    paid:    btn.dataset.vpaid
+  };
+  document.getElementById("ps-info").textContent=
+    "المتبقي على "+pendingPId.client+": "+fmt(pendingPId.rem)+" ريال";
+  document.getElementById("ps-amount").value="";
 
-  document.getElementById("ps-info").textContent =
-    "المتبقي على "+vclient+": "+fmt(vrem)+" ريال";
-  document.getElementById("ps-amount").value = "";
-  document.getElementById("ps-desc").value = "";
+  /* وصف الدفعة التلقائي */
+  var payNum = parseFloat(pendingPId.paid||0)>0 ? 2 : 1;
+  var desc   = "دفعة رقم "+payNum+
+               " من معاملة "+pendingPId.vnum+
+               " — وذلك قيمة "+pendingPId.service+
+               " للعميل: "+pendingPId.client+
+               " (المدفوع سابقاً: "+fmt(pendingPId.paid)+" ريال"+
+               " · المتبقي: "+fmt(pendingPId.rem)+" ريال)";
+  document.getElementById("ps-desc").value=desc;
+
   document.querySelectorAll("#ps-pay-chips .chip").forEach(function(c){c.className="chip";});
-  document.getElementById("ps-proof-wrap").style.display = "none";
-
-  /* جلب بيانات السند لتوليد وصف تلقائي */
-  sbGet("v_vouchers_full","id=eq."+vid).then(function(data){
-    var v=(data||[])[0];
-    if(!v) return;
-    /* حساب رقم الدفعة */
-    var paid   = parseFloat(v.paid_amount||0);
-    var total  = parseFloat(v.total_amount||0);
-    var rem    = parseFloat(v.remaining||0);
-    /* تقدير رقم الدفعة: إذا paid < total فهذه ليست الأولى */
-    var payNum = paid > 0 ? 2 : 1;
-    /* بناء الوصف التلقائي */
-    var desc = "دفعة رقم "+payNum+
-               " من معاملة "+v.voucher_num+
-               " — "+v.service_type+
-               " للعميل: "+(v.client_name||"—")+
-               " (المدفوع سابقاً: "+fmt(paid)+" ريال"+
-               " · المتبقي: "+fmt(rem)+" ريال)";
-    document.getElementById("ps-desc").value = desc;
-  }).catch(function(){});
-
+  document.getElementById("ps-proof-wrap").style.display="none";
   openSheet("partial-sheet");
 }
 
 function togglePSProof(){
-  var chip = document.querySelector("#ps-pay-chips .chip.on");
-  document.getElementById("ps-proof-wrap").style.display =
-    (chip&&(chip.textContent==="شبكة"||chip.textContent==="تحويل")) ? "block" : "none";
+  var chip=document.querySelector("#ps-pay-chips .chip.on");
+  document.getElementById("ps-proof-wrap").style.display=
+    (chip&&(chip.textContent==="شبكة"||chip.textContent==="تحويل"))?"block":"none";
 }
 
 function confirmPartial(){
-  var amt  = parseFloat(document.getElementById("ps-amount").value)||0;
-  var chip = document.querySelector("#ps-pay-chips .chip.on");
-  if(!amt) { showToast("يرجى إدخال المبلغ"); return; }
-  if(!chip){ showToast("يرجى اختيار طريقة الدفع"); return; }
-  var rem = parseFloat(pendingPId.rem||0);
-  if(amt > rem){ showToast("المبلغ أكبر من المتبقي ("+fmt(rem)+" ريال)"); return; }
+  var amt =parseFloat(document.getElementById("ps-amount").value)||0;
+  var chip=document.querySelector("#ps-pay-chips .chip.on");
+  var desc=document.getElementById("ps-desc").value||"";
+  if(!amt) {showToast("يرجى إدخال المبلغ");return;}
+  if(!chip){showToast("يرجى اختيار طريقة الدفع");return;}
+  var rem=parseFloat(pendingPId.rem||0);
+  if(amt>rem){showToast("المبلغ أكبر من المتبقي ("+fmt(rem)+" ريال)");return;}
 
-  var psBtn = document.getElementById("ps-save-btn");
-  psBtn.innerHTML = "<div class=\"spinner\"></div> جارٍ الحفظ...";
-  psBtn.disabled = true;
+  var psBtn=document.getElementById("ps-save-btn");
+  psBtn.innerHTML="<div class=\"spinner\"></div> جارٍ الحفظ...";
+  psBtn.disabled=true;
 
   sbGet("vouchers","id=eq."+pendingPId.id+"&select=paid_amount,total_amount").then(function(data){
     var v=(data||[])[0]; if(!v) throw new Error("السند غير موجود");
-    var newPaid   = parseFloat(v.paid_amount||0)+amt;
-    var newStatus = newPaid >= parseFloat(v.total_amount||0) ? "settled" : "partial";
+    var newPaid  =parseFloat(v.paid_amount||0)+amt;
+    var newStatus=newPaid>=parseFloat(v.total_amount||0)?"settled":"partial";
     return sbPatch("vouchers","id=eq."+pendingPId.id,{
       paid_amount:    newPaid,
       status:         newStatus,
       payment_method: chip.textContent
     });
   }).then(function(){
-    /* حفظ بيانات الدفعة للطباعة */
-    var desc = document.getElementById("ps-desc").value || "";
-    lastPartialData = {
+    lastPartialData={
       client:  pendingPId.client,
       amount:  amt,
       method:  chip.textContent,
       cashier: currentCashier,
       desc:    desc,
+      vnum:    pendingPId.vnum,
+      service: pendingPId.service,
       date:    new Date().toLocaleDateString("ar-SA"),
       time:    new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"})
     };
-
     closeSheet("partial-sheet");
-
-    /* إظهار زر طباعة الدفعة */
-    document.getElementById("print-partial-wrap").style.display = "block";
-
+    document.getElementById("print-partial-wrap").style.display="block";
     showToast("✓ تم تسجيل "+fmt(amt)+" ريال — اضغط 🖨 للطباعة");
-    var psDescVal = document.getElementById("ps-desc").value||"";
     sendWA("💰 دفعة جزئية\nالعميل: "+pendingPId.client+
            "\nالمبلغ: "+fmt(amt)+" ريال\nالطريقة: "+chip.textContent+
-           (psDescVal?"\n📋 "+psDescVal:"")+
+           (desc?"\n📋 "+desc:"")+
            "\n💼 استلمه: "+currentCashier+
            "\n"+new Date().toLocaleString("ar-SA"));
     loadPartialVouchers();
   }).catch(function(e){
     showToast("خطأ: "+e.message);
   }).finally(function(){
-    psBtn.innerHTML = "✓ تأكيد استلام الدفعة";
-    psBtn.disabled = false;
+    psBtn.innerHTML="✓ تأكيد استلام الدفعة";
+    psBtn.disabled=false;
   });
 }
 
-/* PRINT PARTIAL RECEIPT */
+/* ══ PRINT PARTIAL ══ */
 function printPartialReceipt(){
-  if(!lastPartialData){ showToast("لا توجد دفعة مسجلة"); return; }
-  var r = lastPartialData;
-  var w = window.open("","_blank");
+  if(!lastPartialData){showToast("لا توجد دفعة مسجلة");return;}
+  var r=lastPartialData;
+  var w=window.open("","_blank");
   w.document.write("<html dir=\"rtl\"><head><meta charset=\"UTF-8\"><title>سند دفعة</title>");
   w.document.write("<style>body{font-family:Arial;color:#18181a;padding:20px;direction:rtl;max-width:380px;margin:0 auto;font-size:12px;}");
   w.document.write(".row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ddd;}");
   w.document.write(".lbl{color:#666;}.val{font-weight:700;}");
   w.document.write(".ttl{background:#18181a;color:#fff;padding:4px 16px;border-radius:20px;font-size:13px;font-weight:700;display:inline-block;margin:8px 0;}");
   w.document.write(".amt{border:2px solid #18181a;border-radius:6px;padding:10px;text-align:center;margin:10px 0;font-size:20px;font-weight:700;}");
+  w.document.write(".desc{padding:8px;background:#fef3dc;border-radius:6px;font-size:11px;color:#7a4e00;margin:8px 0;line-height:1.6;}");
   w.document.write(".sigs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}");
   w.document.write(".sig{text-align:center;font-size:10px;color:#666;}.sig-line{border-top:1px solid #18181a;margin:14px 5px 4px;}");
   w.document.write(".co{display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid #18181a;margin-bottom:10px;}");
   w.document.write("</style></head><body>");
-  w.document.write("<div class=\"co\"><div><div style=\"font-size:9px;font-weight:700;\">عبدالعزيز حسن المطري للاستشارات الهندسية</div><div style=\"font-size:8px;color:#666;\">A. H. AL-MATRI FOR ENGINEERING CONSULT</div></div><div style=\"text-align:center;\"><div style=\"font-size:12px;font-weight:700;color:#1a4880;\">مطري كونسلت</div></div></div>");
+  w.document.write("<div class=\"co\"><div><div style=\"font-size:9px;font-weight:700;\">عبدالعزيز حسن المطري للاستشارات الهندسية</div><div style=\"font-size:8px;color:#666;\">A. H. AL-MATRI FOR ENGINEERING CONSULT</div></div><div><div style=\"font-size:12px;font-weight:700;color:#1a4880;\">مطري كونسلت</div></div></div>");
   w.document.write("<div class=\"ttl\">سند استلام دفعة</div>");
   w.document.write("<div style=\"font-size:9px;color:#888;margin-bottom:10px;\">التاريخ: "+r.date+" · الساعة: "+r.time+"</div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">العميل:</span><span class=\"val\">"+r.client+"</span></div>");
-  if(r.desc) w.document.write("<div style=\"padding:7px 0;border-bottom:1px solid #ddd;font-size:11px;color:#444;\">📋 "+r.desc+"</div>");
+  if(r.desc) w.document.write("<div class=\"desc\">📋 "+r.desc+"</div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">طريقة الدفع:</span><span class=\"val\">"+r.method+"</span></div>");
   w.document.write("<div class=\"row\"><span class=\"lbl\">استلمه:</span><span class=\"val\">"+r.cashier+"</span></div>");
   w.document.write("<div class=\"amt\">"+parseFloat(r.amount).toLocaleString("ar-SA")+" ريال</div>");
   w.document.write("<div style=\"font-size:10px;color:#7a4e00;text-align:center;margin-bottom:12px;\">فقط "+n2ar(r.amount)+" ريال سعودي لا غير</div>");
   w.document.write("<div class=\"sigs\"><div class=\"sig\"><div class=\"sig-line\"></div>توقيع العميل</div><div class=\"sig\"><div class=\"sig-line\"></div>"+r.cashier+"</div></div>");
   w.document.write("</body></html>");
-  w.document.close();
-  w.print();
+  w.document.close(); w.print();
 }
 
-/* TASKS */
+/* ══ TASKS ══ */
 function renderTasks(list){
-  var el = document.getElementById("tasks-list");
+  var el=document.getElementById("tasks-list");
   if(!list.length){
     el.innerHTML="<div class=\"empty\"><div class=\"empty-icon\">✅</div><div class=\"empty-title\">لا توجد مهام مفتوحة</div></div>";
     return;
   }
   var stMap={waiting:"ts-w",inprog:"ts-i",done:"ts-d"};
   var stLbl={waiting:"انتظار",inprog:"جارٍ",done:"مكتملة"};
-  el.innerHTML = list.map(function(t){
-    var em = teamMembers.filter(function(m){return m.id===t.eng_user_id;})[0]||
-             {initials:"—",name:"—",role:"—",color:"#888",bg:"#1a2a3a"};
-    var st = t.status||"waiting";
+  el.innerHTML=list.map(function(t){
+    var em=teamMembers.filter(function(m){return m.id===t.eng_user_id;})[0]||
+           {initials:"—",name:"—",role:"—",color:"#888",bg:"#1a2a3a"};
+    var st=t.status||"waiting";
     return "<div class=\"task-card\">" +
       "<div class=\"tc-top\">" +
       "<div class=\"tc-av\" style=\"background:"+em.bg+";color:"+em.color+"\">"+em.initials+"</div>" +
@@ -1073,7 +1022,7 @@ function renderTasks(list){
   }).join("");
 }
 
-/* TABS */
+/* ══ TABS ══ */
 function switchTab(name,el){
   document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
   document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
@@ -1081,17 +1030,17 @@ function switchTab(name,el){
   if(el) el.classList.add("active");
 }
 
-/* SHEETS */
+/* ══ SHEETS ══ */
 function openSheet(id){ document.getElementById(id).classList.add("open"); }
 function closeSheet(id){ document.getElementById(id).classList.remove("open"); }
 
-/* CHIPS */
+/* ══ CHIPS ══ */
 function selChip(el,g){
   document.querySelectorAll("#"+g+" .chip").forEach(function(c){c.className="chip";});
   el.className="chip on";
 }
 
-/* WA */
+/* ══ WA ══ */
 function sendWA(msg){
   var p=new URLSearchParams();
   p.append("token",WA_TOK); p.append("to",WA_TO); p.append("body",msg);
@@ -1099,7 +1048,7 @@ function sendWA(msg){
     {method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:p});
 }
 
-/* TOAST */
+/* ══ TOAST ══ */
 function showToast(m){
   var t=document.getElementById("toast");
   t.textContent=m; t.className="toast show";
